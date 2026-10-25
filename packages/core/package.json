@@ -1,0 +1,23 @@
+{
+  "name": "@volt/core",
+  "version": "0.1.0",
+  "description": "Core HTTP engine, application lifecycle, context, and Bun.serve integration for Volt",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@volt/router": "workspace:*",
+    "@volt/validator": "workspace:*",
+    "@volt/serializer": "workspace:*",
+    "@volt/middleware": "workspace:*"
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

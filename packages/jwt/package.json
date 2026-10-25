@@ -1,0 +1,20 @@
+{
+  "name": "@volt/jwt",
+  "version": "0.1.0",
+  "description": "High-performance JWT authentication plugin for Volt built on native Web Crypto",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@volt/middleware": "workspace:*"
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

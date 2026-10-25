@@ -1,0 +1,32 @@
+{
+  "name": "volt-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "High-performance TypeScript-first API framework built for Bun",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "packages/plugins/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "dev": "bun --watch examples/basic-api/index.ts",
+    "dev:hello": "bun --watch examples/hello-world/index.ts",
+    "dev:rest": "bun --watch examples/rest-api/src/index.ts",
+    "dev:auth": "bun --watch examples/authentication/index.ts",
+    "start": "bun run examples/basic-api/index.ts",
+    "test": "bun test packages/*/test packages/plugins/*/test examples/*/test",
+    "test:examples": "bun test examples/*/test",
+    "bench": "bun run benchmarks/benchmark.ts",
+    "bench:compare": "bun run benchmarks/runner.ts",
+    "typecheck": "tsc --noEmit",
+    "git:status": "bash .agents/skills/git-commit-push/scripts/status.sh",
+    "git:push": "bash .agents/skills/git-commit-push/scripts/push.sh",
+    "clean": "find . -name node_modules -type d -prune -exec rm -rf {} +"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.5",
+    "typescript": "^5.8.2"
+  }
+}

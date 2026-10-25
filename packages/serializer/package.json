@@ -1,0 +1,17 @@
+{
+  "name": "@volt/serializer",
+  "version": "0.1.0",
+  "description": "Ultra-fast response serialization and content-type handling for Volt",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

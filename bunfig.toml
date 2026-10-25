@@ -1,0 +1,10 @@
+# Bun configuration for Volt framework workspace
+
+[install]
+# Lockfile configuration
+lockfile = true
+
+[test]
+# Test runner configuration
+root = "."
+coverage = false

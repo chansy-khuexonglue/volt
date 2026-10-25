@@ -1,0 +1,21 @@
+{
+  "name": "@volt/plugin-jwt",
+  "version": "0.1.0",
+  "description": "Official JWT authentication plugin for Volt API framework",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@volt/core": "workspace:*",
+    "@volt/jwt": "workspace:*"
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "basic-api-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch index.ts",
+    "start": "bun run index.ts"
+  },
+  "dependencies": {
+    "volt": "workspace:*"
+  }
+}

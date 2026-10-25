@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@volt/core": ["./packages/core/src/index.ts"],
+      "@volt/router": ["./packages/router/src/index.ts"],
+      "@volt/validator": ["./packages/validator/src/index.ts"],
+      "@volt/serializer": ["./packages/serializer/src/index.ts"],
+      "@volt/middleware": ["./packages/middleware/src/index.ts"],
+      "@volt/di": ["./packages/di/src/index.ts"],
+      "@volt/websocket": ["./packages/websocket/src/index.ts"],
+      "@volt/openapi": ["./packages/openapi/src/index.ts"],
+      "@volt/testing": ["./packages/testing/src/index.ts"],
+      "@volt/cli": ["./packages/cli/src/index.ts"],
+      "@volt/jwt": ["./packages/jwt/src/index.ts"],
+      "@volt/cache": ["./packages/cache/src/index.ts"],
+      "@volt/jobs": ["./packages/jobs/src/index.ts"],
+      "@volt/node": ["./packages/node/src/index.ts"],
+      "@volt/plugin-cors": ["./packages/plugins/cors/src/index.ts"],
+      "@volt/plugin-jwt": ["./packages/plugins/jwt/src/index.ts"],
+      "@volt/plugin-redis": ["./packages/plugins/redis/src/index.ts"],
+      "@volt/plugin-postgres": ["./packages/plugins/postgres/src/index.ts"],
+      "@volt/plugin-logger": ["./packages/plugins/logger/src/index.ts"],
+      "volt": ["./packages/volt/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*",
+    "packages/*/test/**/*",
+    "packages/plugins/*/src/**/*",
+    "packages/plugins/*/test/**/*",
+    "benchmarks/**/*",
+    "examples/**/*"
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "volt-workspace",
+      "devDependencies": {
+        "@types/bun": "^1.4.4",
+        "@types/node": "^26.6.5",
+        "typescript": "^5.8.2",
+      },
+    },
+    "examples/authentication": {
+      "name": "example-authentication",
+      "version": "0.1.0",
+      "dependencies": {
+        "volt": "workspace:*",
+      },
+    },
+    "examples/basic-api": {
+      "name": "basic-api-example",
+      "version": "0.1.0",
+      "dependencies": {
+        "volt": "workspace:*",
+      },
+    },
+    "examples/hello-world": {
+      "name": "example-hello-world",
+      "version": "0.1.0",
+      "dependencies": {
+        "volt": "workspace:*",
+      },
+    },
+    "examples/rest-api": {
+      "name": "example-rest-api",
+      "version": "0.1.0",
+      "dependencies": {
+        "volt": "workspace:*",
+      },
+    },
+    "packages/cache": {
+      "name": "@volt/cache",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/middleware": "workspace:*",
+      },
+    },
+    "packages/cli": {
+      "name": "@volt/cli",
+      "version": "0.1.0",
+      "bin": {
+        "volt": "./bin/volt.ts",
+      },
+    },
+    "packages/core": {
+      "name": "@volt/core",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/middleware": "workspace:*",
+        "@volt/router": "workspace:*",
+        "@volt/serializer": "workspace:*",
+        "@volt/validator": "workspace:*",
+      },
+    },
+    "packages/di": {
+      "name": "@volt/di",
+      "version": "0.1.0",
+    },
+    "packages/jobs": {
+      "name": "@volt/jobs",
+      "version": "0.1.0",
+    },
+    "packages/jwt": {
+      "name": "@volt/jwt",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/middleware": "workspace:*",
+      },
+    },
+    "packages/middleware": {
+      "name": "@volt/middleware",
+      "version": "0.1.0",
+    },
+    "packages/node": {
+      "name": "@volt/node",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+      },
+    },
+    "packages/openapi": {
+      "name": "@volt/openapi",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+        "@volt/validator": "workspace:*",
+      },
+    },
+    "packages/plugins/cors": {
+      "name": "@volt/plugin-cors",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+        "@volt/middleware": "workspace:*",
+      },
+    },
+    "packages/plugins/jwt": {
+      "name": "@volt/plugin-jwt",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+        "@volt/jwt": "workspace:*",
+      },
+    },
+    "packages/plugins/logger": {
+      "name": "@volt/plugin-logger",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+        "@volt/middleware": "workspace:*",
+      },
+    },
+    "packages/plugins/postgres": {
+      "name": "@volt/plugin-postgres",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+      },
+    },
+    "packages/plugins/redis": {
+      "name": "@volt/plugin-redis",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+      },
+    },
+    "packages/router": {
+      "name": "@volt/router",
+      "version": "0.1.0",
+    },
+    "packages/serializer": {
+      "name": "@volt/serializer",
+      "version": "0.1.0",
+    },
+    "packages/testing": {
+      "name": "@volt/testing",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/core": "workspace:*",
+      },
+    },
+    "packages/validator": {
+      "name": "@volt/validator",
+      "version": "0.1.0",
+    },
+    "packages/volt": {
+      "name": "volt",
+      "version": "0.1.0",
+      "dependencies": {
+        "@volt/cache": "workspace:*",
+        "@volt/cli": "workspace:*",
+        "@volt/core": "workspace:*",
+        "@volt/di": "workspace:*",
+        "@volt/jobs": "workspace:*",
+        "@volt/jwt": "workspace:*",
+        "@volt/middleware": "workspace:*",
+        "@volt/node": "workspace:*",
+        "@volt/openapi": "workspace:*",
+        "@volt/plugin-cors": "workspace:*",
+        "@volt/plugin-jwt": "workspace:*",
+        "@volt/plugin-logger": "workspace:*",
+        "@volt/plugin-postgres": "workspace:*",
+        "@volt/plugin-redis": "workspace:*",
+        "@volt/router": "workspace:*",
+        "@volt/serializer": "workspace:*",
+        "@volt/testing": "workspace:*",
+        "@volt/validator": "workspace:*",
+        "@volt/websocket": "workspace:*",
+      },
+    },
+    "packages/websocket": {
+      "name": "@volt/websocket",
+      "version": "0.1.0",
+    },
+  },
+  "packages": {
+    "@types/bun": ["@types/bun@1.4.4", "", { "dependencies": { "bun-types": "1.4.4" } }, "sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ=="],
+
+    "@types/node": ["@types/node@26.6.5", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg=="],
+
+    "@volt/cache": ["@volt/cache@workspace:packages/cache"],
+
+    "@volt/cli": ["@volt/cli@workspace:packages/cli"],
+
+    "@volt/core": ["@volt/core@workspace:packages/core"],
+
+    "@volt/di": ["@volt/di@workspace:packages/di"],
+
+    "@volt/jobs": ["@volt/jobs@workspace:packages/jobs"],
+
+    "@volt/jwt": ["@volt/jwt@workspace:packages/jwt"],
+
+    "@volt/middleware": ["@volt/middleware@workspace:packages/middleware"],
+
+    "@volt/node": ["@volt/node@workspace:packages/node"],
+
+    "@volt/openapi": ["@volt/openapi@workspace:packages/openapi"],
+
+    "@volt/plugin-cors": ["@volt/plugin-cors@workspace:packages/plugins/cors"],
+
+    "@volt/plugin-jwt": ["@volt/plugin-jwt@workspace:packages/plugins/jwt"],
+
+    "@volt/plugin-logger": ["@volt/plugin-logger@workspace:packages/plugins/logger"],
+
+    "@volt/plugin-postgres": ["@volt/plugin-postgres@workspace:packages/plugins/postgres"],
+
+    "@volt/plugin-redis": ["@volt/plugin-redis@workspace:packages/plugins/redis"],
+
+    "@volt/router": ["@volt/router@workspace:packages/router"],
+
+    "@volt/serializer": ["@volt/serializer@workspace:packages/serializer"],
+
+    "@volt/testing": ["@volt/testing@workspace:packages/testing"],
+
+    "@volt/validator": ["@volt/validator@workspace:packages/validator"],
+
+    "@volt/websocket": ["@volt/websocket@workspace:packages/websocket"],
+
+    "basic-api-example": ["basic-api-example@workspace:examples/basic-api"],
+
+    "bun-types": ["bun-types@1.4.4", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
+
+    "example-authentication": ["example-authentication@workspace:examples/authentication"],
+
+    "example-hello-world": ["example-hello-world@workspace:examples/hello-world"],
+
+    "example-rest-api": ["example-rest-api@workspace:examples/rest-api"],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
+
+    "volt": ["volt@workspace:packages/volt"],
+  }
+}

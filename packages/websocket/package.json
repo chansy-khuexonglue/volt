@@ -1,0 +1,17 @@
+{
+  "name": "@volt/websocket",
+  "version": "0.1.0",
+  "description": "High-throughput native WebSocket handling and pub/sub for Volt",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "volt",
+  "version": "0.1.0",
+  "description": "High-performance, TypeScript-first API framework built for Bun",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@volt/core": "workspace:*",
+    "@volt/router": "workspace:*",
+    "@volt/validator": "workspace:*",
+    "@volt/serializer": "workspace:*",
+    "@volt/middleware": "workspace:*",
+    "@volt/di": "workspace:*",
+    "@volt/websocket": "workspace:*",
+    "@volt/openapi": "workspace:*",
+    "@volt/testing": "workspace:*",
+    "@volt/cli": "workspace:*",
+    "@volt/jwt": "workspace:*",
+    "@volt/cache": "workspace:*",
+    "@volt/jobs": "workspace:*",
+    "@volt/node": "workspace:*",
+    "@volt/plugin-cors": "workspace:*",
+    "@volt/plugin-jwt": "workspace:*",
+    "@volt/plugin-redis": "workspace:*",
+    "@volt/plugin-postgres": "workspace:*",
+    "@volt/plugin-logger": "workspace:*"
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}
