@@ -35,4 +35,32 @@ describe('volt (unified package)', () => {
     expect(data.item.title).toBe('Coffee');
     expect(data.id).toBe(1);
   });
+
+  it('exports official backend plugins from top-level volt', async () => {
+    const { graphqlPlugin, prismaPlugin, cookiesPlugin, rateLimitPlugin } = await import('../src/index');
+
+    expect(typeof graphqlPlugin).toBe('function');
+    expect(typeof prismaPlugin).toBe('function');
+    expect(typeof cookiesPlugin).toBe('function');
+    expect(typeof rateLimitPlugin).toBe('function');
+
+    const app = new Volt();
+    app.plugin(cookiesPlugin({ secret: 'test-secret' }));
+    app.plugin(rateLimitPlugin({ max: 50 }));
+    app.plugin(prismaPlugin());
+    app.plugin(
+      graphqlPlugin({
+        typeDefs: 'type Query { ping: String }',
+        resolvers: { Query: { ping: () => 'pong' } },
+      })
+    );
+
+    const client = createTestClient(app);
+    const res = await client.post('/graphql', {
+      body: { query: '{ ping }' },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data).toEqual({ ping: 'pong' });
+  });
 });

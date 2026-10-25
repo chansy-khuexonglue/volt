@@ -21,6 +21,10 @@
       "@volt/plugin-redis": ["./packages/plugins/redis/src/index.ts"],
       "@volt/plugin-postgres": ["./packages/plugins/postgres/src/index.ts"],
       "@volt/plugin-logger": ["./packages/plugins/logger/src/index.ts"],
+      "@volt/plugin-graphql": ["./packages/plugins/graphql/src/index.ts"],
+      "@volt/plugin-prisma": ["./packages/plugins/prisma/src/index.ts"],
+      "@volt/plugin-cookies": ["./packages/plugins/cookies/src/index.ts"],
+      "@volt/plugin-rate-limit": ["./packages/plugins/rate-limit/src/index.ts"],
       "volt": ["./packages/volt/src/index.ts"]
     }
   },

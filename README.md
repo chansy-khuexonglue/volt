@@ -45,6 +45,10 @@ Volt is structured as a modular TypeScript monorepo with 14 core packages and 5 
 * **[`volt`](packages/volt)**: Unified top-level package exporting all framework capabilities.
 
 ### Official Plugins ([`packages/plugins/`](packages/plugins))
+* **[`@volt/plugin-graphql`](packages/plugins/graphql)**: First-class GraphQL support with schema generation, resolvers, context injection, batch queries, and interactive GraphiQL playground.
+* **[`@volt/plugin-prisma`](packages/plugins/prisma)**: Prisma ORM lifecycle management, context store injection, and automatic database error translation (P2002 -> 409, P2025 -> 404).
+* **[`@volt/plugin-cookies`](packages/plugins/cookies)**: Cookie parsing, cryptographic HMAC-SHA256 signing, tampering prevention, and `Set-Cookie` generation.
+* **[`@volt/plugin-rate-limit`](packages/plugins/rate-limit)**: Distributed sliding-window rate limiting with RFC draft + legacy headers and custom key generators.
 * **[`@volt/plugin-cors`](packages/plugins/cors)**: Origin allowlist, credentials, custom headers, and preflight OPTIONS handling.
 * **[`@volt/plugin-jwt`](packages/plugins/jwt)**: Web Crypto JWT signing, verification, and global or route-level authentication guards.
 * **[`@volt/plugin-redis`](packages/plugins/redis)**: Redis integration providing KV operations, pub/sub, and connection lifecycle management.

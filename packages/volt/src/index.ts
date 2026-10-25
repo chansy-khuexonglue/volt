@@ -17,3 +17,7 @@ export * from '@volt/plugin-jwt';
 export * from '@volt/plugin-redis';
 export * from '@volt/plugin-postgres';
 export * from '@volt/plugin-logger';
+export * from '@volt/plugin-graphql';
+export * from '@volt/plugin-prisma';
+export * from '@volt/plugin-cookies';
+export * from '@volt/plugin-rate-limit';

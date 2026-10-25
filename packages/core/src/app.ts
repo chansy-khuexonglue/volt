@@ -47,6 +47,7 @@ export class Volt {
 
   decorate(key: string, value: any): this {
     this.globalStore[key] = value;
+    (this as any)[key] = value;
     return this;
   }
 

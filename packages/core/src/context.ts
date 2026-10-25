@@ -168,7 +168,7 @@ export class VoltContext<
 
   setCookie(name: string, value: string, options: CookieOptions = {}): this {
     let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
-    if (options.maxAge) cookie += `; Max-Age=${options.maxAge}`;
+    if (options.maxAge !== undefined) cookie += `; Max-Age=${options.maxAge}`;
     if (options.domain) cookie += `; Domain=${options.domain}`;
     if (options.path) cookie += `; Path=${options.path}`;
     else cookie += '; Path=/';

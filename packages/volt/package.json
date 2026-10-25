@@ -30,7 +30,11 @@
     "@volt/plugin-jwt": "workspace:*",
     "@volt/plugin-redis": "workspace:*",
     "@volt/plugin-postgres": "workspace:*",
-    "@volt/plugin-logger": "workspace:*"
+    "@volt/plugin-logger": "workspace:*",
+    "@volt/plugin-graphql": "workspace:*",
+    "@volt/plugin-prisma": "workspace:*",
+    "@volt/plugin-cookies": "workspace:*",
+    "@volt/plugin-rate-limit": "workspace:*"
   },
   "scripts": {
     "test": "bun test"
