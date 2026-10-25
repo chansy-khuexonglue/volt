@@ -51,9 +51,16 @@ cd "$WORKSPACE_ROOT"
 # 2. Ensure remote 'origin' is configured
 CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
 if [ -z "$CURRENT_REMOTE" ]; then
-  echo -e "${YELLOW}⚠️  Remote 'origin' not found. Adding $REPO_URL...${NC}"
-  git remote add origin "$REPO_URL"
-  echo -e "${GREEN}✓ Remote 'origin' added.${NC}"
+  # Auto-detect if SSH key works for GitHub
+  if ssh -T -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=3 git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    TARGET_REMOTE="git@github.com:chansy-khuexonglue/volt.git"
+  else
+    TARGET_REMOTE="https://github.com/chansy-khuexonglue/volt.git"
+  fi
+  echo -e "${YELLOW}⚠️  Remote 'origin' not found. Adding $TARGET_REMOTE...${NC}"
+  git remote add origin "$TARGET_REMOTE"
+  CURRENT_REMOTE="$TARGET_REMOTE"
+  echo -e "${GREEN}✓ Remote 'origin' added:${NC} $CURRENT_REMOTE"
 else
   echo -e "${GREEN}✓ Remote origin:${NC} $CURRENT_REMOTE"
 fi
