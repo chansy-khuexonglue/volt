@@ -6,6 +6,10 @@ const HTML_CONTENT_TYPE = 'text/html; charset=utf-8';
 const OCTET_CONTENT_TYPE = 'application/octet-stream';
 
 export function json(data: unknown, init?: number | ResponseInitOptions): Response {
+  if ((init === undefined || init === 200) && typeof Response.json === 'function') {
+    return Response.json(data);
+  }
+
   const options = typeof init === 'number' ? { status: init } : init || {};
   const status = options.status ?? 200;
 
@@ -84,25 +88,35 @@ export function serializeResponse(value: unknown, defaultStatus = 200): Response
     return value;
   }
 
-  if (value === null || value === undefined) {
-    return new Response(null, { status: 204 });
+  if (typeof value === 'object') {
+    if (value === null) {
+      return new Response(null, { status: 204 });
+    }
+
+    // Fast-path: 99% of API responses are plain objects/arrays with 200 status
+    if (defaultStatus === 200 && typeof Response.json === 'function' && !(value instanceof Blob || value instanceof ReadableStream || value instanceof ArrayBuffer || value instanceof Uint8Array)) {
+      return Response.json(value);
+    }
+
+    if (value instanceof Blob || value instanceof ArrayBuffer || value instanceof Uint8Array) {
+      return binary(value as BodyInit, OCTET_CONTENT_TYPE, defaultStatus);
+    }
+
+    if (value instanceof ReadableStream) {
+      return stream(value, OCTET_CONTENT_TYPE, defaultStatus);
+    }
+
+    return json(value, defaultStatus);
   }
 
   if (typeof value === 'string') {
     return text(value, defaultStatus);
   }
 
-  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
-    return text(String(value), defaultStatus);
+  if (value === undefined) {
+    return new Response(null, { status: 204 });
   }
 
-  if (value instanceof Blob || value instanceof ArrayBuffer || value instanceof Uint8Array) {
-    return binary(value as BodyInit, OCTET_CONTENT_TYPE, defaultStatus);
-  }
-
-  if (value instanceof ReadableStream) {
-    return stream(value, OCTET_CONTENT_TYPE, defaultStatus);
-  }
-
-  return json(value, defaultStatus);
+  return text(String(value), defaultStatus);
 }
+

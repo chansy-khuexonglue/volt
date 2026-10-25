@@ -18,5 +18,5 @@ export interface TestClient {
   patch<T = any>(path: string, options?: TestRequestOptions): Promise<TestResponse<T>>;
   head(path: string, options?: TestRequestOptions): Promise<TestResponse<void>>;
   options(path: string, options?: TestRequestOptions): Promise<TestResponse<void>>;
-  fetch(req: Request): Promise<Response>;
+  fetch(req: Request): Promise<Response> | Response;
 }

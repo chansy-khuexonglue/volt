@@ -30,10 +30,14 @@ async function benchmarkEndpoint(
   const latencies: number[] = new Array(iterations);
   let currentIndex = 0;
 
-  // Warmup 500 requests
-  for (let i = 0; i < 500; i++) {
-    await fetch(url, options);
-  }
+  // Warmup connection pool and JIT with concurrent requests
+  await Promise.all(
+    Array.from({ length: 10 }, async () => {
+      for (let i = 0; i < 100; i++) {
+        await fetch(url, options);
+      }
+    })
+  );
 
   const start = performance.now();
 

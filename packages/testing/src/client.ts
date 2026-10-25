@@ -1,6 +1,6 @@
 import { TestClient, TestRequestOptions, TestResponse } from './types';
 
-export function createTestClient(app: { handle: (req: Request) => Promise<Response> }): TestClient {
+export function createTestClient(app: { handle: (req: Request) => Promise<Response> | Response }): TestClient {
   async function makeRequest<T = any>(
     method: string,
     path: string,

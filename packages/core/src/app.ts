@@ -2,7 +2,7 @@ import { compose, MiddlewareHandler } from '@volt/middleware';
 import { Router } from '@volt/router';
 import { serializeResponse } from '@volt/serializer';
 import { compile, ValidationError } from '@volt/validator';
-import { VoltContext } from './context';
+import { VoltContext, extractPathname } from './context';
 import { BadRequestError, handleServerException, HttpError, NotFoundError } from './error';
 import { RouteGroup } from './group';
 import {
@@ -29,6 +29,7 @@ export class Volt {
   private router = new Router<{
     pipeline: (ctx: VoltContext) => Promise<Response> | Response;
     definition: RouteDefinition;
+    isZeroArg?: boolean;
   }>();
 
   private globalMiddlewares: MiddlewareHandler[] = [];
@@ -228,8 +229,9 @@ export class Volt {
     const queryValidator = def.schema?.query ? compile(def.schema.query, { coerce: true }) : null;
     const paramsValidator = def.schema?.params ? compile(def.schema.params, { coerce: true }) : null;
     const headersValidator = def.schema?.headers ? compile(def.schema.headers) : null;
+    const hasBody = ['POST', 'PUT', 'PATCH'].includes(def.method);
 
-    const baseHandler = async (ctx: VoltContext): Promise<Response> => {
+    const baseHandler = (ctx: VoltContext): Response | Promise<Response> => {
       // 1. Validate route params if schema provided
       if (paramsValidator) {
         const res = paramsValidator(ctx.params);
@@ -253,17 +255,39 @@ export class Volt {
       }
 
       // 3. Validate body if schema provided or method has body
-      if (['POST', 'PUT', 'PATCH'].includes(def.method)) {
-        await ctx.parseBody(this.serverOptions.maxRequestBodySize);
-        if (bodyValidator) {
-          const res = bodyValidator(ctx.body);
-          if (!res.success) {
-            throw new BadRequestError('Invalid request body', res.errors);
+      if (hasBody) {
+        return (async () => {
+          await ctx.parseBody(this.serverOptions.maxRequestBodySize);
+          if (bodyValidator) {
+            const res = bodyValidator(ctx.body);
+            if (!res.success) {
+              throw new BadRequestError('Invalid request body', res.errors);
+            }
           }
-        }
+          if (headersValidator) {
+            const headerObj: Record<string, string> = {};
+            ctx.req.headers.forEach((v, k) => {
+              headerObj[k] = v;
+            });
+            const res = headersValidator(headerObj);
+            if (!res.success) {
+              throw new BadRequestError('Invalid request headers', res.errors);
+            }
+          }
+
+          const result = await def.handler(ctx);
+          const response = result instanceof Response ? result : serializeResponse(result);
+          const ctxHeaders = ctx.getResponseHeaders();
+          if (ctxHeaders) {
+            ctxHeaders.forEach((val, key) => {
+              response.headers.append(key, val);
+            });
+          }
+          return response;
+        })();
       }
 
-      // 4. Validate headers if schema provided
+      // 4. Validate headers if schema provided (GET/DELETE/HEAD/OPTIONS)
       if (headersValidator) {
         const headerObj: Record<string, string> = {};
         ctx.req.headers.forEach((v, k) => {
@@ -275,37 +299,69 @@ export class Volt {
         }
       }
 
-      // Execute route handler
-      const result = await def.handler(ctx);
-      const response = serializeResponse(result);
+      // Execute route handler synchronously whenever possible
+      const result = def.handler(ctx);
+      if (result instanceof Promise) {
+        return result.then((res) => {
+          const response = res instanceof Response ? res : serializeResponse(res);
+          const ctxHeaders = ctx.getResponseHeaders();
+          if (ctxHeaders) {
+            ctxHeaders.forEach((val, key) => {
+              response.headers.append(key, val);
+            });
+          }
+          return response;
+        });
+      }
+
+      const response = result instanceof Response ? result : serializeResponse(result);
       const ctxHeaders = ctx.getResponseHeaders();
-      ctxHeaders.forEach((val, key) => {
-        response.headers.append(key, val);
-      });
+      if (ctxHeaders) {
+        ctxHeaders.forEach((val, key) => {
+          response.headers.append(key, val);
+        });
+      }
       return response;
     };
 
-    const pipeline = compose(def.middlewares);
+    const isZeroArg =
+      def.middlewares.length === 0 &&
+      !paramsValidator &&
+      !queryValidator &&
+      !headersValidator &&
+      !hasBody &&
+      def.handler.length === 0;
+
+    const pipeline = isZeroArg
+      ? () => {
+          const res = (def.handler as any)();
+          return res instanceof Response ? res : serializeResponse(res);
+        }
+      : def.middlewares.length === 0
+      ? baseHandler
+      : (() => {
+          const composed = compose(def.middlewares);
+          return (ctx: VoltContext) => composed(ctx, () => baseHandler(ctx));
+        })();
 
     this.router.add(def.method, def.path, {
-      pipeline: (ctx: VoltContext) => pipeline(ctx, () => baseHandler(ctx)),
+      pipeline,
       definition: def,
+      isZeroArg,
     });
   }
 
   /**
-   * Primary entry point for incoming HTTP requests.
-   * Can be invoked directly in-memory for testing without binding ports.
+   * Internal request dispatcher bypassing redundant path extraction.
    */
-  async handle(req: Request): Promise<Response> {
+  private dispatch(req: Request, pathname: string): Response | Promise<Response> {
     try {
-      const url = new URL(req.url);
-      const match = this.router.match(req.method, url.pathname);
+      const match = this.router.match(req.method, pathname);
 
       if (!match) {
         // Check for OPTIONS discovery
         if (req.method === 'OPTIONS') {
-          const allowed = this.router.getAllowedMethods(url.pathname);
+          const allowed = this.router.getAllowedMethods(pathname);
           if (allowed.length > 0) {
             return new Response(null, {
               status: 204,
@@ -313,11 +369,26 @@ export class Volt {
             });
           }
         }
-        throw new NotFoundError(`Cannot ${req.method} ${url.pathname}`);
+        throw new NotFoundError(`Cannot ${req.method} ${pathname}`);
       }
 
-      const ctx = new VoltContext(req, match.params, { ...this.globalStore });
-      const response = await match.handler.pipeline(ctx);
+      const ctx = new VoltContext(req, match.params, this.globalStore);
+      const response = match.handler.pipeline(ctx);
+
+      if (response instanceof Promise) {
+        return response
+          .then((res) => {
+            if (req.method === 'HEAD') {
+              return new Response(null, {
+                status: res.status,
+                statusText: res.statusText,
+                headers: res.headers,
+              });
+            }
+            return res;
+          })
+          .catch((err) => this.handleException(err, req));
+      }
 
       // Strip body for HEAD requests
       if (req.method === 'HEAD') {
@@ -330,19 +401,77 @@ export class Volt {
 
       return response;
     } catch (err: any) {
-      if (this.hooks.onError) {
-        try {
-          return await this.hooks.onError(err, req);
-        } catch (hookErr: any) {
-          return handleServerException(hookErr, this.serverOptions.development);
-        }
-      }
-      return handleServerException(err, this.serverOptions.development);
+      return this.handleException(err, req);
     }
+  }
+
+  /**
+   * Primary entry point for incoming HTTP requests.
+   * Can be invoked directly in-memory for testing without binding ports.
+   */
+  handle(req: Request): Response | Promise<Response> {
+    return this.dispatch(req, extractPathname(req.url));
+  }
+
+  private handleException(err: any, req: Request): Response | Promise<Response> {
+    if (this.hooks.onError) {
+      try {
+        return this.hooks.onError(err, req);
+      } catch (hookErr: any) {
+        return handleServerException(hookErr, this.serverOptions.development);
+      }
+    }
+    return handleServerException(err, this.serverOptions.development);
   }
 
   getRegisteredRoutes(): RouteDefinition[] {
     return [...this.routes];
+  }
+
+  /**
+   * Compiles an ultra-fast, zero-overhead fetch dispatcher for Bun.serve.
+   */
+  compileFetch(): (req: Request) => Response | Promise<Response> {
+    const staticGets = this.router.getStaticGetMap();
+    const staticPosts = this.router.getStaticPostMap();
+    const fastGetParams = this.router.getFastGetParamRoutes();
+    const fastGetCount = fastGetParams.length;
+    const globalStore = this.globalStore;
+
+    return (req: Request): Response | Promise<Response> => {
+      const pathname = extractPathname(req.url);
+
+      if (req.method === 'GET') {
+        const match = staticGets.get(pathname);
+        if (match) {
+          if ((match.handler as any).isZeroArg) {
+            return (match.handler as any).pipeline(undefined);
+          }
+          const ctx = new VoltContext(req, (match.params as any) || {}, globalStore);
+          return match.handler.pipeline(ctx);
+        }
+
+        for (let i = 0; i < fastGetCount; i++) {
+          const r = fastGetParams[i]!;
+          if (pathname.length > r.prefixLen && pathname.startsWith(r.prefix) && pathname.indexOf('/', r.prefixLen) === -1) {
+            const ctx = new VoltContext(req, r.createParams(pathname.slice(r.prefixLen)), globalStore);
+            return (r.handler as any).pipeline(ctx);
+          }
+        }
+      } else if (req.method === 'POST') {
+        const match = staticPosts.get(pathname);
+        if (match) {
+          const ctx = new VoltContext(req, (match.params as any) || {}, globalStore);
+          return match.handler.pipeline(ctx);
+        }
+      }
+
+      return this.dispatch(req, pathname);
+    };
+  }
+
+  get fetch(): (req: Request) => Response | Promise<Response> {
+    return this.compileFetch();
   }
 
   /**
@@ -356,10 +485,12 @@ export class Volt {
       this.hooks.onStart();
     }
 
+    const fetchHandler = this.compileFetch();
+
     const bunServeOptions: any = {
       port: listenPort,
       hostname,
-      fetch: (req: Request) => this.handle(req),
+      fetch: fetchHandler,
     };
 
     if (this.serverOptions.tls) {

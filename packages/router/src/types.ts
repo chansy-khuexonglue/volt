@@ -13,6 +13,17 @@ export interface RouteMatch<T = unknown> {
   params: Record<string, string>;
   pattern: string;
   method: HttpMethod | string;
+  isZeroArg?: boolean;
+}
+
+export interface FastParamRoute<T = unknown> {
+  prefix: string;
+  prefixLen: number;
+  paramName: string;
+  createParams: (val: string) => Record<string, string>;
+  handler: T;
+  pattern: string;
+  method: string;
 }
 
 export interface RouteRecord<T = unknown> {

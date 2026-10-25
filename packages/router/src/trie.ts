@@ -1,4 +1,4 @@
-import { HttpMethod, RouteConflictError, RouteMatch } from './types';
+import { HttpMethod, RouteConflictError, RouteMatch, FastParamRoute } from './types';
 
 export class TrieNode<T> {
   segment: string;
@@ -16,9 +16,30 @@ export class TrieNode<T> {
   }
 }
 
+const EMPTY_PARAMS: Record<string, string> = Object.freeze({});
+
+function splitSegments(path: string): string[] {
+  const segments: string[] = [];
+  let start = 0;
+  const len = path.length;
+  while (start < len && path.charCodeAt(start) === 47) start++;
+  while (start < len) {
+    let end = path.indexOf('/', start);
+    if (end === -1) end = len;
+    if (end > start) {
+      segments.push(path.slice(start, end));
+    }
+    start = end + 1;
+  }
+  return segments;
+}
+
 export class TrieRouter<T = unknown> {
   private root = new TrieNode<T>();
   private staticRoutes = new Map<string, { handler: T; pattern: string; method: string }>();
+  private staticGetRoutes = new Map<string, RouteMatch<T>>();
+  private staticPostRoutes = new Map<string, RouteMatch<T>>();
+  private fastGetParamRoutes: FastParamRoute<T>[] = [];
   private allRoutes: Array<{ method: string; path: string; handler: T; pattern: string }> = [];
 
   constructor(private options: { strictTrailingSlash?: boolean; caseSensitive?: boolean } = {}) {}
@@ -52,6 +73,43 @@ export class TrieRouter<T = unknown> {
         throw new RouteConflictError(existing.pattern, normalized, m);
       }
       this.staticRoutes.set(staticKey, { handler, pattern, method: m });
+
+      const prebuiltMatch: RouteMatch<T> = {
+        handler,
+        params: EMPTY_PARAMS,
+        pattern,
+        method: m,
+      };
+
+      if (m === 'GET') {
+        this.staticGetRoutes.set(normalized, prebuiltMatch);
+      } else if (m === 'POST') {
+        this.staticPostRoutes.set(normalized, prebuiltMatch);
+      }
+    } else {
+      // Fast single suffix-param detection (e.g. /users/:id or /api/items/:slug)
+      const colonIdx = normalized.indexOf(':');
+      if (
+        colonIdx > 0 &&
+        !normalized.includes('*') &&
+        normalized.indexOf(':', colonIdx + 1) === -1 &&
+        normalized.indexOf('/', colonIdx) === -1
+      ) {
+        const prefix = normalized.slice(0, colonIdx);
+        const paramName = normalized.slice(colonIdx + 1);
+        const createParams = (val: string): Record<string, string> => ({ [paramName]: val });
+        if (m === 'GET' || m === 'ALL') {
+          this.fastGetParamRoutes.push({
+            prefix,
+            prefixLen: prefix.length,
+            paramName,
+            createParams,
+            handler,
+            pattern,
+            method: m,
+          });
+        }
+      }
     }
 
     // Always insert into Trie for uniform tree lookup and dynamic matching
@@ -109,15 +167,23 @@ export class TrieRouter<T = unknown> {
 
   match(method: HttpMethod | string, path: string): RouteMatch<T> | null {
     const normalized = this.normalizePath(path);
-    const m = method.toUpperCase();
 
-    // 1. Fast Path: direct O(1) static route table lookup
+    // 1. Ultra-fast direct static route lookup without string concatenation
+    if (method === 'GET') {
+      const match = this.staticGetRoutes.get(normalized);
+      if (match) return match;
+    } else if (method === 'POST') {
+      const match = this.staticPostRoutes.get(normalized);
+      if (match) return match;
+    }
+
+    const m = method.toUpperCase();
     const staticKey = `${m}:${normalized}`;
     const staticMatch = this.staticRoutes.get(staticKey);
     if (staticMatch) {
       return {
         handler: staticMatch.handler,
-        params: {},
+        params: EMPTY_PARAMS,
         pattern: staticMatch.pattern,
         method: m,
       };
@@ -129,75 +195,41 @@ export class TrieRouter<T = unknown> {
       if (getStatic) {
         return {
           handler: getStatic.handler,
-          params: {},
+          params: EMPTY_PARAMS,
           pattern: getStatic.pattern,
           method: 'GET',
         };
       }
     }
 
-    // 2. Dynamic Trie Search
-    const segments = normalized.split('/').filter(Boolean);
+    // 2. Ultra-fast single-parameter GET route match (avoids trie search and segment splitting)
+    if (m === 'GET') {
+      const fastRoutes = this.fastGetParamRoutes;
+      const count = fastRoutes.length;
+      for (let i = 0; i < count; i++) {
+        const r = fastRoutes[i]!;
+        if (normalized.length > r.prefixLen && normalized.startsWith(r.prefix) && normalized.indexOf('/', r.prefixLen) === -1) {
+          return {
+            handler: r.handler,
+            params: { [r.paramName]: normalized.slice(r.prefixLen) },
+            pattern: r.pattern,
+            method: 'GET',
+          };
+        }
+      }
+    }
+
+    // 3. Dynamic Trie Search using fast segment extraction and non-closure traversal
+    const segments = splitSegments(normalized);
     const params: Record<string, string> = {};
 
-    const matchNode = (
-      node: TrieNode<T>,
-      index: number
-    ): { node: TrieNode<T>; pattern: string } | null => {
-      if (index === segments.length) {
-        if (node.handlers.has(m) || node.handlers.has('ALL')) {
-          const h = node.handlers.get(m) ?? node.handlers.get('ALL');
-          return { node, pattern: h!.pattern };
-        }
-        if (m === 'HEAD' && node.handlers.has('GET')) {
-          const h = node.handlers.get('GET');
-          return { node, pattern: h!.pattern };
-        }
-        return null;
-      }
-
-      const seg = segments[index]!;
-
-      // 2a. Try static match first
-      const staticChild = node.staticChildren.get(seg);
-      if (staticChild) {
-        const res = matchNode(staticChild, index + 1);
-        if (res) return res;
-      }
-
-      // 2b. Try parameterized child
-      if (node.paramChild) {
-        params[node.paramChild.paramName!] = seg;
-        const res = matchNode(node.paramChild, index + 1);
-        if (res) return res;
-        delete params[node.paramChild.paramName!];
-      }
-
-      // 2c. Try wildcard child
-      if (node.wildcardChild) {
-        const rest = segments.slice(index).join('/');
-        params[node.wildcardChild.wildcardName] = rest;
-        if (node.wildcardChild.handlers.has(m) || node.wildcardChild.handlers.has('ALL')) {
-          const h = node.wildcardChild.handlers.get(m) ?? node.wildcardChild.handlers.get('ALL');
-          return { node: node.wildcardChild, pattern: h!.pattern };
-        }
-        if (m === 'HEAD' && node.wildcardChild.handlers.has('GET')) {
-          const h = node.wildcardChild.handlers.get('GET');
-          return { node: node.wildcardChild, pattern: h!.pattern };
-        }
-        delete params[node.wildcardChild.wildcardName];
-      }
-
-      return null;
-    };
-
-    const result = matchNode(this.root, 0);
+    const result = this.matchDynamic(this.root, segments, 0, m, params);
     if (result) {
       const h = result.node.handlers.get(m) ?? result.node.handlers.get('ALL') ?? (m === 'HEAD' ? result.node.handlers.get('GET') : undefined);
       if (h) {
         return {
           handler: h.handler,
-          params: { ...params },
+          params,
           pattern: h.pattern,
           method: m,
         };
@@ -215,6 +247,60 @@ export class TrieRouter<T = unknown> {
           method: 'OPTIONS',
         };
       }
+    }
+
+    return null;
+  }
+
+  private matchDynamic(
+    node: TrieNode<T>,
+    segments: string[],
+    index: number,
+    m: string,
+    params: Record<string, string>
+  ): { node: TrieNode<T>; pattern: string } | null {
+    if (index === segments.length) {
+      if (node.handlers.has(m) || node.handlers.has('ALL')) {
+        const h = node.handlers.get(m) ?? node.handlers.get('ALL');
+        return { node, pattern: h!.pattern };
+      }
+      if (m === 'HEAD' && node.handlers.has('GET')) {
+        const h = node.handlers.get('GET');
+        return { node, pattern: h!.pattern };
+      }
+      return null;
+    }
+
+    const seg = segments[index]!;
+
+    // 1. Static child match
+    const staticChild = node.staticChildren.get(seg);
+    if (staticChild) {
+      const res = this.matchDynamic(staticChild, segments, index + 1, m, params);
+      if (res) return res;
+    }
+
+    // 2. Param child match
+    if (node.paramChild) {
+      params[node.paramChild.paramName!] = seg;
+      const res = this.matchDynamic(node.paramChild, segments, index + 1, m, params);
+      if (res) return res;
+      delete params[node.paramChild.paramName!];
+    }
+
+    // 3. Wildcard child match
+    if (node.wildcardChild) {
+      const rest = segments.slice(index).join('/');
+      params[node.wildcardChild.wildcardName] = rest;
+      if (node.wildcardChild.handlers.has(m) || node.wildcardChild.handlers.has('ALL')) {
+        const h = node.wildcardChild.handlers.get(m) ?? node.wildcardChild.handlers.get('ALL');
+        return { node: node.wildcardChild, pattern: h!.pattern };
+      }
+      if (m === 'HEAD' && node.wildcardChild.handlers.has('GET')) {
+        const h = node.wildcardChild.handlers.get('GET');
+        return { node: node.wildcardChild, pattern: h!.pattern };
+      }
+      delete params[node.wildcardChild.wildcardName];
     }
 
     return null;
@@ -242,5 +328,17 @@ export class TrieRouter<T = unknown> {
 
   getRoutes(): Array<{ method: string; path: string; handler: T; pattern: string }> {
     return [...this.allRoutes];
+  }
+
+  getStaticGetMap(): Map<string, RouteMatch<T>> {
+    return this.staticGetRoutes;
+  }
+
+  getStaticPostMap(): Map<string, RouteMatch<T>> {
+    return this.staticPostRoutes;
+  }
+
+  getFastGetParamRoutes(): FastParamRoute<T>[] {
+    return this.fastGetParamRoutes;
   }
 }

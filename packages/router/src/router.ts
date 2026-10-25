@@ -75,4 +75,16 @@ export class Router<T = unknown> {
   getRoutes(): Array<{ method: string; path: string; handler: T; pattern: string }> {
     return this.trie.getRoutes();
   }
+
+  getStaticGetMap(): Map<string, RouteMatch<T>> {
+    return this.trie.getStaticGetMap();
+  }
+
+  getStaticPostMap(): Map<string, RouteMatch<T>> {
+    return this.trie.getStaticPostMap();
+  }
+
+  getFastGetParamRoutes(): import('./types').FastParamRoute<T>[] {
+    return this.trie.getFastGetParamRoutes();
+  }
 }

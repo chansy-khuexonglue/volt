@@ -10,6 +10,18 @@ export interface CookieOptions {
   secure?: boolean;
 }
 
+export function extractPathname(url: string): string {
+  if (url.charCodeAt(0) === 47) {
+    const q = url.indexOf('?');
+    return q === -1 ? url : url.slice(0, q);
+  }
+  const slashSlash = url.indexOf('://');
+  const start = slashSlash === -1 ? 0 : url.indexOf('/', slashSlash + 3);
+  if (start === -1) return '/';
+  const q = url.indexOf('?', start);
+  return q === -1 ? url.slice(start) : url.slice(start, q);
+}
+
 export class VoltContext<
   TParams = Record<string, string>,
   TBody = any,
@@ -20,9 +32,10 @@ export class VoltContext<
   readonly params: TParams;
   readonly store: TStore;
   private _url?: URL;
+  private _path?: string;
   private _query?: TQuery;
   private _body?: TBody;
-  private _responseHeaders = new Headers();
+  private _responseHeaders?: Headers;
   private _status = 200;
 
   constructor(req: Request, params: TParams, store: TStore = {} as TStore) {
@@ -39,7 +52,10 @@ export class VoltContext<
   }
 
   get path(): string {
-    return this.url.pathname;
+    if (!this._path) {
+      this._path = extractPathname(this.req.url);
+    }
+    return this._path;
   }
 
   get method(): string {
@@ -157,8 +173,15 @@ export class VoltContext<
     return this;
   }
 
+  get responseHeaders(): Headers {
+    if (!this._responseHeaders) {
+      this._responseHeaders = new Headers();
+    }
+    return this._responseHeaders;
+  }
+
   setHeader(name: string, value: string): this {
-    this._responseHeaders.set(name, value);
+    this.responseHeaders.set(name, value);
     return this;
   }
 
@@ -177,7 +200,7 @@ export class VoltContext<
     if (options.secure) cookie += '; Secure';
     if (options.sameSite) cookie += `; SameSite=${options.sameSite}`;
 
-    this._responseHeaders.append('Set-Cookie', cookie);
+    this.responseHeaders.append('Set-Cookie', cookie);
     return this;
   }
 
@@ -196,6 +219,9 @@ export class VoltContext<
   }
 
   json(data: unknown, statusCode?: number): Response {
+    if (!this._responseHeaders && (statusCode === undefined || statusCode === 200)) {
+      return json(data);
+    }
     const res = json(data, {
       status: statusCode ?? this._status,
       headers: this._responseHeaders,
@@ -220,14 +246,14 @@ export class VoltContext<
   }
 
   redirect(url: string, status = 302): Response {
-    this._responseHeaders.set('Location', url);
+    this.responseHeaders.set('Location', url);
     return new Response(null, {
       status,
       headers: this._responseHeaders,
     });
   }
 
-  getResponseHeaders(): Headers {
+  getResponseHeaders(): Headers | undefined {
     return this._responseHeaders;
   }
 }
