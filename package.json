@@ -7,7 +7,8 @@
   "workspaces": [
     "packages/*",
     "packages/plugins/*",
-    "examples/*"
+    "examples/*",
+    "benchmarks"
   ],
   "scripts": {
     "dev": "bun --watch examples/basic-api/index.ts",
@@ -15,8 +16,9 @@
     "dev:rest": "bun --watch examples/rest-api/src/index.ts",
     "dev:auth": "bun --watch examples/authentication/index.ts",
     "start": "bun run examples/basic-api/index.ts",
-    "test": "bun test packages/*/test packages/plugins/*/test examples/*/test",
+    "test": "bun test packages/*/test packages/plugins/*/test examples/*/test benchmarks/test",
     "test:examples": "bun test examples/*/test",
+    "test:benchmarks": "bun test benchmarks/test",
     "bench": "bun run benchmarks/benchmark.ts",
     "bench:compare": "bun run benchmarks/runner.ts",
     "bench:all": "bun run benchmarks/all-frameworks.ts",
