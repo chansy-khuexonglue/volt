@@ -21,7 +21,127 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const URL_REGEX = /^https?:\/\/.+/i;
 
+function tryCompileJIT<T extends Schema>(schema: T, options?: CompileOptions): ValidatorFn<Static<T>> | null {
+  if (options?.coerce) return null;
+  if (schema.type !== 'object') return null;
+
+  const objSchema = schema as ObjectSchema;
+  const properties = objSchema.properties;
+  const required = new Set(objSchema.required);
+  const additionalProps = objSchema.additionalProperties;
+
+  const code: string[] = [];
+  code.push('return function validate(v) {');
+  code.push('  if (typeof v !== "object" || v === null || Array.isArray(v)) {');
+  code.push('    return { success: false, errors: [{ path: "value", message: "Expected object, received " + (v === null ? "null" : Array.isArray(v) ? "array" : typeof v) }] };');
+  code.push('  }');
+  code.push('  const errors = [];');
+
+  if (additionalProps === false) {
+    const allowedKeys = JSON.stringify(Object.keys(properties));
+    code.push(`  const allowed = new Set(${allowedKeys});`);
+    code.push('  for (const k of Object.keys(v)) {');
+    code.push('    if (!allowed.has(k)) {');
+    code.push('      errors.push({ path: k, message: "Unexpected property \'" + k + "\'" });');
+    code.push('    }');
+    code.push('  }');
+  }
+
+  for (const [key, prop] of Object.entries(properties)) {
+    const isRequired = required.has(key);
+    const varName = `val_${key.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+    code.push(`  const ${varName} = v[${JSON.stringify(key)}];`);
+
+    code.push(`  if (${varName} === undefined) {`);
+    if (isRequired && !prop.optional) {
+      if (prop.default !== undefined) {
+        code.push(`    v[${JSON.stringify(key)}] = ${JSON.stringify(prop.default)};`);
+      } else {
+        code.push(`    errors.push({ path: ${JSON.stringify(key)}, message: "Field '" + ${JSON.stringify(key)} + "' is required" });`);
+      }
+    }
+    code.push('  } else {');
+
+    if (prop.nullable) {
+      code.push(`    if (${varName} !== null) {`);
+    } else {
+      code.push(`    if (${varName} === null) {`);
+      code.push(`      errors.push({ path: ${JSON.stringify(key)}, message: "Value cannot be null" });`);
+      code.push('    } else {');
+    }
+
+    if (prop.type === 'string') {
+      const s = prop as StringSchema;
+      code.push(`      if (typeof ${varName} !== "string") {`);
+      code.push(`        errors.push({ path: ${JSON.stringify(key)}, message: "Expected string, received " + typeof ${varName} });`);
+      code.push('      } else {');
+      if (s.minLength !== undefined) {
+        code.push(`        if (${varName}.length < ${s.minLength}) errors.push({ path: ${JSON.stringify(key)}, message: "String length must be >= ${s.minLength}, got " + ${varName}.length });`);
+      }
+      if (s.maxLength !== undefined) {
+        code.push(`        if (${varName}.length > ${s.maxLength}) errors.push({ path: ${JSON.stringify(key)}, message: "String length must be <= ${s.maxLength}, got " + ${varName}.length });`);
+      }
+      if (s.format === 'email') {
+        code.push(`        if (!EMAIL_REGEX.test(${varName})) errors.push({ path: ${JSON.stringify(key)}, message: "Invalid email address format" });`);
+      } else if (s.format === 'uuid') {
+        code.push(`        if (!UUID_REGEX.test(${varName})) errors.push({ path: ${JSON.stringify(key)}, message: "Invalid UUID format" });`);
+      } else if (s.format === 'url') {
+        code.push(`        if (!URL_REGEX.test(${varName})) errors.push({ path: ${JSON.stringify(key)}, message: "Invalid URL format" });`);
+      }
+      code.push('      }');
+    } else if (prop.type === 'number') {
+      const n = prop as NumberSchema;
+      code.push(`      if (typeof ${varName} !== "number" || Number.isNaN(${varName})) {`);
+      code.push(`        errors.push({ path: ${JSON.stringify(key)}, message: "Expected number, received " + typeof ${varName} });`);
+      code.push('      } else {');
+      if (n.min !== undefined) {
+        code.push(`        if (${varName} < ${n.min}) errors.push({ path: ${JSON.stringify(key)}, message: "Number must be >= ${n.min}, got " + ${varName} });`);
+      }
+      if (n.max !== undefined) {
+        code.push(`        if (${varName} > ${n.max}) errors.push({ path: ${JSON.stringify(key)}, message: "Number must be <= ${n.max}, got " + ${varName} });`);
+      }
+      if (n.integer) {
+        code.push(`        if (!Number.isInteger(${varName})) errors.push({ path: ${JSON.stringify(key)}, message: "Expected integer, received float" });`);
+      }
+      code.push('      }');
+    } else if (prop.type === 'boolean') {
+      code.push(`      if (typeof ${varName} !== "boolean") {`);
+      code.push(`        errors.push({ path: ${JSON.stringify(key)}, message: "Expected boolean, received " + typeof ${varName} });`);
+      code.push('      }');
+    } else if (prop.type === 'literal') {
+      code.push(`      if (${varName} !== ${JSON.stringify((prop as LiteralSchema).value)}) {`);
+      code.push(`        errors.push({ path: ${JSON.stringify(key)}, message: "Expected literal " + ${JSON.stringify((prop as LiteralSchema).value)} + ", received " + ${varName} });`);
+      code.push('      }');
+    } else if (prop.type === 'enum') {
+      const enumValues = JSON.stringify((prop as EnumSchema).values);
+      code.push(`      const enumSet_${varName} = new Set(${enumValues});`);
+      code.push(`      if (!enumSet_${varName}.has(${varName})) {`);
+      code.push(`        errors.push({ path: ${JSON.stringify(key)}, message: "Value must be one of: " + ${enumValues} });`);
+      code.push('      }');
+    } else {
+      return null;
+    }
+
+    code.push('    }');
+    code.push('  }');
+  }
+
+  code.push('  if (errors.length > 0) return { success: false, errors };');
+  code.push('  return { success: true, data: v };');
+  code.push('};');
+
+  try {
+    const fn = new Function('EMAIL_REGEX', 'UUID_REGEX', 'URL_REGEX', code.join('\n'));
+    return fn(EMAIL_REGEX, UUID_REGEX, URL_REGEX) as ValidatorFn<Static<T>>;
+  } catch {
+    return null;
+  }
+}
+
 export function compile<T extends Schema>(schema: T, options?: CompileOptions): ValidatorFn<Static<T>> {
+  const jit = tryCompileJIT(schema, options);
+  if (jit) return jit;
+
   const coerce = options?.coerce ?? false;
   return function validate(value: unknown): ValidationResult<Static<T>> {
     const errors: ValidationErrorItem[] = [];

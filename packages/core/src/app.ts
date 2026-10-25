@@ -231,30 +231,10 @@ export class Volt {
     const headersValidator = def.schema?.headers ? compile(def.schema.headers) : null;
     const hasBody = ['POST', 'PUT', 'PATCH'].includes(def.method);
 
+    const hasValidation = Boolean(paramsValidator || queryValidator || headersValidator);
+
     const baseHandler = (ctx: VoltContext): Response | Promise<Response> => {
-      // 1. Validate route params if schema provided
-      if (paramsValidator) {
-        const res = paramsValidator(ctx.params);
-        if (!res.success) {
-          throw new BadRequestError('Invalid route parameters', res.errors);
-        }
-        if (res.data) {
-          Object.assign(ctx.params, res.data);
-        }
-      }
-
-      // 2. Validate query params if schema provided
-      if (queryValidator) {
-        const res = queryValidator(ctx.query);
-        if (!res.success) {
-          throw new BadRequestError('Invalid query parameters', res.errors);
-        }
-        if (res.data) {
-          Object.assign(ctx.query, res.data);
-        }
-      }
-
-      // 3. Validate body if schema provided or method has body
+      // 1. Validate body if schema provided or method has body
       if (hasBody) {
         return (async () => {
           await ctx.parseBody(this.serverOptions.maxRequestBodySize);
@@ -287,19 +267,39 @@ export class Volt {
         })();
       }
 
-      // 4. Validate headers if schema provided (GET/DELETE/HEAD/OPTIONS)
-      if (headersValidator) {
-        const headerObj: Record<string, string> = {};
-        ctx.req.headers.forEach((v, k) => {
-          headerObj[k] = v;
-        });
-        const res = headersValidator(headerObj);
-        if (!res.success) {
-          throw new BadRequestError('Invalid request headers', res.errors);
+      // 2. Validate params, query, headers if schemas exist
+      if (hasValidation) {
+        if (paramsValidator) {
+          const res = paramsValidator(ctx.params);
+          if (!res.success) {
+            throw new BadRequestError('Invalid route parameters', res.errors);
+          }
+          if (res.data) {
+            Object.assign(ctx.params, res.data);
+          }
+        }
+        if (queryValidator) {
+          const res = queryValidator(ctx.query);
+          if (!res.success) {
+            throw new BadRequestError('Invalid query parameters', res.errors);
+          }
+          if (res.data) {
+            Object.assign(ctx.query, res.data);
+          }
+        }
+        if (headersValidator) {
+          const headerObj: Record<string, string> = {};
+          ctx.req.headers.forEach((v, k) => {
+            headerObj[k] = v;
+          });
+          const res = headersValidator(headerObj);
+          if (!res.success) {
+            throw new BadRequestError('Invalid request headers', res.errors);
+          }
         }
       }
 
-      // Execute route handler synchronously whenever possible
+      // Fast synchronous route handler
       const result = def.handler(ctx);
       if (result instanceof Promise) {
         return result.then((res) => {
@@ -453,7 +453,12 @@ export class Volt {
 
         for (let i = 0; i < fastGetCount; i++) {
           const r = fastGetParams[i]!;
-          if (pathname.length > r.prefixLen && pathname.startsWith(r.prefix) && pathname.indexOf('/', r.prefixLen) === -1) {
+          if (
+            pathname.length > r.prefixLen &&
+            pathname.charCodeAt(1) === r.prefix.charCodeAt(1) &&
+            pathname.startsWith(r.prefix) &&
+            pathname.indexOf('/', r.prefixLen) === -1
+          ) {
             const ctx = new VoltContext(req, r.createParams(pathname.slice(r.prefixLen)), globalStore);
             return (r.handler as any).pipeline(ctx);
           }

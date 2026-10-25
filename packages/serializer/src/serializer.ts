@@ -94,7 +94,7 @@ export function serializeResponse(value: unknown, defaultStatus = 200): Response
     }
 
     // Fast-path: 99% of API responses are plain objects/arrays with 200 status
-    if (defaultStatus === 200 && typeof Response.json === 'function' && !(value instanceof Blob || value instanceof ReadableStream || value instanceof ArrayBuffer || value instanceof Uint8Array)) {
+    if (defaultStatus === 200 && typeof Response.json === 'function' && ((value as any).constructor === Object || Array.isArray(value))) {
       return Response.json(value);
     }
 

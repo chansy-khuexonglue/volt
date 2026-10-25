@@ -15,11 +15,10 @@ export function extractPathname(url: string): string {
     const q = url.indexOf('?');
     return q === -1 ? url : url.slice(0, q);
   }
-  const slashSlash = url.indexOf('://');
-  const start = slashSlash === -1 ? 0 : url.indexOf('/', slashSlash + 3);
-  if (start === -1) return '/';
-  const q = url.indexOf('?', start);
-  return q === -1 ? url.slice(start) : url.slice(start, q);
+  const s = url.indexOf('/', 7);
+  if (s === -1) return '/';
+  const q = url.indexOf('?', s + 1);
+  return q === -1 ? url.slice(s) : url.slice(s, q);
 }
 
 export class VoltContext<
