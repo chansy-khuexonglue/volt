@@ -8,6 +8,7 @@
     "packages/*",
     "packages/plugins/*",
     "examples/*",
+    "examples/ecommerce/*",
     "benchmarks"
   ],
   "scripts": {
@@ -15,6 +16,8 @@
     "dev:hello": "bun --watch examples/hello-world/index.ts",
     "dev:rest": "bun --watch examples/rest-api/src/index.ts",
     "dev:auth": "bun --watch examples/authentication/index.ts",
+    "dev:ecommerce:api": "bun --watch examples/ecommerce/api/src/index.ts",
+    "dev:ecommerce:web": "bun --cwd examples/ecommerce/web dev",
     "start": "bun run examples/basic-api/index.ts",
     "test": "bun test packages/*/test packages/plugins/*/test examples/*/test benchmarks/test",
     "test:examples": "bun test examples/*/test",

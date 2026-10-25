@@ -1,0 +1,14 @@
+{
+  "name": "@ecommerce/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "seed": "bun run src/db/seed.ts"
+  },
+  "dependencies": {
+    "volt": "workspace:*"
+  }
+}

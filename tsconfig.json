@@ -35,5 +35,11 @@
     "packages/plugins/*/test/**/*",
     "benchmarks/**/*",
     "examples/**/*"
+  ],
+  "exclude": [
+    "examples/ecommerce/web/**/*",
+    "**/node_modules",
+    "**/.nuxt",
+    "**/.output"
   ]
 }
