@@ -144,26 +144,6 @@ volt routes src/index.ts
 
 ---
 
-## 🧪 Testing
-
-Every feature is covered by unit, integration, and type-level tests.
-
-```bash
-# Run all package tests (148 tests across 27 files)
-bun test
-
-# Run in-memory microbenchmarks
-bun run bench
-
-# Run 8-framework live comparative benchmark
-bun run bench:all
-
-# Run TypeScript type check
-bun run typecheck
-```
-
----
-
 ## 📜 License
 
 MIT
