@@ -588,29 +588,25 @@ app.group('/api/v1', (v1) => {
     content: `
 # Schema Validation
 
-Volt integrates seamlessly with popular schema validation libraries like **Zod** and **TypeBox**. When validation fails, Volt automatically returns a standard \`400 Bad Request\` with detailed field errors.
+Volt's built-in \`t\` schema builder validates bodies and queries before the handler runs. Invalid input receives a 400 response. Define schemas in the third argument to a route, as shown below.
     `,
     codeSnippet: {
       filename: 'src/schemas.ts',
       language: 'typescript',
-      code: `import { z } from 'zod';
+      code: `import { Volt, t } from 'voltts';
 
-const CreateProductSchema = z.object({
-  title: z.string().min(3),
-  price: z.number().positive(),
-  inventory: z.number().int().nonnegative().default(0),
-  tags: z.array(z.string()).optional(),
+const app = new Volt({ port: 3000 });
+
+app.post('/api/products', (c) => {
+  return c.json({ success: true, product: c.body }, 201);
+}, {
+  body: t.Object({
+    title: t.String({ minLength: 3 }),
+    price: t.Number({ minimum: 0 }),
+  }),
 });
 
-app.post('/api/products', {
-  schema: {
-    body: CreateProductSchema,
-  },
-}, async (c) => {
-  // c.body is strictly typed!
-  const product = c.body;
-  return c.json({ success: true, product }, 201);
-});`,
+app.listen(3000);`,
     },
   },
 
