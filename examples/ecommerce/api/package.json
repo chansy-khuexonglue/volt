@@ -11,5 +11,9 @@
   },
   "dependencies": {
     "volt": "workspace:*"
+  },
+  "devDependencies": {
+    "@prisma/client": "6",
+    "prisma": "6"
   }
 }

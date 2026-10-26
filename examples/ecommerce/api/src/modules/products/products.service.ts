@@ -1,4 +1,4 @@
-import { sql, Product } from '../../db';
+import { prisma, Product } from '../../db';
 
 export interface ProductFilters {
   category?: string;
@@ -11,96 +11,67 @@ export interface ProductFilters {
 }
 
 export class ProductsService {
-  async getAll(filters?: ProductFilters): Promise<{ products: Product[]; total: number }> {
+  async getAll(filters?: ProductFilters): Promise<{ products: any[]; total: number }> {
     const limit = Math.min(filters?.limit || 50, 100);
     const offset = filters?.offset || 0;
 
-    // Use Bun.SQL tagged template queries
-    let rows: any[];
+    const where: any = {};
+
     if (filters?.category) {
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        WHERE category_id = ${filters.category} OR category_name ILIKE ${'%' + filters.category + '%'}
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else if (filters?.search) {
-      const q = `%${filters.search}%`;
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        WHERE title ILIKE ${q} OR description ILIKE ${q} OR category_name ILIKE ${q}
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else if (filters?.sort === 'price_asc') {
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        ORDER BY price ASC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else if (filters?.sort === 'price_desc') {
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        ORDER BY price DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else if (filters?.sort === 'rating') {
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        ORDER BY rating DESC, review_count DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else {
-      rows = await sql`
-        SELECT id, title, slug, description, price, compare_at_price, category_id,
-               category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-        FROM products
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
+      where.OR = [
+        { category_id: filters.category },
+        { category_name: { contains: filters.category, mode: 'insensitive' } },
+      ];
     }
 
-    const countRes = await sql`SELECT count(*)::int as count FROM products`;
-    const total = countRes[0]?.count || rows.length;
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+        { category_name: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    let orderBy: any = { created_at: 'desc' };
+    if (filters?.sort === 'price_asc') {
+      orderBy = { price: 'asc' };
+    } else if (filters?.sort === 'price_desc') {
+      orderBy = { price: 'desc' };
+    } else if (filters?.sort === 'rating') {
+      orderBy = [{ rating: 'desc' }, { review_count: 'desc' }];
+    }
+
+    // Execute queries through Prisma ORM Client
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        orderBy,
+        take: limit,
+        skip: offset,
+      }),
+      prisma.product.count({ where }),
+    ]);
 
     return {
-      products: rows as Product[],
+      products,
       total,
     };
   }
 
-  async getFeatured(): Promise<Product[]> {
-    const rows = await sql`
-      SELECT id, title, slug, description, price, compare_at_price, category_id,
-             category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-      FROM products
-      WHERE is_featured = true
-      ORDER BY rating DESC
-      LIMIT 6
-    `;
-    return rows as unknown as Product[];
+  async getFeatured(): Promise<any[]> {
+    return prisma.product.findMany({
+      where: { is_featured: true },
+      orderBy: { rating: 'desc' },
+      take: 6,
+    });
   }
 
-  async getById(idOrSlug: string): Promise<Product | null> {
-    const rows = await sql`
-      SELECT id, title, slug, description, price, compare_at_price, category_id,
-             category_name, stock, rating, review_count, badge, is_featured, images, specs, created_at
-      FROM products
-      WHERE id = ${idOrSlug} OR slug = ${idOrSlug}
-      LIMIT 1
-    `;
-    if (!rows || rows.length === 0) return null;
-    return rows[0] as unknown as Product;
+  async getById(idOrSlug: string): Promise<any | null> {
+    return prisma.product.findFirst({
+      where: {
+        OR: [{ id: idOrSlug }, { slug: idOrSlug }],
+      },
+    });
   }
 }
 

@@ -1,0 +1,91 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image_url   String?
+  item_count  Int       @default(0)
+  created_at  DateTime? @default(now())
+
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id               String    @id @default(uuid())
+  title            String
+  slug             String    @unique
+  description      String?
+  price            Decimal   @db.Decimal(10, 2)
+  compare_at_price Decimal?  @db.Decimal(10, 2)
+  category_id      String?
+  category_name    String?
+  stock            Int       @default(0)
+  rating           Decimal   @default(5.0) @db.Decimal(3, 2)
+  review_count     Int       @default(0)
+  badge            String?
+  is_featured      Boolean   @default(false)
+  images           String[]  @default([])
+  specs            Json?
+  created_at       DateTime? @default(now())
+  updated_at       DateTime? @default(now())
+
+  category         Category? @relation(fields: [category_id], references: [id])
+  reviews          Review[]
+
+  @@map("products")
+}
+
+model Review {
+  id         String    @id @default(uuid())
+  product_id String
+  user_name  String
+  rating     Int       @default(5)
+  title      String
+  comment    String
+  created_at DateTime? @default(now())
+
+  product    Product   @relation(fields: [product_id], references: [id])
+
+  @@map("reviews")
+}
+
+model Order {
+  id               String    @id @default(uuid())
+  order_number     String    @unique
+  customer_name    String
+  customer_email   String
+  user_id          String?
+  status           String    @default("pending")
+  total_amount     Decimal   @db.Decimal(10, 2)
+  subtotal         Decimal   @db.Decimal(10, 2)
+  shipping_fee     Decimal   @default(0) @db.Decimal(10, 2)
+  items            Json      @default("[]")
+  shipping_address Json      @default("{}")
+  payment_method   String    @default("credit_card")
+  created_at       DateTime? @default(now())
+
+  @@map("orders")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password_hash String
+  role          String    @default("customer")
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+
+  @@map("users")
+}

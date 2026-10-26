@@ -176,4 +176,95 @@ describe('🛒 Volt eCommerce REST API', () => {
     const orderBody = await orderRes.json();
     expect(orderBody.data.customer_name).toBe('Test Customer');
   });
+
+  it('POST /api/products/:id/reviews creates a review using Prisma Client', async () => {
+    const res = await app.fetch(
+      new Request('http://localhost:3000/api/products/prod-sony-wh1000xm5/reviews', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          userName: 'Alex Dev',
+          rating: 5,
+          title: 'Phenomenal Sound Quality',
+          comment: 'Noise cancellation is best in class.',
+        }),
+      })
+    );
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.data.user_name).toBe('Alex Dev');
+    expect(body.data.rating).toBe(5);
+  });
+
+  it('handles auth lifecycle with Prisma (register, login, getMe)', async () => {
+    const testEmail = `user_${Date.now()}@volt-ecommerce.dev`;
+    const testPassword = 'SecurePassword123!';
+
+    // 1. Register
+    const regRes = await app.fetch(
+      new Request('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Jane Doe',
+          email: testEmail,
+          password: testPassword,
+        }),
+      })
+    );
+    expect(regRes.status).toBe(201);
+    const regBody = await regRes.json();
+    expect(regBody.success).toBe(true);
+    expect(regBody.user.email).toBe(testEmail);
+    expect(regBody.token).toBeDefined();
+
+    const token = regBody.token;
+
+    // 2. Login
+    const loginRes = await app.fetch(
+      new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          email: testEmail,
+          password: testPassword,
+        }),
+      })
+    );
+    expect(loginRes.status).toBe(200);
+    const loginBody = await loginRes.json();
+    expect(loginBody.success).toBe(true);
+    expect(loginBody.token).toBeDefined();
+
+    // 3. Me
+    const meRes = await app.fetch(
+      new Request('http://localhost:3000/api/auth/me', {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      })
+    );
+    expect(meRes.status).toBe(200);
+    const meBody = await meRes.json();
+    expect(meBody.success).toBe(true);
+    expect(meBody.user.email).toBe(testEmail);
+  });
+
+  it('allows direct Prisma ORM operations via Volt context store', async () => {
+    const prisma = app.store.prisma;
+    const productCount = await prisma.product.count();
+    expect(productCount).toBeGreaterThan(0);
+
+    const categories = await prisma.category.findMany({
+      include: {
+        products: {
+          take: 1,
+        },
+      },
+    });
+    expect(categories.length).toBeGreaterThan(0);
+    expect(Array.isArray(categories[0].products)).toBe(true);
+  });
 });
+

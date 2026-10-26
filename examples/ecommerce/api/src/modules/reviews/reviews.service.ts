@@ -1,4 +1,4 @@
-import { sql, Review } from '../../db';
+import { prisma, Review } from '../../db';
 
 export interface CreateReviewInput {
   userName: string;
@@ -9,13 +9,10 @@ export interface CreateReviewInput {
 
 export class ReviewsService {
   async getByProductId(productId: string): Promise<Review[]> {
-    const rows = await sql`
-      SELECT id, product_id, user_name, rating, title, comment, created_at
-      FROM reviews
-      WHERE product_id = ${productId}
-      ORDER BY created_at DESC
-    `;
-    return rows as unknown as Review[];
+    return prisma.review.findMany({
+      where: { product_id: productId },
+      orderBy: { created_at: 'desc' },
+    });
   }
 
   async create(productId: string, input: CreateReviewInput): Promise<Review> {
@@ -26,30 +23,37 @@ export class ReviewsService {
     const comment = input.comment?.trim() || '';
 
     // Insert review
-    const res = await sql`
-      INSERT INTO reviews (id, product_id, user_name, rating, title, comment)
-      VALUES (${id}, ${productId}, ${userName}, ${rating}, ${title}, ${comment})
-      RETURNING id, product_id, user_name, rating, title, comment, created_at
-    `;
+    const review = await prisma.review.create({
+      data: {
+        id,
+        product_id: productId,
+        user_name: userName,
+        rating,
+        title,
+        comment,
+      },
+    });
 
-    // Recalculate average rating & review count for product
-    const stats = await sql`
-      SELECT AVG(rating)::numeric(3,2) as avg_rating, COUNT(*)::int as count
-      FROM reviews
-      WHERE product_id = ${productId}
-    `;
+    // Recalculate average rating & review count for product using Prisma aggregations
+    const aggregations = await prisma.review.aggregate({
+      where: { product_id: productId },
+      _avg: { rating: true },
+      _count: { id: true },
+    });
 
-    if (stats.length > 0) {
-      const avg = stats[0].avg_rating;
-      const count = stats[0].count;
-      await sql`
-        UPDATE products
-        SET rating = ${avg}, review_count = ${count}, updated_at = NOW()
-        WHERE id = ${productId}
-      `;
-    }
+    const avg = aggregations._avg.rating ? Number(aggregations._avg.rating.toFixed(2)) : rating;
+    const count = aggregations._count.id || 1;
 
-    return res[0] as unknown as Review;
+    await prisma.product.update({
+      where: { id: productId },
+      data: {
+        rating: avg,
+        review_count: count,
+        updated_at: new Date(),
+      },
+    });
+
+    return review;
   }
 }
 
