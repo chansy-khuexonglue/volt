@@ -7,7 +7,7 @@ if (process.argv[2] === '--worker') {
   const mode = process.argv[3];
   const PreviousVolt = mode === 'Volt previous' ? (await import(resolve(process.env.BENCH_BASELINE!))).Volt : Volt;
   const server = mode === 'Elysia' ? new Elysia().get('/ping', () => ({message:'pong'})).get('/context', ({request}) => ({header:request.headers.get('x-test')})).listen({port:0,hostname:'127.0.0.1'}).server!
-    : new PreviousVolt({port:0,hostname:'127.0.0.1',nativeRoutes:mode==='Volt native'}).get('/ping', () => ({message:'pong'})).get('/context', (c) => ({header:c.headers.get('x-test')})).listen();
+    : new PreviousVolt({port:0,hostname:'127.0.0.1',nativeRoutes:mode==='Volt native'}).get('/ping', () => ({message:'pong'})).get('/context', (c: { headers: Headers }) => ({header:c.headers.get('x-test')})).listen();
   console.log(server.port);
 } else {
   const modes=process.env.BENCH_BASELINE ? ['Volt previous','Volt JS','Volt native','Elysia'] : ['Volt JS','Volt native','Elysia'];
