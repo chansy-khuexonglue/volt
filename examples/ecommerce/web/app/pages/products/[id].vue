@@ -3,7 +3,7 @@ const route = useRoute();
 const api = useApi();
 const { addItem } = useCart();
 
-const productId = route.params.id as string;
+const productId = computed(() => route.params.id as string);
 const quantity = ref(1);
 const selectedImageIndex = ref(0);
 const isAddingToCart = ref(false);
@@ -20,17 +20,28 @@ const reviewSuccessMessage = ref('');
 
 // Fetch product & reviews
 const { data: productData, refresh: refreshProduct } = await useAsyncData(
-  `product_${productId}`,
-  () => api.getProduct(productId)
+  () => api.getProduct(productId.value),
+  {
+    watch: [productId],
+  }
 );
 
 const { data: reviewsData, refresh: refreshReviews } = await useAsyncData(
-  `reviews_${productId}`,
-  () => api.getReviews(productId)
+  () => api.getReviews(productId.value),
+  {
+    watch: [productId],
+  }
 );
 
 const product = computed(() => productData.value?.data);
 const reviews = computed(() => reviewsData.value?.data || []);
+
+onMounted(() => {
+  if (!product.value) {
+    refreshProduct();
+    refreshReviews();
+  }
+});
 
 const specs = computed(() => {
   if (!product.value?.specs) return {};

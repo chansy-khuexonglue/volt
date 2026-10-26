@@ -1,14 +1,20 @@
 <script setup lang="ts">
 const route = useRoute();
 const api = useApi();
-const orderId = route.params.id as string;
+const orderId = computed(() => route.params.id as string);
 
-const { data: orderData, pending, error } = await useAsyncData(
-  `order_${orderId}`,
-  () => api.getOrder(orderId)
+const { data: orderData, pending, error, refresh: refreshOrder } = await useAsyncData(
+  () => api.getOrder(orderId.value),
+  {
+    watch: [orderId],
+  }
 );
 
 const order = computed(() => orderData.value?.data);
+
+onMounted(() => {
+  if (!order.value) refreshOrder();
+});
 
 const items = computed(() => {
   if (!order.value?.items) return [];

@@ -358,15 +358,28 @@ export class Volt {
     try {
       const match = this.router.match(req.method, pathname);
 
-      if (!match) {
-        // Check for OPTIONS discovery
+      if (!match || !match.handler) {
+        // Check for OPTIONS discovery / preflight
         if (req.method === 'OPTIONS') {
           const allowed = this.router.getAllowedMethods(pathname);
-          if (allowed.length > 0) {
-            return new Response(null, {
-              status: 204,
-              headers: { Allow: allowed.join(', ') },
-            });
+          if (allowed.length > 0 || this.globalMiddlewares.length > 0) {
+            const ctx = new VoltContext(req, match?.params || {}, this.globalStore);
+            if (this.globalMiddlewares.length > 0) {
+              const composed = compose(this.globalMiddlewares);
+              return composed(ctx, () => {
+                return new Response(null, {
+                  status: 204,
+                  headers: { Allow: allowed.length > 0 ? allowed.join(', ') : 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS' },
+                });
+              });
+            }
+
+            if (allowed.length > 0) {
+              return new Response(null, {
+                status: 204,
+                headers: { Allow: allowed.join(', ') },
+              });
+            }
           }
         }
         throw new NotFoundError(`Cannot ${req.method} ${pathname}`);

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 const api = useApi();
 
-// Fetch categories and featured products concurrently
-const [{ data: categoriesData }, { data: featuredData }] = await Promise.all([
-  useAsyncData('categories', () => api.getCategories()),
-  useAsyncData('featured_products', () => api.getFeaturedProducts()),
-]);
+const { data: categoriesData, refresh: refreshCategories } = await useAsyncData('home_categories', () => api.getCategories());
+const { data: featuredData, refresh: refreshFeatured } = await useAsyncData('home_featured_products', () => api.getFeaturedProducts());
 
 const categories = computed(() => categoriesData.value?.data || []);
 const featuredProducts = computed(() => featuredData.value?.data || []);
+
+onMounted(() => {
+  if (categories.value.length === 0) refreshCategories();
+  if (featuredProducts.value.length === 0) refreshFeatured();
+});
 </script>
 
 <template>

@@ -7,13 +7,25 @@ const selectedCategory = ref((route.query.category as string) || '');
 const searchQuery = ref((route.query.q as string) || '');
 const sortBy = ref((route.query.sort as string) || 'newest');
 
+// Synchronize filters when navigating or when route query changes
+watch(
+  () => route.query,
+  (q) => {
+    selectedCategory.value = (q.category as string) || '';
+    searchQuery.value = (q.q as string) || '';
+    sortBy.value = (q.sort as string) || 'newest';
+  }
+);
+
 // Fetch categories for filter chips
-const { data: categoriesData } = await useAsyncData('categories_list', () => api.getCategories());
+const { data: categoriesData, refresh: refreshCategories } = await useAsyncData(
+  'categories_list',
+  () => api.getCategories()
+);
 const categories = computed(() => categoriesData.value?.data || []);
 
 // Fetch products based on query reactive parameters
 const { data: productsData, refresh: refreshProducts, status } = await useAsyncData(
-  'products_catalog',
   () =>
     api.getProducts({
       category: selectedCategory.value || undefined,
@@ -21,12 +33,17 @@ const { data: productsData, refresh: refreshProducts, status } = await useAsyncD
       sort: sortBy.value || undefined,
     }),
   {
-    watch: [selectedCategory, sortBy],
+    watch: [selectedCategory, sortBy, searchQuery],
   }
 );
 
 const products = computed(() => productsData.value?.data || []);
 const totalCount = computed(() => productsData.value?.total || 0);
+
+onMounted(() => {
+  if (categories.value.length === 0) refreshCategories();
+  if (products.value.length === 0) refreshProducts();
+});
 
 const handleSearch = () => {
   refreshProducts();

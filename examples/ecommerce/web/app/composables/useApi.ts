@@ -1,6 +1,12 @@
 export const useApi = () => {
   const config = useRuntimeConfig();
-  const apiBase = config.public.apiBase || 'http://localhost:3000';
+  let apiBase = config.public.apiBase || 'http://localhost:3000';
+
+  if (import.meta.client && typeof window !== 'undefined') {
+    if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      apiBase = `${window.location.protocol}//${window.location.hostname}:3000`;
+    }
+  }
 
   // Persistent session id for cart stored in cookie/localStorage
   const sessionId = useCookie('volt_session_id', {
