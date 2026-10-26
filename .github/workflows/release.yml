@@ -36,6 +36,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish Packages to NPM
+        timeout-minutes: 15
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN || secrets.NPM_AUTH_TOKEN }}
           TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN || secrets.NPM_AUTH_TOKEN }}
@@ -88,10 +89,11 @@ jobs:
               fi
 
               # bun publish rewrites "workspace:*" deps to concrete versions (npm publish does not)
-              if (cd "$pkg" && NPM_CONFIG_TOKEN="$TOKEN" bun publish --access public); then
+              # stdin from /dev/null + timeout: never hang waiting for an interactive OTP prompt
+              if (cd "$pkg" && NPM_CONFIG_TOKEN="$TOKEN" CI=true timeout 120 bun publish --access public < /dev/null); then
                 echo "✅ Successfully published $pkg_name@$pkg_ver"
               else
-                echo "::error::❌ Failed to publish $pkg_name@$pkg_ver"
+                echo "::error::❌ Failed to publish $pkg_name@$pkg_ver. If this timed out, your NPM token requires 2FA: create a Granular Access Token with 'Bypass two-factor authentication' enabled (or a Classic 'Automation' token) and save it as the NPM_TOKEN secret."
                 exit 1
               fi
             fi
