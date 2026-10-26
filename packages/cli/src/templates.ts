@@ -63,7 +63,7 @@ function tsconfigJson(): string {
       target: 'ESNext',
       module: 'ESNext',
       moduleResolution: 'bundler',
-      lib: ['ESNext'],
+      lib: ['ESNext', 'DOM', 'DOM.Iterable'],
       strict: true,
       noImplicitReturns: true,
       noFallthroughCasesInSwitch: true,
@@ -144,14 +144,9 @@ src/
 test/                      # bun:test integration tests
 \`\`\`
 
-## Generate a new module
+## Add a feature module
 
-\`\`\`bash
-bunx volt generate module products
-\`\`\`
-
-This creates \`src/modules/products/*\` plus a test, and registers the module in
-\`src/app.ts\` under \`/api/products\`.
+Copy the users module and register your routes in \`src/app.ts\`.
 
 ## API docs
 
@@ -236,6 +231,8 @@ export function createApp(): Volt {
 
   return app;
 }
+
+export default createApp();
 `,
     'src/index.ts': `import { createApp } from './app';
 
@@ -369,6 +366,8 @@ export function createApp(): Volt {
 
   return app;
 }
+
+export default createApp();
 `,
     'src/index.ts': `import { createApp } from './app';
 import { env } from './config/env';
