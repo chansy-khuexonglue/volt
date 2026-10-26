@@ -1,61 +1,120 @@
 <template>
-  <footer class="mt-24 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-        <!-- Brand Info -->
-        <div class="space-y-4 md:col-span-2">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white">
-              <UIcon name="i-lucide-zap" class="w-4 h-4 fill-current" />
+  <footer class="mt-24 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black text-neutral-600 dark:text-neutral-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      
+      <!-- Architectural Colophon Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12 border-b border-neutral-200 dark:border-neutral-800">
+        
+        <!-- Left Brand & Architecture Specs -->
+        <div class="md:col-span-5 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 flex items-center justify-center font-mono font-black text-xs">
+              V⚡
             </div>
-            <span class="text-lg font-bold text-neutral-900 dark:text-white">VOLT STORE</span>
+            <span class="text-sm font-black tracking-tight text-neutral-900 dark:text-white uppercase">
+              VOLT ARCHIVE // HARDWARE
+            </span>
           </div>
-          <p class="text-sm max-w-sm leading-relaxed text-neutral-500">
-            A production-ready e-commerce experience showcasing the power and raw speed of
-            the <strong>Volt</strong> web framework for Bun paired with <strong>Nuxt UI</strong> and <strong>PostgreSQL</strong>.
+
+          <p class="text-xs text-neutral-500 leading-relaxed max-w-sm font-sans">
+            A production reference storefront demonstrating extreme latency performance, built on the <strong>Volt</strong> web framework for Bun with <strong>PostgreSQL</strong> native drivers and <strong>Nuxt 4</strong>.
           </p>
-          <div class="flex items-center gap-2 text-xs font-mono text-neutral-400">
-            <span class="px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800">Volt API v0.1</span>
-            <span class="px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800">Bun Native SQL</span>
-            <span class="px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800">Nuxt 4</span>
+
+          <!-- Technical Specs Pill Matrix -->
+          <div class="flex flex-wrap gap-1.5 pt-2 font-mono text-[10px]">
+            <span class="px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-500">
+              FRAMEWORK: VOLT TS
+            </span>
+            <span class="px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-500">
+              ENGINE: BUN 1.4
+            </span>
+            <span class="px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-500">
+              DB: POSTGRESQL 16
+            </span>
+            <span class="px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-500">
+              LATENCY: &lt;0.2MS
+            </span>
           </div>
         </div>
 
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white mb-4">
-            Storefront
+        <!-- Middle: Hardware Departments -->
+        <div class="md:col-span-3 space-y-3 font-mono">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+            // HARDWARE INDEX
           </h4>
-          <ul class="space-y-2 text-sm">
-            <li><NuxtLink to="/products" class="hover:text-primary-500 transition">All Products</NuxtLink></li>
-            <li><NuxtLink to="/cart" class="hover:text-primary-500 transition">Shopping Cart</NuxtLink></li>
-            <li><NuxtLink to="/checkout" class="hover:text-primary-500 transition">Checkout</NuxtLink></li>
+          <ul class="space-y-2 text-xs">
+            <li>
+              <NuxtLink to="/products?category=cat-audio" class="hover:text-primary-500 transition-colors">
+                [ 01 ] SMART AUDIO &amp; HI-FI
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/products?category=cat-workspace" class="hover:text-primary-500 transition-colors">
+                [ 02 ] MINIMAL WORKSPACE
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/products?category=cat-computing" class="hover:text-primary-500 transition-colors">
+                [ 03 ] SILICON LAPTOPS
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/products?category=cat-photography" class="hover:text-primary-500 transition-colors">
+                [ 04 ] OPTICS &amp; CAMERAS
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/products?category=cat-bags" class="hover:text-primary-500 transition-colors">
+                [ 05 ] TECHNICAL CARRY
+              </NuxtLink>
+            </li>
           </ul>
         </div>
 
-        <!-- API Links -->
-        <div>
-          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white mb-4">
-            Developer API
+        <!-- Right: Developer Specs -->
+        <div class="md:col-span-4 space-y-3 font-mono">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+            // API TELEMETRY &amp; DOCS
           </h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="http://localhost:3000/docs" target="_blank" class="hover:text-primary-500 transition">Scalar Reference</a></li>
-            <li><a href="http://localhost:3000/swagger" target="_blank" class="hover:text-primary-500 transition">Swagger UI</a></li>
-            <li><a href="http://localhost:3000/openapi.json" target="_blank" class="hover:text-primary-500 transition">OpenAPI JSON</a></li>
-            <li><a href="http://localhost:3000/health" target="_blank" class="hover:text-primary-500 transition">Health Status</a></li>
+          <ul class="space-y-2 text-xs">
+            <li>
+              <a href="http://localhost:3000/docs" target="_blank" class="hover:text-primary-500 transition-colors inline-flex items-center gap-1.5">
+                <span>SCALAR API SPECIFICATION</span>
+                <UIcon name="i-lucide-arrow-up-right" class="w-3 h-3 text-neutral-400" />
+              </a>
+            </li>
+            <li>
+              <a href="http://localhost:3000/swagger" target="_blank" class="hover:text-primary-500 transition-colors inline-flex items-center gap-1.5">
+                <span>OPENAPI 3.1 SCHEMA</span>
+                <UIcon name="i-lucide-arrow-up-right" class="w-3 h-3 text-neutral-400" />
+              </a>
+            </li>
+            <li>
+              <a href="http://localhost:3000/health" target="_blank" class="hover:text-primary-500 transition-colors inline-flex items-center gap-1.5">
+                <span>LIVE SERVER HEALTH</span>
+                <UIcon name="i-lucide-arrow-up-right" class="w-3 h-3 text-neutral-400" />
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/chansy-khuexonglue/volt" target="_blank" class="hover:text-primary-500 transition-colors inline-flex items-center gap-1.5">
+                <span>GITHUB MONOREPO</span>
+                <UIcon name="i-lucide-arrow-up-right" class="w-3 h-3 text-neutral-400" />
+              </a>
+            </li>
           </ul>
         </div>
+
       </div>
 
-      <div class="pt-8 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <p>© {{ new Date().getFullYear() }} Volt Storefront. Built for extreme performance.</p>
-        <div class="flex items-center gap-6">
-          <a href="https://github.com/chansy-khuexonglue/volt" target="_blank" class="hover:text-primary-500 transition flex items-center gap-1">
-            <UIcon name="i-simple-icons-github" class="w-4 h-4" />
-            <span>GitHub</span>
-          </a>
+      <!-- Bottom Bar -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-400">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span>PRODUCTION CLUSTER ONLINE // ALL SERVICES HEALTHY</span>
         </div>
+        <p>© 2026 VOLT FRAMEWORK. ARCHIVAL HARDWARE DIVISION.</p>
       </div>
+
     </div>
   </footer>
 </template>

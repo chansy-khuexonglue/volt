@@ -3,37 +3,48 @@ const { cart, updateQuantity, removeItem, clear } = useCart();
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-    <div class="space-y-2">
-      <div class="flex items-center gap-2 text-xs text-neutral-500">
-        <NuxtLink to="/" class="hover:text-primary-500">Home</NuxtLink>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-8 font-sans">
+    
+    <!-- Header -->
+    <div class="border-b border-neutral-200 dark:border-neutral-800 pb-6">
+      <div class="flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+        <NuxtLink to="/" class="hover:text-primary-500 transition-colors">ARCHIVE</NuxtLink>
         <span>/</span>
-        <span class="text-neutral-900 dark:text-white font-medium">Shopping Cart</span>
+        <span class="text-neutral-900 dark:text-white font-bold">MANIFEST REVIEW</span>
       </div>
-      <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-white">
-        Shopping Cart ({{ cart.itemCount }})
+      <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tight text-neutral-900 dark:text-white mt-1">
+        Inventory Manifest
       </h1>
+      <p class="text-xs text-neutral-500 font-mono mt-1">
+        {{ cart.itemCount }} HARDWARE UNITS STAGED FOR DISPATCH
+      </p>
     </div>
 
     <!-- Empty State -->
-    <div v-if="cart.items.length === 0" class="py-20 text-center space-y-4 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-8">
-      <div class="w-20 h-20 mx-auto rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">
-        <UIcon name="i-lucide-shopping-cart" class="w-10 h-10" />
+    <div v-if="cart.items.length === 0" class="py-24 text-center space-y-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-8 font-mono">
+      <div class="w-12 h-12 mx-auto rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 text-xl">
+        ∅
       </div>
-      <h2 class="text-xl font-bold text-neutral-900 dark:text-white">Your cart is empty</h2>
-      <p class="text-xs text-neutral-500 max-w-sm mx-auto">
-        Explore our curated hardware selection and add products to start your order.
+      <h2 class="text-base font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+        NO COMPONENTS STAGED IN MANIFEST
+      </h2>
+      <p class="text-xs text-neutral-400 max-w-sm mx-auto font-sans">
+        Review the hardware catalog and acquire components to initiate your order.
       </p>
-      <UButton to="/products" color="primary" size="lg" class="mt-4">
-        Explore Products
-      </UButton>
+      <NuxtLink
+        to="/products"
+        class="inline-block mt-2 px-5 py-2.5 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-mono text-xs font-bold hover:bg-primary-600 transition"
+      >
+        BROWSE REGISTRY CATALOG
+      </NuxtLink>
     </div>
 
     <!-- Active Cart Layout -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Items Table / List -->
-      <div class="lg:col-span-2 space-y-4">
-        <div class="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Items Manifest List -->
+      <div class="lg:col-span-8 space-y-4">
+        <div class="p-6 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6">
           <div
             v-for="item in cart.items"
             :key="item.productId"
@@ -43,35 +54,35 @@ const { cart, updateQuantity, removeItem, clear } = useCart();
               <img
                 :src="item.image"
                 :alt="item.title"
-                class="w-20 h-20 object-cover rounded-xl border border-neutral-200 dark:border-neutral-700 shrink-0"
+                class="w-18 h-18 object-cover rounded-xl border border-neutral-200 dark:border-neutral-800 shrink-0 bg-neutral-100 dark:bg-neutral-950"
               />
-              <div>
+              <div class="space-y-0.5">
                 <NuxtLink :to="`/products/${item.productId}`" class="font-bold text-sm text-neutral-900 dark:text-white hover:text-primary-500 transition line-clamp-1">
                   {{ item.title }}
                 </NuxtLink>
-                <p class="text-xs text-neutral-500 mt-1">
-                  ${{ Number(item.price).toFixed(2) }}
+                <p class="text-xs font-mono text-neutral-400">
+                  ${{ Number(item.price).toFixed(2) }} UNIT PRICE
                 </p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+            <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto font-mono">
               <!-- Quantity -->
-              <div class="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden bg-white dark:bg-neutral-950">
+              <div class="flex items-center border border-neutral-300 dark:border-neutral-700 rounded-lg overflow-hidden bg-white dark:bg-neutral-950 text-xs">
                 <button
-                  class="px-2.5 py-1 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-xs"
+                  class="px-2.5 py-1 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
                   @click="updateQuantity(item.productId, item.quantity - 1)"
                 >
-                  <UIcon name="i-lucide-minus" class="w-3.5 h-3.5" />
+                  -
                 </button>
-                <span class="px-3 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                <span class="px-3 font-bold text-neutral-900 dark:text-white">
                   {{ item.quantity }}
                 </span>
                 <button
-                  class="px-2.5 py-1 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-xs"
+                  class="px-2.5 py-1 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
                   @click="updateQuantity(item.productId, item.quantity + 1)"
                 >
-                  <UIcon name="i-lucide-plus" class="w-3.5 h-3.5" />
+                  +
                 </button>
               </div>
 
@@ -83,7 +94,7 @@ const { cart, updateQuantity, removeItem, clear } = useCart();
               <!-- Remove -->
               <button
                 class="text-neutral-400 hover:text-red-500 transition"
-                title="Remove"
+                title="Remove item"
                 @click="removeItem(item.productId)"
               >
                 <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
@@ -91,70 +102,65 @@ const { cart, updateQuantity, removeItem, clear } = useCart();
             </div>
           </div>
 
-          <div class="pt-4 flex justify-between items-center text-xs">
-            <UButton
+          <div class="pt-4 flex justify-between items-center text-xs font-mono">
+            <NuxtLink
               to="/products"
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-arrow-left"
-              size="sm"
+              class="text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition flex items-center gap-1.5"
             >
-              Continue Shopping
-            </UButton>
+              ← CONTINUE EXPLORING
+            </NuxtLink>
             <button
-              class="text-neutral-400 hover:text-red-500 transition font-medium"
+              class="text-neutral-400 hover:text-red-500 transition"
               @click="clear"
             >
-              Clear Cart
+              CLEAR MANIFEST
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Order Summary Card -->
-      <div class="space-y-4">
-        <div class="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-4 shadow-sm">
-          <h3 class="font-bold text-base text-neutral-900 dark:text-white">
-            Order Summary
+      <!-- Manifest Total Summary -->
+      <div class="lg:col-span-4 space-y-4">
+        <div class="p-6 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-5 font-mono">
+          <h3 class="font-bold text-xs uppercase tracking-wider text-neutral-500 border-b border-neutral-100 dark:border-neutral-800 pb-3">
+            LOGISTICS &amp; SETTLEMENT
           </h3>
 
           <div class="space-y-2 text-xs">
             <div class="flex justify-between text-neutral-500">
-              <span>Items Subtotal</span>
-              <span class="font-medium text-neutral-900 dark:text-white">${{ cart.subtotal.toFixed(2) }}</span>
+              <span>ITEMS SUB-TOTAL</span>
+              <span class="font-bold text-neutral-900 dark:text-white">${{ cart.subtotal.toFixed(2) }}</span>
             </div>
             <div class="flex justify-between text-neutral-500">
-              <span>Shipping Fee</span>
-              <span class="font-medium text-neutral-900 dark:text-white">
-                {{ cart.shipping === 0 ? 'FREE' : `$${cart.shipping.toFixed(2)}` }}
+              <span>AIR LOGISTICS</span>
+              <span class="font-bold text-neutral-900 dark:text-white">
+                {{ cart.shipping === 0 ? 'FREE (0.00)' : `$${cart.shipping.toFixed(2)}` }}
               </span>
             </div>
             <div class="flex justify-between text-neutral-500">
-              <span>Estimated Sales Tax</span>
-              <span class="font-medium text-neutral-900 dark:text-white">${{ cart.tax.toFixed(2) }}</span>
+              <span>SALES TAX (8.25%)</span>
+              <span class="font-bold text-neutral-900 dark:text-white">${{ cart.tax.toFixed(2) }}</span>
             </div>
-            <div class="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-base font-extrabold text-neutral-900 dark:text-white">
-              <span>Estimated Total</span>
-              <span>${{ cart.total.toFixed(2) }}</span>
+            <div class="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex justify-between text-sm font-bold text-neutral-900 dark:text-white">
+              <span>FINAL TOTAL</span>
+              <span class="text-base">${{ cart.total.toFixed(2) }}</span>
             </div>
           </div>
 
-          <UButton
+          <NuxtLink
             to="/checkout"
-            color="primary"
-            variant="solid"
-            block
-            size="lg"
-            class="mt-4 font-bold rounded-xl shadow-lg shadow-primary-500/25"
+            class="block w-full py-3 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-mono text-xs font-bold text-center hover:bg-primary-600 dark:hover:bg-neutral-200 transition shadow-sm"
           >
-            Checkout with Credit Card
-          </UButton>
+            CONFIRM &amp; INITIATE DISPATCH →
+          </NuxtLink>
 
-          <div class="pt-2 text-center text-[11px] text-neutral-400">
-            🔒 256-Bit Encrypted Secure Checkout
+          <div class="text-center text-[10px] text-neutral-400">
+            ENCRYPTED POSTGRES ACID TRANSACTION
           </div>
         </div>
       </div>
+
     </div>
+
   </div>
 </template>

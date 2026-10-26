@@ -69,67 +69,86 @@ const selectCategory = (catId: string) => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-    <!-- Breadcrumb & Header -->
-    <div class="space-y-2">
-      <div class="flex items-center gap-2 text-xs text-neutral-500">
-        <NuxtLink to="/" class="hover:text-primary-500">Home</NuxtLink>
-        <span>/</span>
-        <span class="text-neutral-900 dark:text-white font-medium">Products</span>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-8">
+    
+    <!-- Editorial Header & Telemetry -->
+    <div class="border-b border-neutral-200 dark:border-neutral-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+          <NuxtLink to="/" class="hover:text-primary-500 transition-colors">ARCHIVE</NuxtLink>
+          <span>/</span>
+          <span class="text-neutral-900 dark:text-white font-bold">HARDWARE REGISTRY</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tight text-neutral-900 dark:text-white">
+          Component Catalog
+        </h1>
+        <p class="text-xs sm:text-sm text-neutral-500 font-mono">
+          INDEXED // {{ products.length }} OF {{ totalCount }} HARDWARE UNITS AVAILABLE
+        </p>
       </div>
-      <h1 class="text-3xl font-extrabold text-neutral-900 dark:text-white">
-        Product Catalog
-      </h1>
-      <p class="text-sm text-neutral-500">
-        Showing {{ products.length }} of {{ totalCount }} available items
-      </p>
+
+      <!-- Quick Reset Button (if filters active) -->
+      <div v-if="selectedCategory || searchQuery" class="flex items-center gap-2">
+        <button
+          class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 font-mono text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+          @click="selectCategory(''); searchQuery = ''; handleSearch()"
+        >
+          CLEAR ALL FILTERS [ × ]
+        </button>
+      </div>
     </div>
 
-    <!-- Controls Bar -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+    <!-- Precision Control Bar -->
+    <div class="p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      
       <!-- Category Chips -->
       <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
         <button
-          class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors"
-          :class="!selectedCategory ? 'bg-primary-600 text-white shadow-sm' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200'"
+          class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all border"
+          :class="!selectedCategory
+            ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-2xs'
+            : 'bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'"
           @click="selectCategory('')"
         >
-          All Items
+          ALL ({{ totalCount }})
         </button>
         <button
           v-for="cat in categories"
           :key="cat.id"
-          class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors"
-          :class="selectedCategory === cat.id ? 'bg-primary-600 text-white shadow-sm' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200'"
+          class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all border"
+          :class="selectedCategory === cat.id
+            ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-2xs'
+            : 'bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:border-neutral-400'"
           @click="selectCategory(cat.id)"
         >
-          {{ cat.name }}
+          {{ cat.name }} ({{ cat.item_count }})
         </button>
       </div>
 
-      <!-- Search & Sort -->
+      <!-- Search & Sort Controls -->
       <div class="flex items-center gap-3">
         <div class="relative flex-1 sm:w-64">
-          <UIcon name="i-lucide-search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <UIcon name="i-lucide-search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
             v-model="searchQuery"
             type="search"
             placeholder="Search catalog..."
-            class="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="w-full pl-8 pr-3 py-1.5 text-xs font-mono rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500"
             @keyup.enter="handleSearch"
           />
         </div>
 
         <select
           v-model="sortBy"
-          class="px-3 py-1.5 text-xs rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          class="px-3 py-1.5 text-xs font-mono rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary-500"
         >
-          <option value="newest">Newest First</option>
-          <option value="rating">Highest Rated</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
+          <option value="newest">LATEST ADDITIONS</option>
+          <option value="rating">HIGHEST RATED</option>
+          <option value="price_asc">PRICE: LOW → HIGH</option>
+          <option value="price_desc">PRICE: HIGH → LOW</option>
         </select>
       </div>
+
     </div>
 
     <!-- Product Grid -->
@@ -137,24 +156,24 @@ const selectCategory = (catId: string) => {
       <div
         v-for="i in 8"
         :key="i"
-        class="h-80 rounded-2xl bg-neutral-200 dark:bg-neutral-800 animate-pulse"
+        class="h-80 rounded-xl bg-neutral-100 dark:bg-neutral-850 animate-pulse border border-neutral-200/50 dark:border-neutral-800/50"
       />
     </div>
 
-    <div v-else-if="products.length === 0" class="py-20 text-center space-y-3">
-      <div class="w-16 h-16 mx-auto rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400">
-        <UIcon name="i-lucide-package-x" class="w-8 h-8" />
+    <div v-else-if="products.length === 0" class="py-24 text-center space-y-4 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+      <div class="w-12 h-12 mx-auto rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 font-mono text-xl">
+        ∅
       </div>
-      <h3 class="text-base font-semibold text-neutral-900 dark:text-white">No products found</h3>
-      <p class="text-xs text-neutral-500 max-w-sm mx-auto">Try resetting filters or searching for different keywords.</p>
-      <UButton
-        color="primary"
-        variant="outline"
-        size="sm"
+      <div class="space-y-1">
+        <h3 class="text-base font-mono font-bold text-neutral-900 dark:text-white">NO HARDWARE UNITS FOUND</h3>
+        <p class="text-xs text-neutral-400 max-w-sm mx-auto">No components match your specified query parameters.</p>
+      </div>
+      <button
+        class="px-4 py-2 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 font-mono text-xs font-bold hover:bg-primary-600 transition"
         @click="selectedCategory = ''; searchQuery = ''; refreshProducts()"
       >
-        Reset Filters
-      </UButton>
+        RESET ALL FILTERS
+      </button>
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -164,5 +183,6 @@ const selectCategory = (catId: string) => {
         :product="product"
       />
     </div>
+
   </div>
 </template>
