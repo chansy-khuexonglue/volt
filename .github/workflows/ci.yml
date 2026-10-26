@@ -35,3 +35,15 @@ jobs:
 
       - name: Run Framework Test Suite
         run: bun test packages/*/test packages/plugins/*/test benchmarks/test
+
+  docs:
+    name: Build Documentation Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build documentation image
+        run: docker build --progress=plain --file Dockerfile.web --tag volt-docs:ci .
