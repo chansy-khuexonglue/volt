@@ -26,5 +26,5 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-      - name: Run Test Suite
-        run: bun test
+      - name: Run Framework Test Suite
+        run: bun test packages/*/test packages/plugins/*/test benchmarks/test
