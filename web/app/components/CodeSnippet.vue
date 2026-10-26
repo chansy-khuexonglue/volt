@@ -41,8 +41,9 @@ async function copyCode() {
       </div>
 
       <button
+        type="button"
         @click="copyCode"
-        class="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium transition-all bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white border border-neutral-700/60 active:scale-95"
+        class="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium transition-all bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white border border-neutral-700/60 active:scale-95 cursor-pointer"
         :title="copied ? 'Copied!' : 'Copy to clipboard'"
       >
         <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-copy'" class="w-3.5 h-3.5 text-primary-400" />

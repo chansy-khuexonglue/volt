@@ -47,8 +47,9 @@ onMounted(() => {
             autofocus
           />
           <button
+            type="button"
             @click="closeSearch"
-            class="px-2 py-0.5 text-[10px] font-mono text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+            class="px-2 py-0.5 text-[10px] font-mono text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 cursor-pointer select-none"
           >
             ESC
           </button>

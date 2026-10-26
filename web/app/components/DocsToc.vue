@@ -23,8 +23,9 @@ function scrollToSection(id: string) {
       <ul class="space-y-1.5 border-l border-neutral-200 dark:border-neutral-800 text-[11px]">
         <li v-for="item in toc" :key="item.id">
           <button
+            type="button"
             @click="scrollToSection(item.id)"
-            class="block w-full text-left pl-3 py-1 text-neutral-600 dark:text-neutral-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors line-clamp-1"
+            class="block w-full text-left pl-3 py-1 text-neutral-600 dark:text-neutral-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors line-clamp-1 cursor-pointer"
           >
             {{ item.text }}
           </button>

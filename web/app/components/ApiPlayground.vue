@@ -115,12 +115,15 @@ function selectPreset(idx: number) {
       </div>
 
       <!-- Presets Tabs -->
-      <div class="flex flex-wrap items-center gap-1.5">
+      <div class="flex flex-wrap items-center gap-1.5" role="tablist">
         <button
+          type="button"
           v-for="(p, idx) in presets"
           :key="p.path"
           @click="selectPreset(idx)"
-          class="px-2.5 py-1 rounded text-xs font-mono font-medium transition-all"
+          role="tab"
+          :aria-selected="selectedPresetIndex === idx"
+          class="px-2.5 py-1 rounded text-xs font-mono font-medium transition-all cursor-pointer active:scale-95 select-none"
           :class="selectedPresetIndex === idx ? 'bg-primary-500/20 text-primary-400 border border-primary-500/40 font-bold' : 'bg-neutral-800 text-neutral-400 hover:text-neutral-200'"
         >
           <span :class="p.method === 'GET' ? 'text-emerald-400' : 'text-primary-400'">{{ p.method }}</span>
@@ -143,9 +146,10 @@ function selectPreset(idx: number) {
       </div>
 
       <button
+        type="button"
         @click="executeRequest"
         :disabled="isLoading"
-        class="flex items-center gap-1.5 px-4 py-2 rounded bg-primary-500 hover:bg-primary-600 text-white font-mono text-xs font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50"
+        class="flex items-center gap-1.5 px-4 py-2 rounded bg-primary-500 hover:bg-primary-600 text-white font-mono text-xs font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
       >
         <UIcon v-if="!isLoading" name="i-lucide-play" class="w-3.5 h-3.5 fill-current" />
         <UIcon v-else name="i-lucide-loader-2" class="w-3.5 h-3.5 animate-spin" />
