@@ -106,12 +106,12 @@ function selectPreset(idx: number) {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-950 text-zinc-100 overflow-hidden shadow-2xl">
+  <div class="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-950 text-neutral-100 overflow-hidden shadow-sm">
     <!-- Top toolbar -->
-    <div class="p-4 bg-zinc-900 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+    <div class="p-3.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-3 font-mono">
       <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-        <span class="text-xs font-mono font-semibold text-zinc-300">Live API Sandbox</span>
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+        <span class="text-xs font-bold text-neutral-300 uppercase tracking-wider">Live API Sandbox</span>
       </div>
 
       <!-- Presets Tabs -->
@@ -120,32 +120,32 @@ function selectPreset(idx: number) {
           v-for="(p, idx) in presets"
           :key="p.path"
           @click="selectPreset(idx)"
-          class="px-2.5 py-1 rounded-lg text-xs font-mono font-medium transition-all"
-          :class="selectedPresetIndex === idx ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'"
+          class="px-2.5 py-1 rounded text-xs font-mono font-medium transition-all"
+          :class="selectedPresetIndex === idx ? 'bg-primary-500/20 text-primary-400 border border-primary-500/40 font-bold' : 'bg-neutral-800 text-neutral-400 hover:text-neutral-200'"
         >
-          <span :class="p.method === 'GET' ? 'text-emerald-400' : 'text-blue-400'">{{ p.method }}</span>
+          <span :class="p.method === 'GET' ? 'text-emerald-400' : 'text-primary-400'">{{ p.method }}</span>
           {{ p.path.split('?')[0] }}
         </button>
       </div>
     </div>
 
     <!-- URL Bar & Send Button -->
-    <div class="p-4 bg-zinc-950 border-b border-zinc-800/80 flex items-center gap-3">
+    <div class="p-4 bg-neutral-950 border-b border-neutral-800 flex items-center gap-3">
       <span
-        class="text-xs font-mono font-bold px-2.5 py-1.5 rounded-lg"
-        :class="selectedPreset.method === 'GET' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'"
+        class="text-xs font-mono font-bold px-2.5 py-1.5 rounded"
+        :class="selectedPreset.method === 'GET' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-primary-500/10 text-primary-400 border border-primary-500/20'"
       >
         {{ selectedPreset.method }}
       </span>
 
-      <div class="flex-1 font-mono text-xs text-zinc-300 bg-zinc-900/80 px-3 py-2 rounded-lg border border-zinc-800 overflow-x-auto truncate">
+      <div class="flex-1 font-mono text-xs text-neutral-300 bg-neutral-900/90 px-3 py-2 rounded border border-neutral-800 overflow-x-auto truncate">
         http://localhost:3000{{ selectedPreset.path }}
       </div>
 
       <button
         @click="executeRequest"
         :disabled="isLoading"
-        class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-mono text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition-all disabled:opacity-50"
+        class="flex items-center gap-1.5 px-4 py-2 rounded bg-primary-500 hover:bg-primary-600 text-white font-mono text-xs font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50"
       >
         <UIcon v-if="!isLoading" name="i-lucide-play" class="w-3.5 h-3.5 fill-current" />
         <UIcon v-else name="i-lucide-loader-2" class="w-3.5 h-3.5 animate-spin" />
@@ -154,31 +154,31 @@ function selectPreset(idx: number) {
     </div>
 
     <!-- Request / Response Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-zinc-800 text-xs font-mono">
+    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-800 text-xs font-mono">
       <!-- Request Details -->
       <div class="p-4 space-y-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
           Request Payload & Headers
         </div>
-        <div v-if="selectedPreset.body" class="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 overflow-x-auto">
+        <div v-if="selectedPreset.body" class="p-3 rounded bg-neutral-900 border border-neutral-800 text-neutral-300 overflow-x-auto">
           <pre><code>{{ JSON.stringify(selectedPreset.body, null, 2) }}</code></pre>
         </div>
-        <div v-else class="p-4 text-center text-zinc-500 italic">
+        <div v-else class="p-4 text-center text-neutral-500 italic">
           No request body (Query parameters passed via URL)
         </div>
       </div>
 
       <!-- Response Details -->
-      <div class="p-4 space-y-3 bg-zinc-950/80">
-        <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+      <div class="p-4 space-y-3 bg-neutral-950">
+        <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-500">
           <span>Response JSON</span>
           <div class="flex items-center gap-2">
             <span class="text-emerald-400 font-bold">Status {{ activeResponse.status }} OK</span>
-            <span class="text-zinc-400">⚡ {{ responseTime }}ms</span>
+            <span class="text-neutral-400">⚡ {{ responseTime }}ms</span>
           </div>
         </div>
 
-        <div class="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-cyan-300 overflow-x-auto max-h-72">
+        <div class="p-3 rounded bg-neutral-900/90 border border-neutral-800 text-primary-300 overflow-x-auto max-h-72">
           <pre><code>{{ JSON.stringify(activeResponse.data, null, 2) }}</code></pre>
         </div>
       </div>

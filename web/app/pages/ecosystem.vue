@@ -93,14 +93,14 @@ const plugins: PluginInfo[] = [
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
     <!-- Header -->
     <div class="space-y-3 max-w-2xl">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-500 text-xs font-mono font-semibold">
-        <UIcon name="i-lucide-blocks" class="w-4 h-4" />
-        <span>Modular Plugins</span>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-xs font-mono font-bold uppercase tracking-wider border border-primary-500/20">
+        <UIcon name="i-lucide-blocks" class="w-4 h-4 text-primary-500" />
+        <span>Ecosystem Directory</span>
       </div>
-      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-950 dark:text-white">
         Official Plugins Ecosystem
       </h1>
-      <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+      <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
         Extend your Volt application with battle-tested, modular plugins. Zero bloat: only install what you need.
       </p>
     </div>
@@ -110,41 +110,41 @@ const plugins: PluginInfo[] = [
       <div
         v-for="p in plugins"
         :key="p.package"
-        class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md hover:border-cyan-500/40 transition-all flex flex-col justify-between group space-y-4"
+        class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all flex flex-col justify-between group space-y-4 font-mono"
       >
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-bold">
               <UIcon :name="p.icon" class="w-5 h-5" />
             </div>
             <span
               v-if="p.isOfficial"
-              class="text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-500 border border-cyan-500/20"
+              class="text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-primary-500/10 text-primary-500 border border-primary-500/20"
             >
               Official
             </span>
           </div>
 
           <div>
-            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-cyan-500 transition-colors">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase">
               {{ p.name }}
             </h3>
-            <div class="text-xs font-mono text-zinc-400 mt-0.5">
+            <div class="text-[11px] text-neutral-400 mt-0.5">
               {{ p.package }}
             </div>
           </div>
 
-          <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
             {{ p.description }}
           </p>
         </div>
 
-        <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
+        <div class="pt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between">
           <NuxtLink
             :to="`/docs/${p.docSlug}`"
-            class="text-xs font-semibold text-cyan-500 hover:text-cyan-400 flex items-center gap-1"
+            class="text-xs font-bold text-primary-500 hover:text-primary-600 flex items-center gap-1 uppercase tracking-wider"
           >
-            <span>View Documentation</span>
+            <span>Documentation</span>
             <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
           </NuxtLink>
         </div>

@@ -46,64 +46,66 @@ app.listen(() => {
 </script>
 
 <template>
-  <div class="relative overflow-hidden">
-    <!-- Ambient glowing backdrop effect -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none -z-10 overflow-hidden">
-      <div class="absolute top-[-150px] left-1/2 -translate-x-1/2 w-[750px] h-[400px] bg-gradient-to-tr from-cyan-500/20 via-sky-500/15 to-transparent blur-[120px] rounded-full" />
+  <div class="relative overflow-hidden tech-grid">
+    <!-- Ambient subtle glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none -z-10 overflow-hidden">
+      <div class="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-primary-500/10 blur-[130px] rounded-full" />
     </div>
 
     <!-- Hero Section -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 md:pt-24 md:pb-28">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20 md:pt-20 md:pb-24">
       <div class="text-center space-y-6 max-w-4xl mx-auto">
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs font-mono font-medium text-cyan-600 dark:text-cyan-400 select-none shadow-sm">
-          <span class="flex h-2 w-2 rounded-full bg-cyan-500 animate-ping" />
-          <span>⚡ Volt v0.1.0 Released</span>
-          <span class="text-zinc-400 dark:text-zinc-600">•</span>
-          <span class="text-zinc-700 dark:text-zinc-300">Engineered for Bun</span>
+        <!-- Telemetry Pill Badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 text-white dark:bg-neutral-900 dark:text-neutral-200 border border-neutral-800 text-[11px] font-mono select-none shadow-sm">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span class="font-bold text-primary-400">VOLT ARCHITECTURE</span>
+          <span class="text-neutral-600">■</span>
+          <span>BUN 1.1 C++ ENGINE</span>
+          <span class="text-neutral-600">■</span>
+          <span class="text-neutral-400">184,210 REQ/S</span>
         </div>
 
         <!-- Headline -->
-        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-[1.08]">
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-neutral-950 dark:text-white leading-[1.08]">
           The High-Performance API Framework for
-          <span class="bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-600 bg-clip-text text-transparent">
+          <span class="text-primary-500 underline decoration-primary-500/30 underline-offset-8">
             Modern Bun
           </span>
         </h1>
 
         <!-- Subheading -->
-        <p class="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-normal leading-relaxed">
-          Sub-millisecond p99 latency, zero-allocation Radix routing, enterprise Dependency Injection, and first-class Prisma ORM integration.
+        <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
+          Sub-millisecond p99 tail latency, zero-allocation Radix routing, enterprise Dependency Injection, and first-class Prisma ORM integration.
         </p>
 
         <!-- CTA & Quick Install Box -->
-        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
           <NuxtLink
             to="/docs/introduction"
-            class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 group active:scale-95"
+            class="w-full sm:w-auto px-6 py-3 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 font-bold text-xs uppercase tracking-wider font-mono transition-all shadow-sm flex items-center justify-center gap-2 group active:scale-95"
           >
             <span>Explore Documentation</span>
-            <UIcon name="i-lucide-arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <UIcon name="i-lucide-arrow-right" class="w-4 h-4 text-primary-500 group-hover:translate-x-1 transition-transform" />
           </NuxtLink>
 
           <NuxtLink
             to="/benchmarks"
-            class="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
+            class="w-full sm:w-auto px-6 py-3 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-semibold text-xs uppercase tracking-wider font-mono transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm"
           >
-            <UIcon name="i-lucide-gauge" class="w-4 h-4 text-cyan-500" />
-            <span>View Benchmarks</span>
+            <UIcon name="i-lucide-gauge" class="w-4 h-4 text-primary-500" />
+            <span>Telemetry & Benchmarks</span>
           </NuxtLink>
         </div>
 
         <!-- Terminal Install Selector -->
-        <div class="pt-6 max-w-md mx-auto">
-          <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="pt-4 max-w-md mx-auto">
+          <div class="flex items-center justify-center gap-2 mb-2 font-mono">
             <button
               v-for="pkg in (['bun', 'pnpm', 'npm'] as const)"
               :key="pkg"
               @click="activeInstallTab = pkg"
-              class="px-2.5 py-1 rounded text-xs font-mono font-medium transition-all"
-              :class="activeInstallTab === pkg ? 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/30' : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'"
+              class="px-2.5 py-0.5 rounded text-xs transition-all uppercase"
+              :class="activeInstallTab === pkg ? 'bg-primary-500/10 text-primary-500 border border-primary-500/30 font-bold' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'"
             >
               {{ pkg }}
             </button>
@@ -111,13 +113,13 @@ app.listen(() => {
 
           <div
             @click="copyCommand"
-            class="group cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-200 text-xs font-mono shadow-xl hover:border-zinc-700 transition-all select-none"
+            class="group cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs font-mono shadow-sm hover:border-neutral-700 transition-all select-none"
           >
             <div class="flex items-center gap-2">
-              <span class="text-cyan-400 font-bold">$</span>
+              <span class="text-primary-400 font-bold">$</span>
               <span>{{ installCommands[activeInstallTab] }}</span>
             </div>
-            <span class="text-zinc-500 group-hover:text-cyan-400 flex items-center gap-1">
+            <span class="text-neutral-500 group-hover:text-primary-400 flex items-center gap-1">
               <UIcon :name="copied ? 'i-lucide-check' : 'i-lucide-copy'" class="w-3.5 h-3.5" />
               <span>{{ copied ? 'Copied' : 'Copy' }}</span>
             </span>
@@ -126,15 +128,15 @@ app.listen(() => {
       </div>
 
       <!-- Hero Code Preview & Benchmark Teaser Grid -->
-      <div class="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div class="lg:col-span-7">
           <div class="space-y-2">
-            <div class="flex items-center justify-between text-xs font-mono text-zinc-500 px-1">
-              <span class="flex items-center gap-1.5">
-                <UIcon name="i-lucide-code-2" class="w-4 h-4 text-cyan-500" />
-                <span>Modern, Idiomatic TypeScript API</span>
+            <div class="flex items-center justify-between text-xs font-mono text-neutral-500 px-1">
+              <span class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
+                <UIcon name="i-lucide-code-2" class="w-4 h-4 text-primary-500" />
+                <span>Idiomatic TypeScript Core</span>
               </span>
-              <span>Bun native HTTP</span>
+              <span class="uppercase">Bun Serve Engine</span>
             </div>
             <CodeSnippet :code="quickstartCode" language="typescript" filename="server.ts" />
           </div>
@@ -147,96 +149,96 @@ app.listen(() => {
     </section>
 
     <!-- Key Architectural Pillars -->
-    <section class="border-t border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/40 py-20">
+    <section class="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100/40 dark:bg-neutral-950/70 py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div class="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-cyan-500">
-            Engineered for Modern Systems
+          <div class="inline-block text-[11px] font-mono font-bold uppercase tracking-wider text-primary-500">
+            ENGINEERED FOR EXTREME SCALE
+          </div>
+          <h2 class="text-3xl font-extrabold text-neutral-950 dark:text-white tracking-tight">
+            High-Throughput Architectural Pillars
           </h2>
-          <h3 class="text-3xl font-extrabold text-zinc-950 dark:text-white tracking-tight">
-            Why High-Throughput Teams Choose Volt
-          </h3>
-          <p class="text-sm text-zinc-600 dark:text-zinc-400">
-            A thoughtful architecture that does not force you to sacrifice code clarity for raw execution speed.
+          <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-sans">
+            A thoughtful architecture that does not force you to sacrifice code maintainability for raw execution speed.
           </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Pillar 1 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-lucide-zap" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              01
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
               184,000+ Requests / sec
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Direct integration with Bun's C++ native HTTP engine bypasses Node.js legacy event loops, producing sub-millisecond p99 latencies.
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
+              Direct integration with Bun's C++ native HTTP engine bypasses Node.js legacy event loops, producing sub-millisecond p99 tail latencies.
             </p>
           </div>
 
           <!-- Pillar 2 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-lucide-split" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              02
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
               O(1) Radix Tree Router
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
               Static endpoints resolve via instant hash lookups, while dynamic parameters (<code class="code-inline">:id</code>) and wildcards match in a compressed prefix tree.
             </p>
           </div>
 
           <!-- Pillar 3 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-simple-icons-prisma" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              03
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
-              First-Class Prisma Plugin
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
+              Prisma ORM Plugin
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
               Official <code class="code-inline">@volt/plugin-prisma</code> provides context store injection (<code class="code-inline">c.store.prisma</code>), automated P2002 error translation, and graceful connection teardown.
             </p>
           </div>
 
           <!-- Pillar 4 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-lucide-layers" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              04
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
               Built-in Dependency Injection
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              NestJS-style modular architecture with <code class="code-inline">@Injectable()</code>, Singleton & Transient scopes, and circular dependency protection without the performance penalty.
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
+              NestJS-style modular architecture with <code class="code-inline">@Injectable()</code>, Singleton & Transient scopes, and circular dependency protection without the reflection penalty.
             </p>
           </div>
 
           <!-- Pillar 5 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-lucide-book-open" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              05
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
               OpenAPI 3.1 & Swagger
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Generates OpenAPI specs automatically from validation schemas and serves live interactive Swagger UI and Scalar UI documentation out of the box.
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
+              Generates OpenAPI specifications automatically from validation schemas and serves interactive Swagger UI and Scalar UI documentation out of the box.
             </p>
           </div>
 
           <!-- Pillar 6 -->
-          <div class="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm hover:shadow-md transition-all space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
-              <UIcon name="i-lucide-shield-check" class="w-5 h-5" />
+          <div class="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm hover:border-primary-500/40 transition-all space-y-3 group">
+            <div class="w-10 h-10 rounded-lg bg-neutral-900 text-white dark:bg-neutral-800 dark:text-primary-400 flex items-center justify-center font-mono font-bold text-sm">
+              06
             </div>
-            <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
               Automatic Type Coercion
-            </h4>
-            <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              No more manual <code class="code-inline">parseInt()</code> or boolean parsing. Query strings like <code class="code-inline">?limit=20&active=true</code> are automatically coerced into strictly-typed numbers and booleans.
+            </h3>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
+              Eliminate manual parsing. Query strings like <code class="code-inline">?limit=20&active=true</code> are automatically coerced into strictly-typed numbers and booleans.
             </p>
           </div>
         </div>
@@ -247,22 +249,22 @@ app.listen(() => {
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-cyan-500">
-            Interactive Test Drive
-          </h2>
-          <h3 class="text-2xl sm:text-3xl font-extrabold text-zinc-950 dark:text-white tracking-tight mt-1">
+          <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-primary-500">
+            INTERACTIVE SYSTEM TEST
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-950 dark:text-white tracking-tight mt-1">
             Experience Volt's Speed in Your Browser
-          </h3>
-          <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-            Test live routes, inspect type-safe responses, and measure response times.
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-sans">
+            Test live routes, inspect type-safe responses, and measure execution latency.
           </p>
         </div>
 
         <NuxtLink
           to="/playground"
-          class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-cyan-500 hover:text-cyan-400 transition-colors"
+          class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-primary-500 hover:text-primary-600 uppercase tracking-wider transition-colors"
         >
-          <span>Open Fullscreen Playground</span>
+          <span>Open Full Sandbox</span>
           <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
         </NuxtLink>
       </div>
@@ -271,25 +273,25 @@ app.listen(() => {
     </section>
 
     <!-- Bottom CTA -->
-    <section class="border-t border-zinc-200 dark:border-zinc-800/80 bg-zinc-950 text-white py-16 relative overflow-hidden">
+    <section class="border-t border-neutral-200 dark:border-neutral-800 bg-black text-white py-16 relative overflow-hidden">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
-        <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-          Ready to Build Ultra-Fast APIs?
-        </h3>
-        <p class="text-zinc-400 text-sm sm:text-base max-w-xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          Ready to Deploy Extreme Throughput?
+        </h2>
+        <p class="text-neutral-400 text-xs sm:text-sm max-w-xl mx-auto font-sans leading-relaxed">
           Start building production services in seconds with Volt, Bun, and TypeScript.
         </p>
-        <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-2 font-mono">
           <NuxtLink
             to="/docs/quick-start"
-            class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-cyan-500/20 active:scale-95"
+            class="px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
           >
-            Get Started in 60 Seconds
+            Get Started in 60s
           </NuxtLink>
           <a
             href="https://github.com/chansy-khuexonglue/volt"
             target="_blank"
-            class="px-6 py-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-semibold text-sm transition-all flex items-center gap-2"
+            class="px-6 py-3 rounded-lg border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-semibold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
           >
             <UIcon name="i-simple-icons-github" class="w-4 h-4" />
             <span>GitHub Repository</span>
