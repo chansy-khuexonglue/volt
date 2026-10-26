@@ -18,6 +18,7 @@
     "dev:auth": "bun --watch examples/authentication/index.ts",
     "dev:ecommerce:api": "bun --watch examples/ecommerce/api/src/index.ts",
     "dev:ecommerce:web": "bun --cwd examples/ecommerce/web dev",
+    "dev:docs": "bun --cwd web dev --port 3002",
     "start": "bun run examples/basic-api/index.ts",
     "test": "bun test packages/*/test packages/plugins/*/test examples/*/test examples/ecommerce/*/test benchmarks/test",
     "test:examples": "bun test examples/*/test examples/ecommerce/*/test",

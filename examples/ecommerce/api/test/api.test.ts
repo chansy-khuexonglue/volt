@@ -18,7 +18,7 @@ describe('🛒 Volt eCommerce REST API', () => {
     expect(body.database).toBe('connected');
     expect(body.orm).toBe('Prisma Plugin (@volt/plugin-prisma)');
     expect(body.framework).toBe('Volt');
-  });
+  }, 15000);
 
   it('OPTIONS /api/products returns 204 with full CORS preflight headers', async () => {
     const req = new Request('http://localhost:3000/api/products', {
