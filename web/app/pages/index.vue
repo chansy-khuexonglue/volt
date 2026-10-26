@@ -83,10 +83,10 @@ app.listen(() => {
         <!-- CTA & Quick Install Box -->
         <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
           <NuxtLink
-            to="/docs/introduction"
+            to="/docs/quick-start"
             class="w-full sm:w-auto px-6 py-3 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 font-bold text-xs uppercase tracking-wider font-mono transition-all shadow-sm flex items-center justify-center gap-2 group active:scale-95"
           >
-            <span>Explore Documentation</span>
+            <span>Build your first API</span>
             <UIcon name="i-lucide-arrow-right" class="w-4 h-4 text-primary-500 group-hover:translate-x-1 transition-transform" />
           </NuxtLink>
 
@@ -99,6 +99,17 @@ app.listen(() => {
           </NuxtLink>
         </div>
 
+        <div class="max-w-xl mx-auto text-left rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-950 p-4 font-mono text-xs text-neutral-100 space-y-2">
+          <p class="text-neutral-400"># Install, create index.ts, then run</p>
+          <p>bun add voltts</p>
+          <p>import { Volt } from 'voltts';</p>
+          <p>const app = new Volt({ port: 3000 });</p>
+          <p>app.get('/hello', () => ({ message: 'Hello Volt' }));</p>
+          <p>app.listen(3000);</p>
+          <p class="text-neutral-400"># bun run index.ts</p>
+          <p class="text-primary-400">curl http://localhost:3000/hello</p>
+          <NuxtLink to="/docs/tutorial-crud" class="inline-block text-primary-400 underline pt-2">Continue with the Tasks API tutorial →</NuxtLink>
+        </div>
         <!-- Terminal Install Selector -->
         <div class="pt-4 max-w-md mx-auto">
           <div class="flex items-center justify-center gap-2 mb-2 font-mono">
