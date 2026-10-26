@@ -64,6 +64,8 @@ export type Handler<
 ) => HandlerReturn | Promise<HandlerReturn>;
 
 export interface ServerOptions {
+  /** Use Bun native routing for eligible static GET routes. Defaults to true. */
+  nativeRoutes?: boolean;
   port?: number;
   hostname?: string;
   development?: boolean;
