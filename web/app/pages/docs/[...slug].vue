@@ -15,7 +15,9 @@ const slug = computed(() => {
 });
 
 const doc = computed<DocItem>(() => {
-  return docsDatabase[slug.value] || docsDatabase['introduction'];
+  const page = docsDatabase[slug.value];
+  if (!page) throw createError({ statusCode: 404, statusMessage: 'Documentation page not found' });
+  return page;
 });
 
 useSeoMeta({
@@ -72,81 +74,7 @@ const nextDoc = computed(() => {
       </p>
     </div>
 
-    <!-- Interactive Code Snippet -->
-    <div v-if="doc.codeSnippet" class="space-y-2">
-      <div class="text-xs font-mono text-neutral-500 font-bold uppercase tracking-wider px-1 flex items-center gap-1.5">
-        <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-primary-500" />
-        <span>Implementation Example</span>
-      </div>
-      <CodeSnippet
-        :code="doc.codeSnippet.code"
-        :language="doc.codeSnippet.language"
-        :filename="doc.codeSnippet.filename"
-      />
-    </div>
-
-    <!-- Formatted Documentation Body -->
-    <article class="prose dark:prose-invert max-w-none text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed space-y-6 font-sans">
-      <div
-        v-for="(para, idx) in doc.content.trim().split('\n\n')"
-        :key="idx"
-        class="space-y-3"
-      >
-        <!-- Heading 2 -->
-        <h2
-          v-if="para.startsWith('## ')"
-          :id="para.replace('## ', '').toLowerCase().replace(/[^a-z0-9]+/g, '-')"
-          class="text-xl font-bold text-neutral-950 dark:text-white tracking-tight pt-4 border-t border-neutral-100 dark:border-neutral-800/80 font-sans"
-        >
-          {{ para.replace('## ', '') }}
-        </h2>
-
-        <!-- Heading 1 -->
-        <h3
-          v-else-if="para.startsWith('# ')"
-          :id="para.replace('# ', '').toLowerCase().replace(/[^a-z0-9]+/g, '-')"
-          class="text-2xl font-bold text-neutral-950 dark:text-white tracking-tight font-sans"
-        >
-          {{ para.replace('# ', '') }}
-        </h3>
-
-        <!-- Fenced code examples -->
-        <pre v-else-if="para.startsWith('```')" class="overflow-x-auto rounded-xl bg-neutral-950 p-4 text-xs text-neutral-100"><code>{{ para.replace(/^```[^\n]*\n?/, '').replace(/\n?```$/, '') }}</code></pre>
-
-        <!-- Table -->
-        <div v-else-if="para.includes('| :--- |')" class="my-6 overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
-          <table class="w-full text-left text-xs font-mono">
-            <tbody>
-              <tr
-                v-for="(row, rIdx) in para.split('\n')"
-                :key="rIdx"
-                :class="rIdx === 0 ? 'bg-neutral-100 dark:bg-neutral-950 font-bold border-b border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white' : 'border-b border-neutral-100 dark:border-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/30'"
-              >
-                <td
-                  v-for="(cell, cIdx) in row.split('|').filter(c => c.trim().length > 0)"
-                  :key="cIdx"
-                  class="p-3.5"
-                >
-                  {{ cell.trim() }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Unordered List -->
-        <ul v-else-if="para.startsWith('- ')" class="space-y-2 list-disc pl-5">
-          <li v-for="(line, lIdx) in para.split('\n')" :key="lIdx">
-            {{ line.replace('- ', '') }}
-          </li>
-        </ul>
-
-        <!-- Normal Paragraph -->
-        <p v-else class="text-neutral-600 dark:text-neutral-300 leading-relaxed">
-          {{ para }}
-        </p>
-      </div>
-    </article>
+    <DocsContent :content="doc.content" />
 
     <!-- Next & Previous Navigation Footer -->
     <div class="pt-10 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-4 font-mono">

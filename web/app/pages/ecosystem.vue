@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Volt Plugins & Ecosystem',
-  description: 'Explore official Volt plugins: Prisma ORM, Redis, PostgreSQL native driver, JWT, rate limiting, and GraphQL.',
+  description: 'Explore official Volt plugins: Prisma ORM, Redis, PostgreSQL client integration, JWT, rate limiting, and GraphQL.',
 });
 
 interface PluginInfo {
@@ -23,9 +23,9 @@ const plugins: PluginInfo[] = [
     isOfficial: true,
   },
   {
-    name: 'PostgreSQL Native',
+    name: 'PostgreSQL Integration',
     package: '@voltts/plugin-postgres',
-    description: 'Harnesses Bun\'s native SQL client for high-throughput tagged template queries and transaction support.',
+    description: 'Inject a compatible PostgreSQL client with query and transaction methods. The default implementation is a mock.',
     docSlug: 'plugin-postgres',
     icon: 'i-simple-icons-postgresql',
     isOfficial: true,
@@ -33,7 +33,7 @@ const plugins: PluginInfo[] = [
   {
     name: 'Redis Cache',
     package: '@voltts/plugin-redis',
-    description: 'Redis client with pooled connections, response caching, key expiration, and session store helpers.',
+    description: 'Inject a compatible Redis client with get/set and TTL operations. The default store is in memory.',
     docSlug: 'plugin-redis',
     icon: 'i-simple-icons-redis',
     isOfficial: true,
@@ -57,7 +57,7 @@ const plugins: PluginInfo[] = [
   {
     name: 'Rate Limiter',
     package: '@voltts/plugin-rate-limit',
-    description: 'Token bucket rate limiting to prevent DDoS, abuse, and brute force with standard RFC headers.',
+    description: 'Window-based request counters with configurable stores, key generators, and limit headers.',
     docSlug: 'plugin-rate-limit',
     icon: 'i-lucide-gauge',
     isOfficial: true,

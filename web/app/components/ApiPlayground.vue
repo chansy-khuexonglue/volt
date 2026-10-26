@@ -83,20 +83,13 @@ const presets: EndpointPreset[] = [
 ];
 
 const selectedPresetIndex = ref(0);
-const selectedPreset = computed(() => presets[selectedPresetIndex.value]);
+const selectedPreset = computed(() => presets[selectedPresetIndex.value] ?? presets[0]!);
 
-const isLoading = ref(false);
-const activeResponse = ref<any>(presets[0].response);
-const responseTime = ref<number>(0.84);
+const activeResponse = ref<any>(presets[0]!.response);
+
 
 function executeRequest() {
-  isLoading.value = true;
-  const start = performance.now();
-  setTimeout(() => {
-    activeResponse.value = selectedPreset.value.response;
-    responseTime.value = Number((performance.now() - start + Math.random() * 0.4).toFixed(2));
-    isLoading.value = false;
-  }, 120);
+  activeResponse.value = selectedPreset.value!.response;
 }
 
 function selectPreset(idx: number) {
@@ -111,7 +104,7 @@ function selectPreset(idx: number) {
     <div class="p-3.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-3 font-mono">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-        <span class="text-xs font-bold text-neutral-300 uppercase tracking-wider">Live API Sandbox</span>
+        <span class="text-xs font-bold text-neutral-300 uppercase tracking-wider">Preset Response Explorer</span>
       </div>
 
       <!-- Presets Tabs -->
@@ -132,6 +125,7 @@ function selectPreset(idx: number) {
       </div>
     </div>
 
+    <p class="border-b border-neutral-800 px-4 py-3 text-xs leading-5 text-neutral-400">These are preset examples, not requests to a running Volt API. Follow the <NuxtLink to="/docs/tutorial-crud" class="text-primary-400 underline">Tasks API tutorial</NuxtLink> to run and test real endpoints.</p>
     <!-- URL Bar & Send Button -->
     <div class="p-4 bg-neutral-950 border-b border-neutral-800 flex items-center gap-3">
       <span
@@ -148,12 +142,10 @@ function selectPreset(idx: number) {
       <button
         type="button"
         @click="executeRequest"
-        :disabled="isLoading"
         class="flex items-center gap-1.5 px-4 py-2 rounded bg-primary-500 hover:bg-primary-600 text-white font-mono text-xs font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
       >
-        <UIcon v-if="!isLoading" name="i-lucide-play" class="w-3.5 h-3.5 fill-current" />
-        <UIcon v-else name="i-lucide-loader-2" class="w-3.5 h-3.5 animate-spin" />
-        <span>{{ isLoading ? 'Executing...' : 'Send' }}</span>
+        <UIcon name="i-lucide-play" class="w-3.5 h-3.5 fill-current" />
+        <span>Preview</span>
       </button>
     </div>
 
@@ -178,7 +170,7 @@ function selectPreset(idx: number) {
           <span>Response JSON</span>
           <div class="flex items-center gap-2">
             <span class="text-emerald-400 font-bold">Status {{ activeResponse.status }} OK</span>
-            <span class="text-neutral-400">⚡ {{ responseTime }}ms</span>
+            <span class="text-neutral-400">Preset response · no network request</span>
           </div>
         </div>
 

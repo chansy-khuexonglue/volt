@@ -8,17 +8,17 @@ FROM oven/bun:1-alpine AS builder
 WORKDIR /app
 
 # Copy package metadata
-COPY web/package.json ./
+COPY web/package.json web/bun.lock ./
 
 # Install dependencies with Bun
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # Copy web application source code
 COPY web/ ./
 
 # Build Nuxt 4 production bundle (Nitro server + static assets)
 ENV NODE_ENV=production
-RUN bun run build
+RUN bun run typecheck && bun run build
 
 # ==========================================
 # Stage 2: Minimal Production Runtime
