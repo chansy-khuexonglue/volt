@@ -2,15 +2,17 @@ import { Volt } from '../packages/core/src/index';
 import { Elysia } from 'elysia';
 import os from 'node:os';
 import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 if (process.argv[2] === '--worker') {
   const mode = process.argv[3];
+  const PreviousVolt = mode === 'Volt previous' ? (await import(resolve(process.env.BENCH_BASELINE!))).Volt : Volt;
   const server = mode === 'Elysia' ? new Elysia().get('/ping', () => ({message:'pong'})).get('/context', ({request}) => ({header:request.headers.get('x-test')})).listen({port:0,hostname:'127.0.0.1'}).server!
-    : new Volt({port:0,hostname:'127.0.0.1',nativeRoutes:mode==='Volt native'}).get('/ping', () => ({message:'pong'})).get('/context', (c) => ({header:c.headers.get('x-test')})).listen();
+    : new PreviousVolt({port:0,hostname:'127.0.0.1',nativeRoutes:mode==='Volt native'}).get('/ping', () => ({message:'pong'})).get('/context', (c) => ({header:c.headers.get('x-test')})).listen();
   console.log(server.port);
 } else {
-  const modes=['Volt JS','Volt native','Elysia'];
+  const modes=process.env.BENCH_BASELINE ? ['Volt previous','Volt JS','Volt native','Elysia'] : ['Volt JS','Volt native','Elysia'];
   const results: Array<{mode:string;repeat:number;rps:number;p99:number;errors:number}>=[];
-  for(let repeat=0;repeat<5;repeat++) for(const mode of [...modes.slice(repeat%3),...modes.slice(0,repeat%3)]) {
+  for(let repeat=0;repeat<5;repeat++) for(const mode of [...modes.slice(repeat%modes.length),...modes.slice(0,repeat%modes.length)]) {
     const child=Bun.spawn([process.execPath,import.meta.path,'--worker',mode],{stdout:'pipe',stderr:'inherit'});
     try {
       const reader=child.stdout.getReader();const {value}=await reader.read();reader.releaseLock();
