@@ -1,4 +1,4 @@
-import { Volt, cors, logger, openapi } from 'volt';
+import { Volt, cors, logger, openapi, prismaPlugin } from 'volt';
 import { config } from './config';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -6,7 +6,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { sql } from './db';
+import { prisma, sql } from './db';
 
 export function createApplication(): Volt {
   const app = new Volt({
@@ -18,6 +18,15 @@ export function createApplication(): Volt {
   app.use(logger({ format: 'dev' }));
   app.use(cors({ origin: config.cors.origin, credentials: true }));
 
+  // Register Official Volt Prisma ORM Plugin
+  app.plugin(
+    prismaPlugin({
+      client: prisma,
+      handleErrors: true,
+      injectContext: true,
+    })
+  );
+
   // Interactive OpenAPI / Swagger Docs
   app.use(
     openapi({
@@ -25,7 +34,7 @@ export function createApplication(): Volt {
         title: 'Volt High-Performance eCommerce API',
         version: '1.0.0',
         description:
-          'Full-featured eCommerce REST API built with Volt, Bun, and PostgreSQL. Powers storefront browsing, product search, cart sessions, checkout, and customer reviews.',
+          'Full-featured eCommerce REST API built with Volt, Bun, Prisma Plugin, and PostgreSQL. Powers storefront browsing, product search, cart sessions, checkout, and customer reviews.',
       },
       path: '/docs',
       swaggerPath: '/swagger',
@@ -37,12 +46,13 @@ export function createApplication(): Volt {
   // Health check endpoint
   app.get('/health', async (ctx) => {
     try {
-      const dbCheck = await sql`SELECT 1 as healthy`;
+      await prisma.$connect();
       return ctx.json({
         status: 'ok',
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
-        database: dbCheck.length > 0 ? 'connected' : 'disconnected',
+        database: 'connected',
+        orm: 'Prisma Plugin (@volt/plugin-prisma)',
         framework: 'Volt',
         runtime: `Bun v${Bun.version}`,
       });

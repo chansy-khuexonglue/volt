@@ -4,12 +4,19 @@ import { createApplication } from '../src/app';
 describe('🛒 Volt eCommerce REST API', () => {
   const app = createApplication();
 
-  it('GET /health returns 200 with database status connected', async () => {
+  it('loads DATABASE_URL from .env and registers Prisma plugin on Volt application', () => {
+    expect((app as any).prisma).toBeDefined();
+    expect(app.store.prisma).toBeDefined();
+    expect(typeof (app as any).prisma.$connect).toBe('function');
+  });
+
+  it('GET /health returns 200 with database status connected and Prisma ORM reported', async () => {
     const res = await app.fetch(new Request('http://localhost:3000/health'));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe('ok');
     expect(body.database).toBe('connected');
+    expect(body.orm).toBe('Prisma Plugin (@volt/plugin-prisma)');
     expect(body.framework).toBe('Volt');
   });
 
