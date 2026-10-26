@@ -6,8 +6,10 @@ useSeoMeta({
   ogDescription: 'Experience 180,000+ requests per second with sub-millisecond p99 latency on Bun.',
 });
 
-const activeInstallTab = ref<'bun' | 'pnpm' | 'npm'>('bun');
-const installCommands = {
+const installPkgOptions = ['bun', 'pnpm', 'npm'] as const;
+type PkgManager = typeof installPkgOptions[number];
+const activeInstallTab = ref<PkgManager>('bun');
+const installCommands: Record<PkgManager, string> = {
   bun: 'bun add volt',
   pnpm: 'pnpm add volt',
   npm: 'npm install volt',
@@ -101,7 +103,7 @@ app.listen(() => {
         <div class="pt-4 max-w-md mx-auto">
           <div class="flex items-center justify-center gap-2 mb-2 font-mono">
             <button
-              v-for="pkg in (['bun', 'pnpm', 'npm'] as const)"
+              v-for="pkg in installPkgOptions"
               :key="pkg"
               @click="activeInstallTab = pkg"
               class="px-2.5 py-0.5 rounded text-xs transition-all uppercase"

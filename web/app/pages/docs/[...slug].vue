@@ -43,8 +43,9 @@ const nextDoc = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-10">
-    <!-- Breadcrumbs -->
+  <div class="flex items-start gap-8">
+    <div class="flex-1 min-w-0 max-w-3xl space-y-10">
+      <!-- Breadcrumbs -->
     <div class="flex items-center gap-2 text-xs font-mono text-neutral-500 uppercase tracking-wider">
       <NuxtLink to="/docs/introduction" class="hover:text-primary-500 transition-colors">Docs</NuxtLink>
       <span>/</span>
@@ -178,8 +179,6 @@ const nextDoc = computed(() => {
     </div>
   </div>
 
-  <!-- Teleport Table of Contents to the right layout slot -->
-  <template #toc>
-    <DocsToc :toc="doc.toc" />
-  </template>
+  <DocsToc :toc="doc.toc" />
+</div>
 </template>

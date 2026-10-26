@@ -72,21 +72,21 @@ watch(() => route.path, () => {
             <NuxtLink
               to="/benchmarks"
               class="transition-colors hover:text-primary-500"
-              :class="route.path === '/benchmarks' ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
+              :class="route.path.startsWith('/benchmarks') ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
             >
               Benchmarks
             </NuxtLink>
             <NuxtLink
               to="/playground"
               class="transition-colors hover:text-primary-500"
-              :class="route.path === '/playground' ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
+              :class="route.path.startsWith('/playground') ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
             >
               Sandbox
             </NuxtLink>
             <NuxtLink
               to="/ecosystem"
               class="transition-colors hover:text-primary-500"
-              :class="route.path === '/ecosystem' ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
+              :class="route.path.startsWith('/ecosystem') ? 'text-primary-500 font-bold' : 'text-neutral-600 dark:text-neutral-400'"
             >
               Ecosystem
             </NuxtLink>

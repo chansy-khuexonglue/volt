@@ -8,12 +8,9 @@
         <DocsSidebar />
 
         <!-- Middle: Main Article Content Slot -->
-        <main class="flex-1 min-w-0 max-w-3xl">
+        <main class="flex-1 min-w-0">
           <slot />
         </main>
-
-        <!-- Right: Table of Contents & Community Slot -->
-        <slot name="toc" />
       </div>
     </div>
 
