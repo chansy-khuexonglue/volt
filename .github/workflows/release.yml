@@ -1,9 +1,10 @@
-name: Release & Publish
+name: Release & Publish to NPM
 
 on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -34,17 +35,28 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Publish to NPM
+      - name: Publish Packages to NPM
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN || secrets.NPM_AUTH_TOKEN }}
         run: |
-          # Publish core and plugins
-          for pkg in packages/core packages/router packages/validator packages/di packages/openapi packages/cli packages/volt packages/plugins/*; do
+          if [ -z "$TOKEN" ]; then
+            echo "::error::No NPM secret found! Ensure NPM_TOKEN or NODE_AUTH_TOKEN is configured in GitHub Repository Secrets."
+            exit 1
+          fi
+
+          # Configure npm credentials
+          echo "//registry.npmjs.org/:_authToken=${TOKEN}" > ~/.npmrc
+
+          echo "🚀 Publishing workspace packages to NPM..."
+          
+          # Attempt Bun native recursive publisher first
+          bun publish --recursive --access public || true
+
+          # Explicit package publish fallback for npm compatibility
+          for pkg in packages/core packages/router packages/validator packages/di packages/serializer packages/middleware packages/websocket packages/openapi packages/testing packages/cli packages/jwt packages/cache packages/jobs packages/node packages/volt packages/plugins/*; do
             if [ -f "$pkg/package.json" ]; then
               echo "Publishing $pkg..."
-              cd "$pkg"
-              npm publish --access public --provenance || true
-              cd - > /dev/null
+              npm publish "$pkg" --access public || true
             fi
           done
 
