@@ -95,7 +95,6 @@ export const docCategories: DocCategory[] = [
     icon: 'i-lucide-gauge',
     items: [
       { slug: 'benchmarks', title: 'Performance & Benchmarks' },
-      { slug: 'deployment', title: 'Production Deployment' },
     ],
   },
 ];
@@ -223,6 +222,7 @@ app.listen();`,
     toc: [
       { id: 'create-the-project', text: 'Create the project' },
       { id: 'add-the-routes', text: 'Add the routes' },
+      { id: 'update-and-delete', text: 'Update and delete' },
       { id: 'try-the-api', text: 'Try the API' },
       { id: 'next-steps', text: 'Next steps' },
     ],
@@ -243,6 +243,10 @@ Create \`index.ts\` using the complete example above. This tutorial keeps tasks 
 
 \`GET /tasks\` returns all tasks. \`GET /tasks/:id\` reads a path parameter and returns 404 when it cannot find the task. \`POST /tasks\` validates the JSON body before the handler runs and returns 201 for a new task. The \`t.Object\` schema requires a title of at least two characters.
 
+## Update and delete
+
+`PUT /tasks/:id` replaces a title after validating the body. `DELETE /tasks/:id` removes a task and returns 204. Both return 404 when the ID does not exist.
+
 ## Try the API
 
 Start the server:
@@ -257,6 +261,8 @@ In another terminal, create and fetch a task:
 curl -i http://localhost:3000/tasks
 curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"Learn Volt"}'
 curl -i http://localhost:3000/tasks/1
+curl -i -X PUT http://localhost:3000/tasks/1 -H 'Content-Type: application/json' -d '{"title":"Build a Volt API"}'
+curl -i -X DELETE http://localhost:3000/tasks/1
 \`\`\`
 
 Try an invalid body to see validation in action:
@@ -290,6 +296,22 @@ app.post('/tasks', (c) => {
   return c.json(task, 201);
 }, {
   body: t.Object({ title: t.String({ minLength: 2 }) }),
+});
+
+app.put('/tasks/:id', (c) => {
+  const task = tasks.find((item) => item.id === Number(c.params.id));
+  if (!task) return c.json({ error: 'Task not found' }, 404);
+  task.title = c.body.title;
+  return c.json(task);
+}, {
+  body: t.Object({ title: t.String({ minLength: 2 }) }),
+});
+
+app.delete('/tasks/:id', (c) => {
+  const index = tasks.findIndex((item) => item.id === Number(c.params.id));
+  if (index === -1) return c.json({ error: 'Task not found' }, 404);
+  tasks.splice(index, 1);
+  return new Response(null, { status: 204 });
 });
 
 app.listen(3000, (server) => {
@@ -1137,68 +1159,4 @@ bun run bench:all`,
     },
   },
 
-  deployment: {
-    slug: 'deployment',
-    title: 'Production Deployment',
-    description: 'Deploy Volt to Docker, Fly.io, Railway, Kubernetes, and Linux edge VMs.',
-    category: 'Benchmarks & Ops',
-    toc: [
-      { id: 'docker-deployment', text: 'Docker & Compose' },
-      { id: 'web-docs', text: 'Deploying Documentation' },
-      { id: 'environment-variables', text: 'Environment Configuration' },
-    ],
-    content: `
-# Production Deployment
-
-Volt compiles to a single lean executable or runs directly under \`bun run\`. Production Docker images start in under 10ms with RSS footprint below 35MB.
-
-## Multi-Container Docker Compose
-
-Deploy the Volt API Engine, Documentation Portal, and PostgreSQL database with a single command:
-
-\`\`\`bash
-docker compose up -d --build
-\`\`\`
-
-## Service Ports
-
-| Service | Port | Description |
-| :--- | :--- | :--- |
-| **volt-api** | \`3000\` | High-throughput Volt REST API engine |
-| **volt-docs** | \`3002\` | Nuxt 4 Documentation & Telemetry Portal |
-| **postgres** | \`5432\` | PostgreSQL 17 Relational Database |
-    `,
-    codeSnippet: {
-      filename: 'docker-compose.yml',
-      language: 'yaml',
-      code: `services:
-  volt-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/volt_ecommerce?schema=public
-
-  volt-docs:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=production
-
-  postgres:
-    image: postgres:17-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=volt_ecommerce`,
-    },
-  },
 };
