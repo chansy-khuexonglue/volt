@@ -492,33 +492,35 @@ export const timingMiddleware: MiddlewareHandler = async (c, next) => {
   'lifecycle-hooks': {
     slug: 'lifecycle-hooks',
     title: 'Lifecycle Hooks',
-    description: 'Tap into request execution phases with fine-grained lifecycle hooks.',
+    description: 'Run setup and cleanup callbacks and handle unhandled request errors.',
     category: 'Core Concepts',
     toc: [
       { id: 'available-hooks', text: 'Available Hooks' },
-      { id: 'execution-order', text: 'Hook Execution Order' },
+      { id: 'execution-order', text: 'Execution Order' },
     ],
     content: `
 # Lifecycle Hooks
 
-Volt provides granular hooks for requests:
-1. \`onRequest\`: Triggered immediately when a request arrives.
-2. \`preValidation\`: Before body/query validation executes.
-3. \`preHandler\`: After validation passes, before controller handler.
-4. \`postHandler\`: After controller handler produces a result.
-5. \`onError\`: Invoked if an exception is thrown at any point.
-6. \`onResponse\`: Final step after response headers are sent.
-    `,
-    codeSnippet: {
-      filename: 'src/hooks.ts',
-      language: 'typescript',
-      code: `app.hook('onRequest', async (c) => {
-  console.log(\`[\${c.req.method}] \${c.req.url}\`);
-});
+Volt supports \`app.onStart(fn)\` before the server starts, \`app.onStop(fn)\` during shutdown, and \`app.onError(fn)\` for unhandled request errors. The error callback receives an Error and the native Request, and must return a Response. For work around each request, use middleware instead.
 
-app.hook('onError', async (err, c) => {
-  console.error('Request Error:', err.message);
-});`,
+## Execution Order
+
+Register callbacks before calling \`listen()\`. Await \`app.stop()\` when shutting down to run the stop callback.
+`,
+    codeSnippet: {
+      filename: 'index.ts',
+      language: 'typescript',
+      code: `import { Volt } from 'voltts';
+
+const app = new Volt({ port: 3000 });
+app.onStart(() => console.log('Starting Volt'));
+app.onStop(() => console.log('Stopping Volt'));
+app.onError((error) => {
+  console.error(error);
+  return Response.json({ error: 'Internal server error' }, { status: 500 });
+});
+app.get('/health', () => ({ ok: true }));
+app.listen(3000);`,
     },
   },
 
