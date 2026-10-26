@@ -33,6 +33,9 @@ jobs:
       - name: Run Framework Test Suite
         run: bun test packages/*/test packages/plugins/*/test benchmarks/test
 
+      - name: Verify documented examples
+        run: bun test web/test
+
   docs:
     name: Build Documentation Docker Image
     runs-on: ubuntu-latest

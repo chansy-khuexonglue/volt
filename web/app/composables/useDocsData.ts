@@ -1,1164 +1,303 @@
+import { docExamples } from '../data/docExamples';
+import { parseDocBlocks } from '../utils/docsMarkdown';
+
 export interface DocItem {
   slug: string;
   title: string;
   description: string;
-  badge?: string;
   category: string;
-  toc: { id: string; text: string; depth?: number }[];
+  badge?: string;
   content: string;
-  codeSnippet?: {
-    filename?: string;
-    language: string;
-    code: string;
-  };
+  toc: { id: string; text: string; depth?: number }[];
 }
-
 export interface DocCategory {
   title: string;
   icon: string;
-  items: {
-    slug: string;
-    title: string;
-    badge?: string;
-  }[];
+  items: { slug: string; title: string; badge?: string }[];
 }
 
-export const docCategories: DocCategory[] = [
+const pages: Omit<DocItem, 'toc'>[] = [
   {
-    title: 'Getting Started',
-    icon: 'i-lucide-rocket',
-    items: [
-      { slug: 'introduction', title: 'Introduction' },
-      { slug: 'quick-start', title: 'Quick Start', badge: 'Fast' },
-      { slug: 'tutorial-crud', title: 'Tutorial: Build a Tasks API', badge: 'New' },
-      { slug: 'cli', title: 'Volt CLI' },
-    ],
+    "slug": "introduction",
+    "title": "Introduction to Volt",
+    "description": "Learn the request model, package structure, and where to start.",
+    "category": "Getting Started",
+    "content": "## What is Volt?\n\nVolt is a TypeScript API framework built around Bun's HTTP server and Web Standard Request and Response objects. You register routes, attach validation schemas, and return JSON, text, or a Response.\n\n## Start here\n\n1. Follow [Quick Start](/docs/quick-start) to run your first endpoint.\n2. Build the [Tasks API tutorial](/docs/tutorial-crud) to learn CRUD and validation.\n3. Add [tests](/docs/testing), [authentication](/docs/plugin-jwt), and [OpenAPI](/docs/openapi).\n4. Use the [package guide](/docs/packages) to find optional integrations.\n\n## What a request looks like\n\nA registered route runs its captured middleware, parses the body for POST/PUT/PATCH, validates configured schemas, calls your handler, and serializes its result. An exception becomes an HTTP error response. Register middleware before its routes.\n\n## Current boundaries\n\nVolt's native server uses Bun. A separate Node adapter is available. Route parameter names are inferred, but request body and query types are not automatically inferred from a route schema. Use Static<typeof Schema> explicitly when you need a TypeScript type. Database plugins need real clients for persistence; their defaults are mocks or memory stores. Read the limitations on each integration page."
   },
   {
-    title: 'Core Concepts',
-    icon: 'i-lucide-cpu',
-    items: [
-      { slug: 'application', title: 'Application & Server' },
-      { slug: 'context', title: 'Context & Response API' },
-      { slug: 'middleware', title: 'Middleware Pipeline' },
-      { slug: 'lifecycle-hooks', title: 'Lifecycle Hooks' },
-    ],
+    "slug": "quick-start",
+    "title": "Quick Start",
+    "description": "Install Volt, start a server, and verify its response.",
+    "category": "Getting Started",
+    "content": "## Prerequisites\n\nInstall a recent stable [Bun release](https://bun.sh/docs/installation). Check the runtime before starting:\n\n```bash\nbun --version\n```\n\n## Create a project\n\n```bash\nmkdir my-volt-api\ncd my-volt-api\nbun init -y\nbun add voltts\n```\n\n## Create index.ts\n\nCopy the entire file below. The import.meta.main guard starts the server only when this file is run directly, so you can import the app in tests.\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt({ port: 3000 });\napp.get('/hello', () => ({ message: 'Hello Volt' }));\n\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Run and verify\n\n```bash\nbun run index.ts\n# In another terminal:\ncurl -i http://localhost:3000/hello\n```\n\nExpect HTTP 200 and {\"message\":\"Hello Volt\"}. For automatic reload while editing, run `bun --watch index.ts`.\n\n## Continue learning\n\nFollow [Build a Tasks API](/docs/tutorial-crud). If startup fails, see [Troubleshooting](/docs/troubleshooting)."
   },
   {
-    title: 'Routing & Handlers',
-    icon: 'i-lucide-split',
-    items: [
-      { slug: 'router', title: 'Radix Tree Router' },
-      { slug: 'route-groups', title: 'Route Groups & Scoping' },
-    ],
+    "slug": "tutorial-crud",
+    "title": "Tutorial: Build a Tasks API",
+    "description": "A complete CRUD API with validation, expected responses, and tests.",
+    "category": "Getting Started",
+    "content": "## Create the project\n\n```bash\nmkdir tasks-api\ncd tasks-api\nbun init -y\nbun add voltts\n```\n\nThe tutorial uses an in-memory Map. Restarting the process clears tasks. IDs increase independently of task count, so deleting one task does not reuse an existing ID.\n\n## Complete application\n\nSave the entire file as index.ts. POST and PUT share a schema; both require title and done. PUT replaces the complete task input. DELETE returns an empty 204 response.\n\n```typescript index.ts\nimport { Volt, t, type Static } from 'voltts';\n\nconst TaskInput = t.Object({\n  title: t.String({ minLength: 2, maxLength: 120 }),\n  done: t.Boolean(),\n});\ntype Task = Static<typeof TaskInput> & { id: number };\n\nexport function createApp() {\n  const app = new Volt({ port: 3000 });\n  const tasks = new Map<number, Task>();\n  let nextId = 1;\n\n  app.get('/tasks', () => ({ tasks: [...tasks.values()] }));\n  app.get('/tasks/:id', (c) => {\n    const task = tasks.get(Number(c.params.id));\n    return task ? c.json(task) : c.json({ error: 'Task not found' }, 404);\n  });\n  app.post('/tasks', (c) => {\n    const input: Static<typeof TaskInput> = c.body;\n    const task: Task = { id: nextId++, title: input.title, done: input.done };\n    tasks.set(task.id, task);\n    return c.json(task, 201);\n  }, { body: TaskInput });\n  app.put('/tasks/:id', (c) => {\n    const id = Number(c.params.id);\n    if (!tasks.has(id)) return c.json({ error: 'Task not found' }, 404);\n    const input: Static<typeof TaskInput> = c.body;\n    const task: Task = { id, title: input.title, done: input.done };\n    tasks.set(id, task);\n    return c.json(task);\n  }, { body: TaskInput });\n  app.delete('/tasks/:id', (c) => {\n    if (!tasks.delete(Number(c.params.id))) {\n      return c.json({ error: 'Task not found' }, 404);\n    }\n    return new Response(null, { status: 204 });\n  });\n  return app;\n}\n\nconst app = createApp();\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Start the server\n\n```bash\nbun run index.ts\n```\n\n## Create and read a task\n\n```bash\ncurl -i -X POST http://localhost:3000/tasks \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"title\":\"Learn Volt\",\"done\":false}'\ncurl -i http://localhost:3000/tasks\ncurl -i http://localhost:3000/tasks/1\n```\n\nPOST returns 201 with {\"id\":1,\"title\":\"Learn Volt\",\"done\":false}. The list endpoint returns {\"tasks\":[...]}; reading ID 1 returns the task directly.\n\n## Update and delete\n\n```bash\ncurl -i -X PUT http://localhost:3000/tasks/1 \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"title\":\"Build a Volt API\",\"done\":true}'\ncurl -i -X DELETE http://localhost:3000/tasks/1\ncurl -i http://localhost:3000/tasks/1\n```\n\nPUT returns 200 with the updated task, DELETE returns 204, and the final GET returns 404 with {\"error\":\"Task not found\"}.\n\n## Check validation failures\n\n```bash\ncurl -i -X POST http://localhost:3000/tasks \\\n  -H 'Content-Type: application/json' -d '{\"title\":\"x\",\"done\":false}'\n```\n\nExpect HTTP 400. The response contains a message and field details. The handler does not create a task when validation fails.\n\n## Add automated tests\n\nContinue with [Testing](/docs/testing), which imports createApp from this file. Add [OpenAPI](/docs/openapi) for an interactive reference, then replace the Map with a real database using the [Prisma guide](/docs/plugin-prisma)."
   },
   {
-    title: 'Validation & Typing',
-    icon: 'i-lucide-shield-check',
-    items: [
-      { slug: 'schema-validation', title: 'Schema Validation' },
-      { slug: 'type-coercion', title: 'Automatic Type Coercion', badge: 'New' },
-    ],
+    "slug": "cli",
+    "title": "Volt CLI",
+    "description": "Use the commands implemented by the current CLI.",
+    "category": "Getting Started",
+    "content": "## Install the CLI\n\nThe executable is provided by @voltts/cli. Run it through Bun:\n\n```bash\nbun add --dev @voltts/cli\nbunx --bun --package @voltts/cli volt --help\n```\n\n## Scaffold and run\n\n```bash\nbunx --bun --package @voltts/cli volt new my-api\ncd my-api\nbun install\nbun run dev\n```\n\n## Supported commands\n\n| Command | Behavior |\n| --- | --- |\n| volt new name | Creates a project directory with src/index.ts and package scripts |\n| volt dev src/index.ts | Starts Bun watch mode |\n| volt routes src/app.ts | Imports the file and prints registered routes |\n| volt version | Prints the CLI version |\n| volt help | Prints command help |\n\n## Inspect routes without starting a server\n\nRoute inspection imports your entry module. Export an app and guard listen with import.meta.main, as in [Quick Start](/docs/quick-start), to prevent side effects during inspection. The current executable has no build or generator commands; use Bun directly for bundling and write modules as shown in [Modular Architecture](/docs/modules)."
   },
   {
-    title: 'OpenAPI & Swagger',
-    icon: 'i-lucide-book-open',
-    items: [
-      { slug: 'openapi', title: 'OpenAPI 3.1 & Swagger UI' },
-    ],
+    "slug": "troubleshooting",
+    "title": "Troubleshooting",
+    "description": "Resolve common setup, body parsing, plugin, and documentation problems.",
+    "category": "Getting Started",
+    "content": "## Server will not start\n\nCheck bun --version, install dependencies in the application directory, and confirm index.ts exists. If port 3000 is occupied, stop the old process or choose a new port. Native app.listen requires Bun; use the Node adapter for Node.\n\n## Body is empty or validation fails\n\nSend Content-Type: application/json with JSON requests. Use the order (path, handler, schema) and Volt t schemas. Numeric constraints use min/max. POST/PUT/PATCH bodies are automatically parsed; do not read the same Request stream a second time. A malformed JSON body can currently fall back to an empty object; require the fields your handler needs.\n\n## Header helper is missing\n\nUse c.setHeader(name, value), c.getHeader(name), or c.headers.get(name). c.header() is not a VoltContext method. Return the response from middleware after awaiting next().\n\n## Database returns no rows or model types are missing\n\nPostgreSQL and Redis plugin defaults are mock or memory implementations. Inject an initialized real driver. For Prisma, run generate with the exact application schema before typechecking imports such as User or Product. Migration and queries require a reachable database.\n\n## Docs code displays as text\n\nFenced examples need matching triple-backtick delimiters and a language label. The docs renderer preserves blank lines in fenced blocks and renders internal links and table cells. If editing a content string in TypeScript, use an escaped or JSON-encoded string rather than unescaped template backticks.\n\n## Unexpected cross-request state\n\nc.store is application-level shared state. Keep authenticated users and request-specific data in local variables. Plugins that inject context-bound helpers need care across awaited work. See [Context](/docs/context) and [Authentication](/docs/plugin-jwt)."
   },
   {
-    title: 'Architecture & DI',
-    icon: 'i-lucide-layers',
-    items: [
-      { slug: 'dependency-injection', title: 'Dependency Injection' },
-      { slug: 'modules', title: 'Modular Architecture' },
-    ],
+    "slug": "application",
+    "title": "Application & Server",
+    "description": "Configure the native server, request limits, and shutdown.",
+    "category": "Core Concepts",
+    "content": "## Server options\n\n| Option | Meaning |\n| --- | --- |\n| port | Listening port; defaults to 3000 |\n| hostname | Network interface; defaults to 0.0.0.0 |\n| development | Include development error details; keep false for public services |\n| maxRequestBodySize | Maximum body size in bytes, forwarded to Bun's server |\n| tls | Object containing certificate and key strings |\n\n## Complete example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt({\n  port: Number(process.env.PORT ?? 3000),\n  hostname: '0.0.0.0',\n  development: false,\n  maxRequestBodySize: 1024 * 1024,\n});\napp.get('/health', () => ({ ok: true }));\n\nif (import.meta.main) {\n  app.listen();\n  process.once('SIGTERM', async () => {\n    await app.stop();\n    process.exit(0);\n  });\n}\nexport default app;\n```\n\n## Run and stop\n\nRun `bun run index.ts`, then request /health. listen() uses the configured port; listen(4000) overrides it. The optional listen callback receives Bun's server instance. await app.stop() stops the native server, runs plugin cleanup, and then the stop callback.\n\n## In-memory handling\n\nUse await app.handle(new Request('http://localhost/health')) to dispatch without opening a socket. Register all routes and plugins before calling handle or listen. See [Testing](/docs/testing) and [Lifecycle Hooks](/docs/lifecycle-hooks)."
   },
   {
-    title: 'Plugins Ecosystem',
-    icon: 'i-lucide-blocks',
-    items: [
-      { slug: 'plugin-prisma', title: 'Prisma ORM Plugin', badge: 'Official' },
-      { slug: 'plugin-postgres', title: 'PostgreSQL Native' },
-      { slug: 'plugin-redis', title: 'Redis Cache' },
-      { slug: 'plugin-jwt', title: 'JWT Authentication' },
-      { slug: 'plugin-cors', title: 'CORS & Security' },
-      { slug: 'plugin-rate-limit', title: 'Rate Limiter' },
-      { slug: 'plugin-cookies', title: 'Signed Cookies' },
-      { slug: 'plugin-logger', title: 'Structured Logger' },
-      { slug: 'plugin-graphql', title: 'GraphQL Server' },
-    ],
+    "slug": "context",
+    "title": "Context & Response API",
+    "description": "Read request data and return correctly formed HTTP responses.",
+    "category": "Core Concepts",
+    "content": "## Request data\n\n| API | Value |\n| --- | --- |\n| c.req | Native Request |\n| c.params | Path parameters; strings unless schema coercion applies |\n| c.query | Query values; repeated keys become arrays |\n| c.headers | Native Headers; read with get(name) |\n| c.body | Parsed POST/PUT/PATCH body |\n| c.store | Application decoration store; shared across requests |\n| c.url, c.path, c.method | Parsed URL, pathname, and HTTP method |\n\n## Complete example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt();\napp.get('/users/:id', (c) => {\n  c.setHeader('X-Example', 'volt');\n  return c.json({\n    id: c.params.id,\n    profile: c.query.profile === 'true',\n    accept: c.headers.get('accept'),\n  });\n});\napp.get('/text', (c) => c.text('Hello Volt'));\napp.get('/html', (c) => c.html('<h1>Hello Volt</h1>'));\napp.get('/redirect', (c) => c.redirect('/text'));\napp.post('/echo', (c) => c.json({ body: c.body }, 201));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try request and response helpers\n\n```bash\nbun run index.ts\ncurl -i 'http://localhost:3000/users/42?profile=true'\ncurl -i -X POST http://localhost:3000/echo -H 'Content-Type: application/json' -d '{\"title\":\"Coffee\"}'\n```\n\nUse c.json(data, status), c.text(text, status), c.html(html, status), c.redirect(url, status), and c.setHeader(name, value). Prefer explicit status arguments such as c.json(data, 201). A returned object becomes JSON; null or undefined becomes an empty 204 response.\n\n## Body and state rules\n\nPOST, PUT, and PATCH bodies are parsed before the handler. Use await c.parseBody() explicitly for methods outside that set when needed. Read multipart data with c.file(), c.files(), or c.formData(). Do not consume c.req.json() after automatic parsing. c.store is shared application state: keep per-request identity and temporary values in local variables rather than adding them to this store."
   },
   {
-    title: 'Benchmarks & Ops',
-    icon: 'i-lucide-gauge',
-    items: [
-      { slug: 'benchmarks', title: 'Performance & Benchmarks' },
-    ],
+    "slug": "middleware",
+    "title": "Middleware Pipeline",
+    "description": "Register middleware in the correct order and return its response.",
+    "category": "Core Concepts",
+    "content": "## Registration and execution\n\nRegister app.use() before the routes it should affect. Volt captures middleware when routes are registered. A middleware receives (context, next); return next(), or await it and return the resulting Response. Return an HTTP response early to stop the chain.\n\n## Complete global and route example\n\n```typescript index.ts\nimport { Volt, type MiddlewareHandler } from 'voltts';\n\nconst timing: MiddlewareHandler = async (_c, next) => {\n  const start = performance.now();\n  const response = await next();\n  if (response instanceof Response) {\n    response.headers.set('Server-Timing', `app;dur=${performance.now() - start}`);\n  }\n  return response;\n};\nconst requireKey: MiddlewareHandler = (c, next) => {\n  if (c.headers.get('x-demo-key') !== 'tutorial-key') {\n    return c.json({ error: 'Missing demo key' }, 401);\n  }\n  return next();\n};\nconst app = new Volt();\n// Register global middleware BEFORE registering routes.\napp.use(timing);\napp.get('/public', () => ({ public: true }));\n// Arguments: path, handler, schema, route middleware array.\napp.get('/private', () => ({ private: true }), undefined, [requireKey]);\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try both branches\n\n```bash\nbun run index.ts\ncurl -i http://localhost:3000/public\ncurl -i http://localhost:3000/private\ncurl -i http://localhost:3000/private -H 'x-demo-key: tutorial-key'\n```\n\nExpect 200, 401, and 200. Server-Timing is added to returned responses. The key is a tutorial value, not an authentication system.\n\n## Group middleware\n\nUse group.use() before group routes, or pass middleware as the fourth argument to an individual route. Do not mix the handler and schema argument order: the signature is (path, handler, schema?, middleware[]?). See [Route Groups](/docs/route-groups)."
   },
+  {
+    "slug": "lifecycle-hooks",
+    "title": "Lifecycle Hooks",
+    "description": "Register the startup, shutdown, and error hooks that Volt currently supports.",
+    "category": "Core Concepts",
+    "content": "## Supported hooks\n\nUse app.onStart(fn), app.onStop(fn), and app.onError(fn). onError receives an Error and native Request and must return a Response. For validation errors and HttpError handling, see [Error Handling](/docs/error-handling).\n\n## Complete example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt();\napp.onStart(() => console.log('Starting Volt'));\napp.onStop(() => console.log('Stopped Volt'));\napp.onError((error, request) => {\n  console.error(request.method, request.url, error);\n  return Response.json({ error: 'Unexpected error' }, { status: 500 });\n});\napp.get('/health', () => ({ ok: true }));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Callback timing\n\nRegister hooks before listen(). The current startup callback is invoked without awaiting its result, so perform asynchronous initialization before listen(), rather than inside onStart. stop() awaits plugin cleanup and onStop. Each hook setter replaces the previous callback of that kind. Per-request hooks such as preValidation and onResponse are not implemented; use [middleware](/docs/middleware) around a handler."
+  },
+  {
+    "slug": "error-handling",
+    "title": "Error Handling",
+    "description": "Return predictable HTTP errors without exposing internal exceptions.",
+    "category": "Core Concepts",
+    "content": "## Complete error handler\n\n```typescript index.ts\nimport { Volt, HttpError, NotFoundError } from 'voltts';\n\nconst app = new Volt({ development: false });\napp.onError((error, request) => {\n  if (error instanceof HttpError) return error.toResponse(false);\n  console.error(request.url, error);\n  return Response.json({ error: 'Internal server error' }, { status: 500 });\n});\napp.get('/users/:id', () => {\n  throw new NotFoundError('User not found');\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try a missing resource\n\n```bash\nbun run index.ts\ncurl -i http://localhost:3000/users/42\n```\n\nExpect 404 with status, error, and message fields. Built-in errors include BadRequestError (400), UnauthorizedError (401), ForbiddenError (403), NotFoundError (404), PayloadTooLargeError (413), and UnsupportedMediaTypeError (415).\n\n## Preserve validation errors\n\nA custom onError replaces the default error conversion. Check instanceof HttpError first to retain validation statuses and details. Return a generic 500 message for unexpected errors and log the original exception privately. The default development mode can expose stack traces; keep development false for public services."
+  },
+  {
+    "slug": "router",
+    "title": "Routing",
+    "description": "Define static, parameterized, wildcard, and method-specific routes.",
+    "category": "Routing & Handlers",
+    "content": "## Route signatures\n\nThe registration signature is app.get(path, handler, schema?, middleware[]?). The same order applies to post, put, patch, delete, head, and options. app.all() registers a method fallback; app.add(method, path, ...) accepts an explicit method.\n\n## Complete routing example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt();\napp.get('/status', () => ({ ok: true }));\napp.get('/users/:id', (c) => ({ id: c.params.id }));\napp.get('/posts/:postId/comments/:commentId', (c) => ({\n  postId: c.params.postId,\n  commentId: c.params.commentId,\n}));\napp.get('/files/*filepath', (c) => c.text(c.params.filepath));\napp.post('/items', (c) => c.json({ item: c.body }, 201));\napp.delete('/items/:id', () => new Response(null, { status: 204 }));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try parameters and wildcards\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/users/42\ncurl http://localhost:3000/posts/1/comments/2\ncurl http://localhost:3000/files/reports/annual.csv\n```\n\nThe parameter handler returns ID 42 as a string. A wildcard captures the remaining path. Do not map a wildcard directly to an unchecked filesystem path.\n\n## HEAD and OPTIONS\n\nHEAD requests use the registered route and omit the response body. OPTIONS discovery reports registered methods. For browser preflight requests, register [CORS middleware](/docs/plugin-cors) before routes. Unknown routes produce a 404 response; do not assume every unsupported method produces 405."
+  },
+  {
+    "slug": "route-groups",
+    "title": "Route Groups & Scoping",
+    "description": "Organize prefixes and group middleware without hidden handlers.",
+    "category": "Routing & Handlers",
+    "content": "## Complete nested group example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt();\napp.group('/api/v1', (api) => {\n  api.get('/products', () => ({ products: [] }));\n  api.group('/admin', (admin) => {\n    admin.use((c, next) => {\n      if (c.headers.get('x-demo-key') !== 'tutorial-key') {\n        return c.json({ error: 'Unauthorized' }, 401);\n      }\n      return next();\n    });\n    admin.post('/products', (c) => c.json(c.body, 201));\n  });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Resulting URLs\n\n| Route | Access |\n| --- | --- |\n| GET /api/v1/products | Public list |\n| POST /api/v1/admin/products | Requires the demo header |\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/api/v1/products\ncurl -i -X POST http://localhost:3000/api/v1/admin/products -H 'x-demo-key: tutorial-key' -H 'Content-Type: application/json' -d '{\"title\":\"Coffee\"}'\n```\n\n## Scoping rules\n\nCall use() before the routes it protects. A group with path '/' registers its prefix without a trailing slash. Groups collect routes and middleware; they do not create an isolated dependency container or per-request store."
+  },
+  {
+    "slug": "schema-validation",
+    "title": "Schema Validation",
+    "description": "Use Volt schemas, numeric limits, validation errors, and explicit static types.",
+    "category": "Validation & Typing",
+    "content": "## Complete validated request example\n\nUse Volt's t builder in the third route argument. Numeric constraints are min and max. The body is validated at runtime; use Static<typeof Schema> for an explicit TypeScript type.\n\n```typescript index.ts\nimport { Volt, t, type Static } from 'voltts';\n\nconst ProductInput = t.Object({\n  title: t.String({ minLength: 3, maxLength: 100 }),\n  price: t.Number({ min: 0 }),\n  stock: t.Integer({ min: 0 }),\n  tags: t.Optional(t.Array(t.String())),\n}, { additionalProperties: false });\ntype ProductInput = Static<typeof ProductInput>;\n\nconst app = new Volt();\napp.post('/products', (c) => {\n  const product: ProductInput = c.body;\n  return c.json({ product }, 201);\n}, { body: ProductInput });\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Test valid and invalid input\n\n```bash\nbun run index.ts\ncurl -i -X POST http://localhost:3000/products -H 'Content-Type: application/json' -d '{\"title\":\"Coffee\",\"price\":12,\"stock\":3}'\ncurl -i -X POST http://localhost:3000/products -H 'Content-Type: application/json' -d '{\"title\":\"x\",\"price\":-1,\"stock\":3}'\n```\n\nExpect 201 for the valid input and 400 for the invalid input. additionalProperties: false rejects extra keys.\n\n## Schema vocabulary\n\n| Builder | Options or behavior |\n| --- | --- |\n| t.String() | minLength, maxLength, format |\n| t.Number(), t.Integer() | min, max; Integer rejects fractions |\n| t.Boolean() | Requires a boolean in a JSON body |\n| t.Object(properties) | Validates nested properties |\n| t.Array(item) | minItems, maxItems |\n| t.Optional(schema), t.Nullable(schema) | Allows missing values or null |\n| t.Enum(values), t.Literal(value) | Restricts to known values |\n| t.Union(schemas), t.Custom(fn) | Alternative types or a validation callback |\n\n## Validation targets and type limits\n\nRoutes accept body, query, params, headers, and response entries. Body, query, params, and headers are request validators. Header names should be lowercase. Response schemas provide OpenAPI metadata; the current core does not enforce them on outgoing data. The built-in route signature does not infer body/query types from schemas. Zod objects are not accepted directly as Volt schemas. See [Type Coercion](/docs/type-coercion) for URL inputs."
+  },
+  {
+    "slug": "type-coercion",
+    "title": "Query & Parameter Coercion",
+    "description": "Understand how URL strings become values and when to parse them yourself.",
+    "category": "Validation & Typing",
+    "content": "## Complete query example\n\n```typescript index.ts\nimport { Volt, t } from 'voltts';\n\nconst app = new Volt();\napp.get('/items', (c) => ({ query: c.query }), {\n  query: t.Object({\n    limit: t.Optional(t.Integer({ min: 1, max: 100 })),\n    active: t.Optional(t.Boolean()),\n    tags: t.Optional(t.Array(t.String())),\n  }),\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try it\n\n```bash\nbun run index.ts\ncurl 'http://localhost:3000/items?limit=20&active=false&tags=coffee&tags=tea'\ncurl -i 'http://localhost:3000/items?limit=invalid'\n```\n\nThe first response contains limit 20, active false, and an array of tags. Invalid numeric text produces 400.\n\n## Conversion rules\n\nQuery and path-parameter schemas enable coercion. Numbers accept nonempty numeric strings; booleans recognize true/false and 1/0 (case-insensitive). Repeated query keys already form an array. Comma-separated strings are not automatically split into arrays. Without a schema query values remain strings or arrays. JSON bodies are not automatically coerced.\n\n## POST and path parameter caveat\n\nIn the current core, the POST/PUT/PATCH body branch validates the body and headers but does not run query or parameter validation. If those methods need typed URL inputs, call compile(schema, { coerce: true }) explicitly and handle a failed result. Do not rely on GET coercion behavior for all methods."
+  },
+  {
+    "slug": "dependency-injection",
+    "title": "Dependency Injection",
+    "description": "Register explicit dependencies and resolve services at startup.",
+    "category": "Architecture & DI",
+    "content": "## Complete service example\n\nUse deps to declare constructor dependencies. The marker decorator alone does not wire constructor arguments in Container.resolve().\n\n```typescript index.ts\nimport { Volt, Container } from 'voltts';\n\nclass ProductService {\n  constructor(private label: string) {}\n  list() { return [{ id: 1, title: this.label }]; }\n}\nconst container = new Container();\ncontainer.registerValue('productLabel', 'Coffee');\ncontainer.register({\n  provide: ProductService,\n  useClass: ProductService,\n  deps: ['productLabel'],\n  lifetime: 'singleton',\n});\ncontainer.init();\nconst service = container.resolve(ProductService);\nconst app = new Volt();\napp.get('/products', () => ({ products: service.list() }));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Verify the service\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/products\n```\n\nExpect {\"products\":[{\"id\":1,\"title\":\"Coffee\"}]}.\n\n## Providers and lifetimes\n\nContainer supports registerValue, class providers, and registerFactory. Explicit class providers accept deps and lifetime ('singleton', 'transient', or 'request'). init() resolves singleton providers and detects circular dependencies. Resolve services before starting the server when possible.\n\n## Scope boundaries\n\ncreateScope() creates a child container, but parent registrations resolve in the parent. Request lifetimes are cached within the container that owns their registration; they are not automatically per HTTP request. Register request-specific providers in an explicit child container. Keep asynchronous factory initialization outside synchronous resolve()."
+  },
+  {
+    "slug": "modules",
+    "title": "Modular Architecture",
+    "description": "Compose feature modules using the actual ModuleConfig API.",
+    "category": "Architecture & DI",
+    "content": "## Complete module example\n\n```typescript index.ts\nimport { Volt, type ModuleConfig } from 'voltts';\n\nconst productsModule: ModuleConfig = {\n  name: 'products',\n  setup(app) {\n    app.group('/products', (products) => {\n      products.get('/', () => ({ products: [{ id: 1, title: 'Coffee' }] }));\n      products.get('/:id', (c) => ({ id: c.params.id }));\n    });\n  },\n};\nconst app = new Volt();\napp.registerModule({ name: 'app', imports: [productsModule] });\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## How registration works\n\nregisterModule() recursively registers imports, then calls setup(app). ModuleConfig is an object interface, not a VoltModule class. The current implementation does not process providers or exports automatically. Use a Container explicitly for services as described in [Dependency Injection](/docs/dependency-injection).\n\n## Suggested project structure\n\n| File | Responsibility |\n| --- | --- |\n| src/index.ts | Start the server |\n| src/app.ts | Compose modules and middleware |\n| src/products/module.ts | Register product routes |\n| src/products/service.ts | Business logic and persistence |\n| test/products.test.ts | Test app.handle through createTestClient |\n\nSeparate server startup from application creation so tests can instantiate the app without binding a port."
+  },
+  {
+    "slug": "plugins",
+    "title": "Writing Plugins",
+    "description": "Register shared services and clean them up explicitly.",
+    "category": "Architecture & DI",
+    "content": "## Complete plugin example\n\n```typescript index.ts\nimport { Volt, type VoltPlugin } from 'voltts';\n\nconst greetingPlugin: VoltPlugin = {\n  name: 'example-greeting',\n  version: '1.0.0',\n  setup(app) {\n    app.decorate('greeting', { message: 'Hello from a plugin' });\n  },\n  cleanup() {\n    console.log('Plugin cleanup');\n  },\n};\nconst app = new Volt();\napp.plugin(greetingPlugin);\napp.get('/greeting', (c) => c.json(c.store.greeting));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Plugin contract\n\nA VoltPlugin has a unique name, optional version, setup(app), and optional cleanup(app). Register with app.plugin(plugin) or app.use(plugin). Duplicate names throw an error. app.decorate(name, value) stores a shared service on app.store and the application object; handlers read it through c.store.\n\n## Initialization and cleanup\n\nThe current plugin() implementation invokes setup without awaiting its Promise. Connect asynchronous clients before registering the plugin, then pass the ready client into setup. await app.stop() invokes each cleanup callback. Do not put request-specific identity in application decorations because c.store is shared across requests."
+  },
+  {
+    "slug": "testing",
+    "title": "Testing",
+    "description": "Test the same app used by the CRUD tutorial without opening a port.",
+    "category": "Guides",
+    "content": "## Reuse the Tasks API\n\nStart with the complete [Tasks API tutorial](/docs/tutorial-crud) saved as index.ts. createApp() gives each test a fresh task store. Install Bun types if your editor needs them:\n\n```bash\nbun add --dev @types/bun\n```\n\n## Complete test file\n\nSave this as tasks.test.ts beside index.ts:\n\n```typescript tasks.test.ts\nimport { expect, test } from 'bun:test';\nimport { createTestClient } from 'voltts';\nimport { createApp } from './index';\n\ntest('create, read, update, and delete a task', async () => {\n  const client = createTestClient(createApp());\n  const created = await client.post('/tasks', {\n    body: { title: 'Learn Volt', done: false },\n  });\n  expect(created.status).toBe(201);\n  const task = await created.json();\n  expect((await client.get(`/tasks/${task.id}`)).status).toBe(200);\n  const updated = await client.put(`/tasks/${task.id}`, {\n    body: { title: 'Ship an API', done: true },\n  });\n  expect((await updated.json()).done).toBe(true);\n  expect((await client.delete(`/tasks/${task.id}`)).status).toBe(204);\n  expect((await client.get(`/tasks/${task.id}`)).status).toBe(404);\n});\n\ntest('reject invalid input', async () => {\n  const client = createTestClient(createApp());\n  const response = await client.post('/tasks', { body: { title: 'x', done: false } });\n  expect(response.status).toBe(400);\n});\n```\n\n## Run the tests\n\n```bash\nbun test tasks.test.ts\n```\n\ncreateTestClient returns native Responses; inspect status, headers, and await response.json(). Its body option serializes plain objects as JSON, and query appends URL parameters. It does not start a server. Use a real listener for tests of network connections, WebSocket upgrades, or Bun's socket-level limits."
+  },
+  {
+    "slug": "file-uploads",
+    "title": "File Uploads",
+    "description": "Receive multipart files with explicit size checks.",
+    "category": "Guides",
+    "content": "## Complete upload example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt({ maxRequestBodySize: 2 * 1024 * 1024 });\napp.post('/upload', async (c) => {\n  const file = await c.file('document');\n  if (!file) return c.json({ error: 'document is required' }, 400);\n  if (file.size > 1024 * 1024) {\n    return c.json({ error: 'File must be at most 1 MiB' }, 413);\n  }\n  return c.json({ name: file.name, size: file.size, type: file.type }, 201);\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Send a file\n\n```bash\nbun run index.ts\nprintf 'Hello Volt' > sample.txt\ncurl -i -X POST http://localhost:3000/upload -F 'document=@sample.txt'\n```\n\nExpect 201 with the file name, size, and MIME type. c.files('document') reads repeated files; c.formData() exposes the parsed FormData.\n\n## Handling uploaded data\n\nThis example returns metadata only. Validate file size and content before persisting anything. A client's MIME type and file name are untrusted. Generate a storage key rather than using the uploaded name as a path. Bun's server enforces maxRequestBodySize on real network requests; in-memory tests do not replace network-level limit checks."
+  },
+  {
+    "slug": "streaming",
+    "title": "Streaming & Downloads",
+    "description": "Send server-sent events and downloadable responses using Web Streams.",
+    "category": "Guides",
+    "content": "## Complete streaming example\n\n```typescript index.ts\nimport { Volt } from 'voltts';\n\nconst app = new Volt();\napp.get('/events', () => {\n  const encoder = new TextEncoder();\n  const stream = new ReadableStream<Uint8Array>({\n    start(controller) {\n      controller.enqueue(encoder.encode('event: greeting\\ndata: {\"message\":\"Hello Volt\"}\\n\\n'));\n      controller.close();\n    },\n  });\n  return new Response(stream, {\n    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' },\n  });\n});\napp.get('/download', () => new Response('id,title\\n1,Coffee\\n', {\n  headers: {\n    'Content-Type': 'text/csv; charset=utf-8',\n    'Content-Disposition': 'attachment; filename=\"products.csv\"',\n  },\n}));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Try both responses\n\n```bash\nbun run index.ts\ncurl -N http://localhost:3000/events\ncurl -i http://localhost:3000/download\n```\n\nThe event endpoint emits one greeting event and closes; it is not a long-running subscription. The download endpoint returns a small generated CSV with a download filename.\n\n## Extending the stream\n\nFor a continuous stream, release timers or subscriptions in cancel() and handle client disconnects. Return a native Response to control headers and status. Set the appropriate content type when returning a bare ReadableStream through the stream() helper. The Node adapter forwards response chunks but has different backpressure and runtime behavior from Bun's server."
+  },
+  {
+    "slug": "security",
+    "title": "Request Limits & Security",
+    "description": "Apply response headers, timeouts, and explicit access checks.",
+    "category": "Guides",
+    "content": "## Complete limits example\n\n```typescript index.ts\nimport { Volt, secureHeaders, timeout } from 'voltts';\n\nconst app = new Volt({ development: false, maxRequestBodySize: 1024 * 1024 });\napp.use(secureHeaders());\napp.use(timeout(5000));\napp.post('/echo', (c) => c.json(c.body));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## What each control does\n\nmaxRequestBodySize configures Bun's incoming body limit. secureHeaders adds headers such as X-Content-Type-Options and a default Content-Security-Policy. timeout(5000) returns 504 after the deadline, but does not cancel an ongoing database query or external request. Propagate cancellation to those operations yourself.\n\n## Authentication and state\n\nUse [JWT Authentication](/docs/plugin-jwt) to verify credentials per request. CORS does not grant API authorization, and a rate limiter is not a complete abuse-prevention system. Do not store the authenticated user in c.store because the current application store is shared. Use local variables and service instances that are safe to share.\n\n## Browser access\n\nRead the [CORS guide](/docs/plugin-cors) before enabling browser credentials. The current CORS implementation can reflect a rejected origin when credentials is true, so enforce a credentialed origin policy in a trusted upstream or custom middleware until that behavior is corrected. Cookie authentication also needs CSRF protection appropriate to your application."
+  },
+  {
+    "slug": "caching",
+    "title": "Response Caching",
+    "description": "Cache public GET responses and verify cache hits.",
+    "category": "Guides",
+    "content": "## Complete cache example\n\n```typescript index.ts\nimport { Volt, cache, MemoryCacheStore } from 'voltts';\n\nconst app = new Volt();\nconst store = new MemoryCacheStore();\nlet reads = 0;\napp.get('/catalog', () => ({ reads: ++reads, products: ['Coffee'] }), undefined, [\n  cache({ store, ttl: 30, etag: true }),\n]);\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Verify cache behavior\n\n```bash\nbun run index.ts\ncurl -i http://localhost:3000/catalog\ncurl -i http://localhost:3000/catalog\n```\n\nThe first response has X-Cache: MISS; the second has X-Cache: HIT and the same reads value. ttl is in seconds. The default key includes the HTTP method, path, and query string. The middleware caches successful 200 responses for GET and HEAD and can generate ETag headers.\n\n## Cache boundaries\n\nOnly attach shared response caching to public endpoints. The default key does not include user identity or authorization headers. In-memory entries disappear on restart and are not shared across processes. MemoryCacheStore supports deletion and clearing; a RedisCacheStore adapter requires a compatible client. Do not apply this response cache to streaming, binary, or personalized endpoints without a suitable storage and key policy."
+  },
+  {
+    "slug": "background-jobs",
+    "title": "Background Jobs",
+    "description": "Run small in-process jobs and inspect their state.",
+    "category": "Guides",
+    "content": "## Complete queue example\n\n```typescript index.ts\nimport { Volt, JobQueue } from 'voltts';\n\nconst queue = new JobQueue({ concurrency: 2 });\nqueue.define('receipt', (job) => ({ orderId: job.data.orderId, generated: true }));\nconst app = new Volt();\napp.onStop(() => queue.stop());\napp.post('/receipts', (c) => {\n  const job = queue.add('receipt', { orderId: 'order-1' }, { attempts: 3, backoffDelayMs: 100 });\n  return c.json({ id: job.id }, 202);\n});\napp.get('/jobs/:id', (c) => {\n  const job = queue.getJob(c.params.id);\n  if (!job) return c.json({ error: 'Job not found' }, 404);\n  return c.json({ id: job.id, status: job.status, result: job.result });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Enqueue a job\n\n```bash\nbun run index.ts\ncurl -i -X POST http://localhost:3000/receipts\n# Use the returned id:\ncurl http://localhost:3000/jobs/REPLACE_WITH_JOB_ID\n```\n\nThe queue runs two handlers concurrently, retries failed jobs up to three attempts, and reports pending, running, completed, or failed. waitForJob(id) is useful in tests; avoid waiting for background work in the API request that enqueues it.\n\n## Durability and shutdown\n\nJobQueue is an in-process memory queue. It does not persist jobs, coordinate workers across processes, or currently enforce the priority option. stop() pauses scheduling; it does not await all active jobs. Use a durable external queue for work that must survive a process restart."
+  },
+  {
+    "slug": "websockets",
+    "title": "WebSockets",
+    "description": "Use the exported manager with Bun’s explicit upgrade API.",
+    "category": "Guides",
+    "content": "## Current integration status\n\nThe exported WebSocketManager dispatches open, message, close, drain, and error callbacks. The core app.ws() path currently creates a placeholder manager and is not a complete end-to-end integration. Use the explicit Bun server wiring below rather than relying on app.ws().\n\n## Complete echo server\n\n```typescript index.ts\nimport { Volt, WebSocketManager } from 'voltts';\n\nconst app = new Volt();\napp.get('/health', () => ({ ok: true }));\nconst sockets = new WebSocketManager();\nsockets.register('/ws', {\n  open(ws) { ws.send('Connected to Volt'); },\n  message(ws, message) { ws.send(`Echo: ${String(message)}`); },\n});\n\nif (import.meta.main) {\n  const handlers = sockets.createBunWebSocketHandler();\n  Bun.serve<{ path: string }>({\n    port: 3000,\n    fetch(request, server) {\n      if (new URL(request.url).pathname === '/ws') {\n        if (server.upgrade(request, { data: { path: '/ws' } })) return;\n        return new Response('WebSocket upgrade required', { status: 400 });\n      }\n      return app.handle(request);\n    },\n    websocket: {\n      ...handlers,\n      error(error, ws) { handlers.error(ws, error); },\n    },\n  });\n}\nexport default app;\n```\n\n## Connect a client\n\nRun `bun run index.ts`, then use this code in a browser's developer console:\n\n```javascript\nconst socket = new WebSocket('ws://localhost:3000/ws');\nsocket.onmessage = (event) => console.log(event.data);\nsocket.onopen = () => socket.send('Hello');\n```\n\nExpect a connection greeting and an echo. HTTP GET /health is still dispatched through Volt. This example starts Bun.serve directly, so it does not use app.listen() or automatically run Volt's startup and shutdown hooks. Configure upgrade authorization and resource limits for your application's needs."
+  },
+  {
+    "slug": "node-adapter",
+    "title": "Node.js Adapter",
+    "description": "Run the core HTTP app through the Node adapter.",
+    "category": "Guides",
+    "content": "## Runtime scope\n\nThe native app.listen() implementation targets Bun. On Node use @voltts/core and @voltts/node directly, plus a TypeScript runner such as tsx. Bun-specific facilities such as Bun.SQL and WebSocket upgrades are not supplied by this HTTP adapter.\n\n```bash\nnpm install @voltts/core @voltts/node\nnpm install --save-dev tsx typescript @types/node\n```\n\n## Complete Node entry point\n\n```typescript index.ts\nimport { Volt } from '@voltts/core';\nimport { serve } from '@voltts/node';\n\nconst app = new Volt();\napp.get('/health', () => ({ ok: true }));\nif (import.meta.main) {\n  const server = serve(app, { port: 3000, hostname: '0.0.0.0' });\n  process.once('SIGTERM', () => server.close(() => { void app.stop(); }));\n}\nexport default app;\n```\n\n## Run on Node\n\nNode's TypeScript runner does not provide Bun's import.meta.main. Replace that guard with a direct server start in a standalone Node entry, or use this separate launcher:\n\n```typescript start.ts\nimport { serve } from '@voltts/node';\nimport app from './index';\nserve(app, { port: 3000 });\n```\n\n```bash\nnpx tsx start.ts\ncurl http://localhost:3000/health\n```\n\nThe adapter converts Node requests into Web Standard Requests and forwards responses. It does not provide automatic parity for Bun server options, cookies with multiple Set-Cookie headers, or stream backpressure. Verify those behaviors for your application."
+  },
+  {
+    "slug": "plugin-jwt",
+    "title": "JWT Authentication",
+    "description": "Issue demo tokens and verify each request using the current JWT plugin.",
+    "category": "Plugins Ecosystem",
+    "content": "## Configure secrets\n\nThe bundled JWT implementation supports HS256, HS384, and HS512. Set a strong JWT_SECRET and a separate DEMO_PASSWORD in your environment. The example password comparison is only a tutorial login flow; replace it with real user lookup and password verification.\n\n```bash\nexport JWT_SECRET='replace-with-a-long-random-secret'\nexport DEMO_PASSWORD='replace-with-a-demo-password'\n```\n\n## Complete token and profile API\n\n```typescript index.ts\nimport { Volt, jwtPlugin, t, type JwtPayload } from 'voltts';\n\nconst secret = process.env.JWT_SECRET;\nconst demoPassword = process.env.DEMO_PASSWORD;\nif (!secret || !demoPassword) throw new Error('Set JWT_SECRET and DEMO_PASSWORD');\n\nconst app = new Volt();\napp.plugin(jwtPlugin({ secret }));\napp.post('/token', async (c) => {\n  // Demo only: replace this comparison with your user/password verification.\n  if (c.body.password !== demoPassword) return c.json({ error: 'Unauthorized' }, 401);\n  const token = await c.store.jwt.sign({ sub: 'demo-user' }, { expiresIn: '15m' });\n  return c.json({ token });\n}, { body: t.Object({ password: t.String({ minLength: 1 }) }) });\n\napp.get('/me', async (c) => {\n  const header = c.headers.get('authorization') ?? '';\n  if (!header.startsWith('Bearer ')) return c.json({ error: 'Missing token' }, 401);\n  try {\n    // Keep identity in a local variable for this request.\n    const user: JwtPayload = await c.store.jwt.verify(header.slice(7));\n    return c.json({ id: user.sub });\n  } catch {\n    return c.json({ error: 'Invalid or expired token' }, 401);\n  }\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Request a token\n\n```bash\nbun run index.ts\ncurl -i -X POST http://localhost:3000/token -H 'Content-Type: application/json' -d '{\"password\":\"replace-with-a-demo-password\"}'\n# Copy the token from the response:\ncurl -i http://localhost:3000/me -H 'Authorization: Bearer REPLACE_WITH_TOKEN'\ncurl -i http://localhost:3000/me\n```\n\nExpect 200 for a verified token and 401 when it is missing, invalid, or expired. expiresIn accepts seconds or strings such as 15m and 1h.\n\n## Plugin helpers and guards\n\nThe plugin decorates c.store.jwt, not c.jwt. protectAll installs the JWT middleware before subsequent routes. The jwt() middleware writes verified claims to c.store.user by default. Because that store is currently shared across requests, the example above verifies into a local variable instead. Decoding a token alone does not verify its signature. OpenAPI security declarations do not enforce token verification."
+  },
+  {
+    "slug": "plugin-cookies",
+    "title": "Signed Cookies",
+    "description": "Sign cookie values with the plugin’s actual context helper.",
+    "category": "Plugins Ecosystem",
+    "content": "## Configure and run\n\nSet COOKIE_SECRET before running the sample. Signed values provide integrity, not encryption. Do not put secrets in a signed cookie.\n\n```bash\nexport COOKIE_SECRET='replace-with-a-long-random-cookie-secret'\n```\n\n```typescript index.ts\nimport { Volt, cookiesPlugin, type CookieContextHelper } from 'voltts';\n\nconst secret = process.env.COOKIE_SECRET;\nif (!secret) throw new Error('Set COOKIE_SECRET');\nconst app = new Volt();\napp.plugin(cookiesPlugin({ secret }));\napp.post('/preference', (c) => {\n  const cookies: CookieContextHelper = c.store.cookies;\n  cookies.setSigned('theme', 'dark', {\n    httpOnly: true,\n    sameSite: 'lax',\n    secure: process.env['NODE_ENV'] === 'production',\n    maxAge: 86400,\n  });\n  return c.json({ saved: true });\n});\napp.get('/preference', (c) => {\n  const cookies: CookieContextHelper = c.store.cookies;\n  const theme = cookies.getSigned('theme');\n  if (theme === false) return c.json({ error: 'Invalid signature' }, 400);\n  return c.json({ theme: theme ?? 'light' });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Save and read a preference\n\n```bash\nbun run index.ts\ncurl -i -c cookies.txt -X POST http://localhost:3000/preference\ncurl -i -b cookies.txt http://localhost:3000/preference\n```\n\nThe helper provides get, getSigned, set, setSigned, and delete. getSigned returns false for tampering and undefined for a missing value. The core c.setCookie method does not accept a signed flag; use setSigned.\n\n## Cookie options and concurrency\n\nUse httpOnly, secure on HTTPS, and an appropriate sameSite policy. maxAge is seconds. Cookie helpers are injected through middleware and reference a request context. Since c.store is shared in the current core, do not retain the helper between requests; read it immediately in the handler and avoid using it after awaiting unrelated work."
+  },
+  {
+    "slug": "plugin-cors",
+    "title": "CORS & Browser Access",
+    "description": "Configure browser origins and understand current credential restrictions.",
+    "category": "Plugins Ecosystem",
+    "content": "## Complete non-credentialed example\n\n```typescript index.ts\nimport { Volt, cors } from 'voltts';\n\nconst app = new Volt();\napp.use(cors({\n  origin: ['http://localhost:5173'],\n  methods: ['GET', 'POST', 'OPTIONS'],\n  allowedHeaders: ['Content-Type', 'Authorization'],\n}));\napp.get('/products', () => ({ products: [] }));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Test preflight\n\n```bash\nbun run index.ts\ncurl -i -X OPTIONS http://localhost:3000/products -H 'Origin: http://localhost:5173' -H 'Access-Control-Request-Method: GET'\n```\n\nExpect 204 with Access-Control-Allow-Origin for the allowed origin. Test allowed and rejected origins before enabling a browser client.\n\n## Middleware or plugin\n\ncors(options) is middleware for app.use(). corsPlugin(options) is the plugin wrapper for app.plugin(). Supported options include origin, methods, allowedHeaders, exposedHeaders, credentials, and maxAge. Register either before routes; do not register both for the same purpose.\n\n## Credentialed requests\n\nThe current implementation can reflect a disallowed origin when credentials is true. Do not rely on origin arrays alone for credentialed browser access until that implementation is fixed. Enforce the policy in a trusted upstream or a custom origin check. CORS is a browser policy, not API authentication or authorization."
+  },
+  {
+    "slug": "plugin-rate-limit",
+    "title": "Rate Limiting",
+    "description": "Use the actual plugin export and verify 429 responses.",
+    "category": "Plugins Ecosystem",
+    "content": "## Complete rate limit example\n\n```typescript index.ts\nimport { Volt, rateLimitPlugin } from 'voltts';\n\nconst app = new Volt();\napp.plugin(rateLimitPlugin({\n  windowMs: 60000,\n  max: 3,\n  // One shared bucket for this demo. Use a trusted identity in a real app.\n  keyGenerator: () => 'tutorial',\n}));\napp.get('/limited', () => ({ ok: true }));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Reach the limit\n\n```bash\nbun run index.ts\nfor i in 1 2 3 4; do curl -i http://localhost:3000/limited; done\n```\n\nThe fourth request returns 429 with Retry-After and limit headers. windowMs is milliseconds. The plugin uses a counter with a reset window; it is not a token bucket. rateLimitPlugin is the plugin export; rateLimit is the separate core middleware.\n\n## Store and identity\n\nThe default MemoryRateLimitStore is process-local. A custom store must implement increment and resetKey. A key generator should use a trusted identity. The built-in default reads forwarding headers, which must be stripped or set by a trusted proxy; clients must not be able to choose their own rate-limit identity. Rate limiting is one layer of abuse protection."
+  },
+  {
+    "slug": "plugin-logger",
+    "title": "Structured Logging",
+    "description": "Register the logger plugin and read its shared logger service.",
+    "category": "Plugins Ecosystem",
+    "content": "## Complete logger example\n\n```typescript index.ts\nimport { Volt, loggerPlugin } from 'voltts';\n\nconst app = new Volt();\napp.plugin(loggerPlugin({ format: 'json' }));\napp.get('/health', (c) => {\n  c.store.logger.info('Health endpoint called');\n  return c.json({ ok: true });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Verify output\n\nRun `bun run index.ts` and request /health. The plugin logs requests and exposes c.store.logger.info, warn, error, and debug. format: 'json' emits structured lines; format: 'dev' emits readable development messages. Use logger(options) instead when you only need request middleware.\n\n## Avoid sensitive log fields\n\nSupply your own log function through the options if needed. Keep tokens, passwords, and private request bodies out of logs. Timing measures handler processing observed by the middleware, not client network latency."
+  },
+  {
+    "slug": "plugin-graphql",
+    "title": "GraphQL",
+    "description": "Mount a complete schema and verify a query.",
+    "category": "Plugins Ecosystem",
+    "content": "## Complete GraphQL example\n\nThe plugin uses the graphql package. Install it if your application does not already include it:\n\n```bash\nbun add graphql\n```\n\n```typescript index.ts\nimport { Volt, graphqlPlugin } from 'voltts';\n\nconst app = new Volt();\napp.plugin(graphqlPlugin({\n  path: '/graphql',\n  typeDefs: 'type Query { greeting(name: String): String! }',\n  resolvers: {\n    Query: {\n      greeting: ({ name }: { name?: string }) => `Hello ${name ?? 'World'}`,\n    },\n  },\n  graphiql: true,\n}));\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Execute a query\n\n```bash\nbun run index.ts\ncurl -i -X POST http://localhost:3000/graphql -H 'Content-Type: application/json' -d '{\"query\":\"{ greeting(name: \\\"Chansy\\\") }\"}'\n```\n\nExpect {\"data\":{\"greeting\":\"Hello Chansy\"}}. Open /graphql in a browser requesting HTML for GraphiQL.\n\n## Schema and context options\n\nProvide schema or typeDefs. rootValue and resolvers.Query/resolvers.Mutation supply root resolver functions. context(c) can build a request-local context for resolvers. POST supports a single query or an array of query objects. Introspection, query complexity limits, and authorization require application-specific configuration; enabling GraphiQL is not an authentication policy."
+  },
+  {
+    "slug": "plugin-redis",
+    "title": "Redis Integration",
+    "description": "Distinguish the memory default from a real Redis client.",
+    "category": "Plugins Ecosystem",
+    "content": "## Default behavior\n\nredisPlugin() creates DefaultMemoryRedisClient. Supplying url alone does not open a Redis connection in the current implementation; prefix is not applied to keys. This runnable example uses the memory store explicitly:\n\n```typescript index.ts\nimport { Volt, redisPlugin, type VoltRedisClient } from 'voltts';\n\nconst app = new Volt();\n// Without an injected client this is an in-memory implementation.\napp.plugin(redisPlugin());\napp.get('/stats', async (c) => {\n  const redis: VoltRedisClient = c.store.redis;\n  const cached = await redis.get('stats');\n  if (cached) return c.json({ source: 'cache', stats: JSON.parse(cached) });\n  const stats = { products: 10 };\n  await redis.set('stats', JSON.stringify(stats), 30);\n  return c.json({ source: 'computed', stats });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Verify a cache hit\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/stats\ncurl http://localhost:3000/stats\n```\n\nThe second response reads the memory cache. Values expire after 30 seconds. The interface uses set(key, value, ttlSeconds), not setex.\n\n## Connect a real client\n\nInitialize your Redis driver before plugin registration and pass a compatible client through redisPlugin({ client }). It must provide get, set with an optional TTL in seconds, del, has, and optional close. Driver method names and TTL signatures differ, so adapt them to VoltRedisClient explicitly. The plugin does not create a connection pool, retry driver connections, or provide decorator caching. See [Response Caching](/docs/caching) for HTTP response caching.\n\n## Complete real Redis adapter\n\nThis recipe requires a running Redis instance. Install the driver and configure its URL:\n\n```bash\nbun add redis@5\nexport REDIS_URL='redis://localhost:6379'\n```\n\n```typescript index.ts\nimport { Volt, redisPlugin, type VoltRedisClient } from 'voltts';\nimport { createClient } from 'redis';\n\nconst raw = createClient({ url: process.env.REDIS_URL });\nraw.on('error', (error) => console.error('Redis connection error', error));\nawait raw.connect();\nconst client: VoltRedisClient = {\n  get: (key) => raw.get(key),\n  async set(key, value, ttlSeconds) {\n    if (ttlSeconds !== undefined) await raw.set(key, value, { EX: ttlSeconds });\n    else await raw.set(key, value);\n  },\n  async del(key) { return (await raw.del(key)) > 0; },\n  async has(key) { return (await raw.exists(key)) > 0; },\n  async close() { await raw.close(); },\n};\nconst app = new Volt();\napp.plugin(redisPlugin({ client }));\napp.get('/redis-check', async () => {\n  await client.set('volt:check', 'connected', 30);\n  return { value: await client.get('volt:check') };\n});\nprocess.once('SIGTERM', async () => { await app.stop(); process.exit(0); });\napp.listen(3000);\n```\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/redis-check\n```\n\nExpect {\"value\":\"connected\"}. The adapter maps the driver's TTL and connection lifecycle to Volt's interface. Prefix your keys explicitly. This recipe follows the [node-redis connection guide](https://redis.io/docs/latest/develop/clients/nodejs/) and requires integration testing against your service.\n"
+  },
+  {
+    "slug": "plugin-postgres",
+    "title": "PostgreSQL Integration",
+    "description": "Understand the client contract and avoid accidentally using the mock.",
+    "category": "Plugins Ecosystem",
+    "content": "## Default behavior\n\npostgresPlugin() creates MockPostgresClient when no client is supplied. connectionString and other connection options are not used to instantiate a driver in the current implementation. It does not automatically use Bun.SQL. The following runnable example is explicitly a mock check:\n\n```typescript index.ts\nimport { Volt, postgresPlugin, type PostgresClient } from 'voltts';\n\nconst app = new Volt();\n// Without an injected client this is a mock, not a database connection.\napp.plugin(postgresPlugin());\napp.get('/database-check', async (c) => {\n  const db: PostgresClient = c.store.db;\n  const result = await db.query('SELECT 1');\n  return c.json({ rows: result.rows, mode: 'mock' });\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Verify the mock\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/database-check\n```\n\nSELECT 1 returns a mock row. Other statements generally return empty rows and do not persist data.\n\n## Real client contract\n\nConnect a driver before plugin registration and pass it as postgresPlugin({ client }). The PostgresClient interface requires query(sql, params) returning { rows, rowCount }, transaction(callback), and optionally end(). The plugin decorates c.store.db and c.store.postgres. Use parameterized query text and arguments, not user-generated SQL strings. It calls end() during app.stop(). For a complete persistent setup using generated models, follow [Prisma ORM](/docs/plugin-prisma).\n\n## Complete real PostgreSQL adapter\n\nInstall node-postgres and configure a reachable PostgreSQL database:\n\n```bash\nbun add pg\nbun add --dev @types/pg\nexport DATABASE_URL='postgresql://postgres:postgres@localhost:5432/volt'\n```\n\n```typescript index.ts\nimport { Volt, postgresPlugin, type PostgresClient } from 'voltts';\nimport { Pool, type PoolClient } from 'pg';\n\nconst pool = new Pool({ connectionString: process.env.DATABASE_URL });\nawait pool.query('SELECT 1');\nfunction adapter(connection?: PoolClient): PostgresClient {\n  return {\n    async query<T>(sql: string, params = []) {\n      const result = await (connection ?? pool).query(sql, params);\n      return { rows: result.rows as T[], rowCount: result.rowCount ?? 0 };\n    },\n    async transaction<T>(callback: (db: PostgresClient) => Promise<T>) {\n      if (connection) throw new Error('Nested transactions need savepoint support');\n      const transaction = await pool.connect();\n      try {\n        await transaction.query('BEGIN');\n        const result = await callback(adapter(transaction));\n        await transaction.query('COMMIT');\n        return result;\n      } catch (error) {\n        await transaction.query('ROLLBACK');\n        throw error;\n      } finally {\n        transaction.release();\n      }\n    },\n    end: connection ? undefined : () => pool.end(),\n  };\n}\nconst db = adapter();\nconst app = new Volt();\napp.plugin(postgresPlugin({ client: db }));\napp.get('/database-time', async () => ({ rows: (await db.query('SELECT now() AS time')).rows }));\napp.post('/transaction-check', async () => {\n  const result = await db.transaction((tx) => tx.query('SELECT $1::text AS message', ['Hello Volt']));\n  return { rows: result.rows };\n});\nprocess.once('SIGTERM', async () => { await app.stop(); process.exit(0); });\napp.listen(3000);\n```\n\n```bash\nbun run index.ts\ncurl http://localhost:3000/database-time\ncurl -X POST http://localhost:3000/transaction-check\n```\n\nEach transaction borrows one pool connection and releases it in finally. Parameter values are passed separately from SQL text. This follows the [node-postgres transaction guide](https://node-postgres.com/features/transactions). Nested transactions require savepoints and are rejected by this small adapter. Verify the recipe against your database before extending it.\n"
+  },
+  {
+    "slug": "plugin-prisma",
+    "title": "Prisma ORM",
+    "description": "Create a schema, generate a client, and persist users.",
+    "category": "Plugins Ecosystem",
+    "content": "## Install and configure\n\nThis example uses Prisma 6's prisma-client-js generator. Use matching versions of prisma and @prisma/client. A running PostgreSQL database is required for migration and requests.\n\n```bash\nbun add @prisma/client@6\nbun add --dev prisma@6\nmkdir -p prisma\nexport DATABASE_URL='postgresql://postgres:postgres@localhost:5432/volt'\n```\n\n## Create prisma/schema.prisma\n\n```prisma prisma/schema.prisma\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\ngenerator client {\n  provider = \"prisma-client-js\"\n}\nmodel User {\n  id    String @id @default(uuid())\n  name  String\n  email String @unique\n}\n```\n\n## Generate and migrate\n\n```bash\nbunx prisma generate --schema=prisma/schema.prisma\nbunx prisma migrate dev --schema=prisma/schema.prisma --name init\n```\n\nGenerate before typechecking code that imports model types. Client generation needs the schema; migration and queries need database connectivity.\n\n## Complete API\n\n```typescript index.ts\nimport { Volt, prismaPlugin, t } from 'voltts';\nimport { PrismaClient } from '@prisma/client';\n\nconst prisma = new PrismaClient();\nawait prisma.$connect();\nconst app = new Volt();\napp.plugin(prismaPlugin({ client: prisma, handleErrors: true }));\napp.post('/users', async (c) => {\n  const user = await prisma.user.create({ data: { name: c.body.name, email: c.body.email } });\n  return c.json(user, 201);\n}, { body: t.Object({ name: t.String({ minLength: 2 }), email: t.String({ format: 'email' }) }) });\napp.get('/users', async () => ({ users: await prisma.user.findMany() }));\nprocess.once('SIGTERM', async () => { await app.stop(); process.exit(0); });\napp.listen(3000);\n```\n\n## Test persistence and conflicts\n\n```bash\nbun run index.ts\ncurl -i -X POST http://localhost:3000/users -H 'Content-Type: application/json' -d '{\"name\":\"Chansy\",\"email\":\"chansy@example.com\"}'\ncurl http://localhost:3000/users\n```\n\nRepeat the POST with the same email to receive a 409 from P2002 translation. P2025 becomes 404; P2003/P2000 become 400. Without client the plugin creates a memory mock with no model methods. Pass an initialized real client directly, not an async client factory. Cleanup calls $disconnect() during app.stop(). This database recipe requires integration testing against your database."
+  },
+  {
+    "slug": "openapi",
+    "title": "OpenAPI & Swagger UI",
+    "description": "Generate request schemas and document response metadata.",
+    "category": "API Reference",
+    "content": "## Complete OpenAPI example\n\n```typescript index.ts\nimport { Volt, openapi, t } from 'voltts';\n\nconst app = new Volt();\napp.use(openapi({\n  info: { title: 'Tasks API', version: '1.0.0' },\n  path: '/docs',\n  swaggerPath: '/swagger',\n  specPath: '/openapi.json',\n  ui: 'both',\n  openapiVersion: '3.1.0',\n}));\napp.post('/tasks', (c) => c.json(c.body, 201), {\n  summary: 'Create a task',\n  tags: ['Tasks'],\n  body: t.Object({ title: t.String({ minLength: 2 }) }),\n  response: { 201: t.Object({ title: t.String() }) },\n});\nif (import.meta.main) app.listen(3000);\nexport default app;\n```\n\n## Open the reference\n\nRun `bun run index.ts`. Open http://localhost:3000/docs for Scalar, http://localhost:3000/swagger for Swagger UI, or http://localhost:3000/openapi.json for the specification.\n\n## Options and metadata\n\nThe default specification version is 3.0.3. Set openapiVersion: '3.1.0' explicitly for 3.1. ui accepts scalar, swagger, or both. Route metadata includes summary, description, tags, response, and security. A security declaration describes your API; you must still enforce authentication in handlers or middleware.\n\n## Response contract\n\nResponse schemas describe the contract in generated documentation. They do not currently validate or filter returned objects. Return the exact public fields yourself to avoid leaking database fields. Interactive UIs load third-party assets from CDNs and need network access."
+  },
+  {
+    "slug": "packages",
+    "title": "Package Reference",
+    "description": "Find every framework package and its documentation.",
+    "category": "API Reference",
+    "content": "## Public packages\n\nInstall voltts for the bundled exports or individual @voltts packages for a smaller import surface. The public scope is @voltts, not @volt.\n\n| Package | Main API | Guide |\n| --- | --- | --- |\n| @voltts/core | Volt, VoltContext, HttpError | [Application](/docs/application) |\n| @voltts/router | Router, TrieRouter | [Routing](/docs/router) |\n| @voltts/validator | t, compile, Static | [Validation](/docs/schema-validation) |\n| @voltts/serializer | json, text, html, binary, stream | [Responses](/docs/context) |\n| @voltts/middleware | cors, logger, rateLimit, secureHeaders, timeout | [Middleware](/docs/middleware) |\n| @voltts/di | Container | [Dependency Injection](/docs/dependency-injection) |\n| @voltts/openapi | openapi, swagger | [OpenAPI](/docs/openapi) |\n| @voltts/testing | createTestClient | [Testing](/docs/testing) |\n| @voltts/jwt | sign, verify, decode, jwt | [Authentication](/docs/plugin-jwt) |\n| @voltts/cache | cache, MemoryCacheStore, RedisCacheStore | [Caching](/docs/caching) |\n| @voltts/jobs | JobQueue | [Jobs](/docs/background-jobs) |\n| @voltts/node | serve, createNodeServer, createNodeHandler | [Node adapter](/docs/node-adapter) |\n| @voltts/websocket | WebSocketManager | [WebSockets](/docs/websockets) |\n| @voltts/cli | volt executable | [CLI](/docs/cli) |\n| voltts | Framework and plugin exports | [Quick Start](/docs/quick-start) |\n\n## Official plugins\n\nThe repository includes plugin-cors, plugin-jwt, plugin-redis, plugin-postgres, plugin-logger, plugin-graphql, plugin-prisma, plugin-cookies, and plugin-rate-limit under @voltts. Each plugin's guide explains setup and current limitations. Redis and PostgreSQL defaults do not connect to external services."
+  },
+  {
+    "slug": "framework-comparison",
+    "title": "Framework Comparison",
+    "description": "Compare documentation paths and equivalent API concepts without unsupported speed claims.",
+    "category": "API Reference",
+    "content": "## Compare the learning paths\n\nElysia documents routes, lifecycle, validation, testing, and WebSockets. Hono separates its core API from guides for validation, testing, streaming, and middleware. Fastify separates getting-started guides from detailed server, request, reply, hooks, plugins, and schema references. Volt follows this guide/reference split and adds complete examples for implemented APIs.\n\n| Task | Volt | Other frameworks |\n| --- | --- | --- |\n| Start a server | new Volt(), routes, listen() on Bun | Elysia optimizes for Bun; Hono uses runtime adapters; Fastify uses its server API |\n| Route inputs | path, handler, schema, middleware array | Check each framework's argument order and validation model |\n| Validation | Built-in t schemas; explicit Static types | Elysia has schema/type integration; Hono uses validators; Fastify uses JSON Schema/type providers |\n| Testing | createTestClient(app) with native Responses | Each framework provides its own in-process testing pattern |\n| State | c.store currently shares app decorations | State lifetimes differ; verify before porting authentication or DI code |\n| Database setup | Explicit real client injection | Database drivers and lifecycle still need application configuration |\n\n## Choose using your workload\n\nCompare runtime requirements, type inference, plugin maturity, HTTP semantics, and integration tests on your endpoints. Volt's API is evolving; consult each guide's current boundaries before migrating. There is no universal speed winner from a single synthetic result.\n\n## Primary documentation\n\n- [Elysia Quick Start](https://elysiajs.com/quick-start)\n- [Hono Documentation](https://hono.dev/docs/)\n- [Fastify Reference](https://fastify.dev/docs/latest/Reference/)\n- [Volt benchmark methodology](/docs/benchmarks)"
+  },
+  {
+    "slug": "benchmarks",
+    "title": "Benchmark Methodology",
+    "description": "Reproduce the repository harness and distinguish network tests from microbenchmarks.",
+    "category": "API Reference",
+    "content": "## Run the checked-in harness\n\nRun from the repository root after installing workspace dependencies:\n\n```bash\nbun install --frozen-lockfile\nbun --version\nnode --version\nbun run bench\nbun run bench:compare\nbun run bench:all\n```\n\n## What each command measures\n\n| Command | Scope |\n| --- | --- |\n| bench | Volt in-memory request/handler microbenchmarks |\n| bench:compare | Volt in-memory scenarios in benchmarks/runner.ts; not a multi-framework network ranking |\n| bench:all | Starts framework servers and measures localhost fetch requests |\n\nThe network harness uses 10,000 requests and 40 concurrent workers per scenario, with warmup. It measures static GET, dynamic parameters, and validated JSON POST. Inspect benchmarks/all-frameworks.ts and benchmarks/servers for exact endpoints and runtime execution.\n\n## Report enough context\n\nRecord the commit, dependency lockfile, runtime versions, operating system, CPU, load generator, concurrency, request count, payloads, and error counts. Repeat runs and report variability plus throughput and p50/p95/p99 latency. Measure CPU and memory separately if those matter. Current browser charts are not a live telemetry feed; only published raw runs can substantiate a ranking.\n\n## Interpret results\n\nIn-memory dispatch omits TCP and client networking. Localhost tests combine client and server load on one machine. Do not compare either directly with production traffic or infer ORM/database throughput from these HTTP scenarios. Use equivalent validation and response work for every framework. No current run is claimed by this documentation update."
+  }
 ];
 
-export const docsDatabase: Record<string, DocItem> = {
-  introduction: {
-    slug: 'introduction',
-    title: 'Introduction to Volt',
-    description: 'A high-performance, TypeScript-first API framework built specifically for Bun.',
-    category: 'Getting Started',
-    toc: [
-      { id: 'what-is-volt', text: 'What is Volt?' },
-      { id: 'why-volt', text: 'Why Choose Volt?' },
-      { id: 'key-features', text: 'Key Architectural Features' },
-      { id: 'performance-philosophy', text: 'Performance Philosophy' },
-    ],
-    content: `
-# What is Volt?
-
-**Volt** is a next-generation API framework for modern TypeScript runtimes, engineered from the ground up for **Bun**. It couples ultra-low latency Radix routing with developer ergonomics: end-to-end type safety, automatic query coercion, built-in dependency injection, zero-overhead OpenAPI generation, and a first-class plugin ecosystem.
-
-## Why Choose Volt?
-
-Traditional Node.js frameworks carry decades of legacy baggage (callback chains, bulky abstractions, redundant serialization). Even modern alternatives often compromise between raw speed and architectural maintainability.
-
-Volt bridges this gap:
-- **Maximum Bun Performance**: Built natively around \`Bun.serve\` and native Web Standards (\`Request\`, \`Response\`).
-- **Zero-Overhead Routing**: Custom $O(1)$ Radix Tree matching static paths in constant time and extracting dynamic parameters with zero allocations.
-- **Production Modular Architecture**: Enterprise-ready Dependency Injection container with \`@Injectable()\`, \`VoltModule\`, and lifecycle management.
-- **First-Class Plugins**: Native plugins for Prisma ORM, Redis, PostgreSQL, JWT, Rate Limiting, and GraphQL.
-    `,
-    codeSnippet: {
-      filename: 'index.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-
-const app = new Volt({ port: 3000 });
-
-app.get('/', (c) => c.json({ message: '⚡ Powered by Volt & Bun' }));
-
-app.listen(() => {
-  console.log('Server running on http://localhost:3000');
-});`,
-    },
-  },
-
-  'quick-start': {
-    slug: 'quick-start',
-    title: 'Quick Start',
-    description: 'Get up and running with a production-grade Volt application in under 60 seconds.',
-    category: 'Getting Started',
-    badge: 'Fast',
-    toc: [
-      { id: 'prerequisites', text: 'Prerequisites' },
-      { id: 'scaffold-new-project', text: 'Create a New Project' },
-      { id: 'manual-installation', text: 'Manual Installation' },
-      { id: 'first-api-route', text: 'Your First API Route' },
-      { id: 'running-dev-server', text: 'Starting the Server' },
-    ],
-    content: `
-# Quick Start
-
-You can build a blazing-fast REST API with Volt in less than a minute.
-
-## Prerequisites
-
-Volt runs on Bun. Install a recent Bun release and check its version before starting.
-\`\`\`bash
-# Verify Bun is installed
-bun --version
-\`\`\`
-
-## Manual Installation
-
-In a new directory run \`bun init -y\`, then install Volt:
-
-\`\`\`bash
-bun add voltts
-\`\`\`
-
-## Your First API Route
-
-Create an \`index.ts\` file and declare your routes. Run it with \`bun run index.ts\`, then open \`http://localhost:3000/api/health\`. For a complete API with POST requests and validation, follow [Build a Tasks API](/docs/tutorial-crud).
-    `,
-    codeSnippet: {
-      filename: 'index.ts',
-      language: 'typescript',
-      code: `import { Volt, cors, logger } from 'voltts';
-
-const app = new Volt({
-  port: 3000,
-  development: true,
-});
-
-// Attach standard middlewares
-app.use(logger({ format: 'dev' }));
-app.use(cors());
-
-// Basic Route
-app.get('/api/health', (c) => {
-  return c.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
-
-// Dynamic parameter route
-app.get('/api/users/:id', (c) => {
-  const userId = c.params.id;
-  return c.json({ userId, role: 'admin' });
-});
-
-app.listen();`,
-    },
-  },
-
-
-  'tutorial-crud': {
-    slug: 'tutorial-crud',
-    title: 'Tutorial: Build a Tasks API',
-    description: 'Build and test a small REST API with routes, path parameters, JSON bodies, and validation.',
-    category: 'Getting Started',
-    badge: 'New',
-    toc: [
-      { id: 'create-the-project', text: 'Create the project' },
-      { id: 'add-the-routes', text: 'Add the routes' },
-      { id: 'update-and-delete', text: 'Update and delete' },
-      { id: 'try-the-api', text: 'Try the API' },
-      { id: 'next-steps', text: 'Next steps' },
-    ],
-    content: `
-## Create the project
-
-Install Bun, then run these commands in a new directory:
-
-\`\`\`bash
-mkdir tasks-api && cd tasks-api
-bun init -y
-bun add voltts
-\`\`\`
-
-Create \`index.ts\` using the complete example above. This tutorial keeps tasks in memory, so restarting the server clears them.
-
-## Add the routes
-
-\`GET /tasks\` returns all tasks. \`GET /tasks/:id\` reads a path parameter and returns 404 when it cannot find the task. \`POST /tasks\` validates the JSON body before the handler runs and returns 201 for a new task. The \`t.Object\` schema requires a title of at least two characters.
-
-## Update and delete
-
-\`PUT /tasks/:id\` replaces a title after validating the body. \`DELETE /tasks/:id\` removes a task and returns 204. Both return 404 when the ID does not exist.
-
-## Try the API
-
-Start the server:
-
-\`\`\`bash
-bun run index.ts
-\`\`\`
-
-In another terminal, create and fetch a task:
-
-\`\`\`bash
-curl -i http://localhost:3000/tasks
-curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"Learn Volt"}'
-curl -i http://localhost:3000/tasks/1
-curl -i -X PUT http://localhost:3000/tasks/1 -H 'Content-Type: application/json' -d '{"title":"Build a Volt API"}'
-curl -i -X DELETE http://localhost:3000/tasks/1
-\`\`\`
-
-Try an invalid body to see validation in action:
-
-\`\`\`bash
-curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"x"}'
-\`\`\`
-
-## Next steps
-
-Read [Schema Validation](/docs/schema-validation) for more field types, [Middleware](/docs/middleware) for request processing, and [OpenAPI](/docs/openapi) for interactive API documentation. Replace the in-memory array with a database before using this example for persistent data.
-`,
-    codeSnippet: {
-      filename: 'index.ts',
-      language: 'typescript',
-      code: `import { Volt, t } from 'voltts';
-
-const app = new Volt({ port: 3000 });
-const tasks: { id: number; title: string }[] = [];
-
-app.get('/tasks', () => ({ tasks }));
-
-app.get('/tasks/:id', (c) => {
-  const task = tasks.find((item) => item.id === Number(c.params.id));
-  return task ? c.json(task) : c.json({ error: 'Task not found' }, 404);
-});
-
-app.post('/tasks', (c) => {
-  const task = { id: tasks.length + 1, title: c.body.title };
-  tasks.push(task);
-  return c.json(task, 201);
-}, {
-  body: t.Object({ title: t.String({ minLength: 2 }) }),
-});
-
-app.put('/tasks/:id', (c) => {
-  const task = tasks.find((item) => item.id === Number(c.params.id));
-  if (!task) return c.json({ error: 'Task not found' }, 404);
-  task.title = c.body.title;
-  return c.json(task);
-}, {
-  body: t.Object({ title: t.String({ minLength: 2 }) }),
-});
-
-app.delete('/tasks/:id', (c) => {
-  const index = tasks.findIndex((item) => item.id === Number(c.params.id));
-  if (index === -1) return c.json({ error: 'Task not found' }, 404);
-  tasks.splice(index, 1);
-  return new Response(null, { status: 204 });
-});
-
-app.listen(3000, (server) => {
-  console.log(\`Tasks API: http://localhost:\${server.port}\`);
-});`,
-    },
-  },
-
-  cli: {
-    slug: 'cli',
-    title: 'Volt CLI Tool',
-    description: 'Command line interface for scaffolding, generators, dev servers, and production builds.',
-    category: 'Getting Started',
-    toc: [
-      { id: 'installation', text: 'Installation' },
-      { id: 'commands', text: 'CLI Commands' },
-      { id: 'scaffolding-generators', text: 'Generators' },
-    ],
-    content: `
-# Volt CLI
-
-The Volt CLI helps you scaffold new applications, generate modules, controllers, and services, and run optimized test suites.
-
-## Available Commands
-
-- \`volt new <project-name>\`: Scaffold a complete template with TypeScript, routing, and testing.
-- \`volt g module <name>\`: Generate a new Volt feature module.
-- \`volt g controller <name>\`: Generate a route controller.
-- \`volt g service <name>\`: Generate an injectable service.
-- \`volt dev\`: Start the Bun development server with auto-reload.
-- \`volt build\`: Compile and bundle for production deployment.
-    `,
-    codeSnippet: {
-      filename: 'terminal',
-      language: 'bash',
-      code: `# Scaffold a new app with Volt
-bunx volt new my-awesome-api
-
-# Change directory
-cd my-awesome-api
-
-# Start dev server
-bun dev`,
-    },
-  },
-
-  application: {
-    slug: 'application',
-    title: 'Application & Server',
-    description: 'Configure and orchestrate the Volt application instance and HTTP lifecycle.',
-    category: 'Core Concepts',
-    toc: [
-      { id: 'volt-instance', text: 'The Volt Instance' },
-      { id: 'configuration-options', text: 'Configuration Options' },
-      { id: 'server-lifecycle', text: 'Server Lifecycle & Shutdown' },
-      { id: 'error-handling', text: 'Global Error Handling' },
-    ],
-    content: `
-# Application & Server
-
-The \`Volt\` class is the central orchestrator of your backend. It configures the underlying Bun HTTP engine, registers plugins, mounts middlewares, and dispatches incoming requests through the Radix router.
-
-## Configuration Options
-
-When creating an instance of \`Volt\`, you can supply:
-- \`port\`: Network port to listen on (default: \`3000\`).
-- \`hostname\`: Network interface (default: \`'0.0.0.0'\`).
-- \`development\`: Enables verbose error traces and stack traces in responses (default: \`false\`).
-- \`maxRequestBodySize\`: Maximum payload size in bytes.
-- \`onError\`: Custom error translation function.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-
-export const app = new Volt({
-  port: Number(process.env.PORT) || 3000,
-  development: process.env.NODE_ENV !== 'production',
-  onError(err, ctx) {
-    console.error('Unhandled Server Error:', err);
-    return ctx.json({
-      success: false,
-      error: err.message || 'Internal Server Error',
-    }, 500);
-  },
-});`,
-    },
-  },
-
-  context: {
-    slug: 'context',
-    title: 'Context & Response API',
-    description: 'Explore the ergonomic Context object passed to every route handler and middleware.',
-    category: 'Core Concepts',
-    toc: [
-      { id: 'context-properties', text: 'Context Properties' },
-      { id: 'response-helpers', text: 'Response Helpers' },
-      { id: 'request-parsing', text: 'Request Body & Headers' },
-      { id: 'context-store', text: 'Context Store (c.store)' },
-    ],
-    content: `
-# Context & Response API
-
-Every route handler receives an instance of \`Context\` (\`c\`). It exposes convenient methods to read incoming HTTP request details and send fast responses without boilerplate.
-
-## Core Properties
-
-- \`c.req\`: The native Web Standard \`Request\` object.
-- \`c.params\`: Extracted path parameters (e.g. \`c.params.id\`).
-- \`c.query\`: Parsed and coerced URL query parameters.
-- \`c.body\`: Pre-parsed JSON or form body.
-- \`c.headers\`: Request headers lookup map.
-- \`c.store\`: State container accessible across plugins and middlewares (e.g. \`c.store.user\`, \`c.store.prisma\`).
-
-## Response Helpers
-
-- \`c.json(data, status?)\`: Returns a JSON response with \`application/json\` content-type.
-- \`c.text(text, status?)\`: Returns plain text.
-- \`c.html(html, status?)\`: Returns HTML content.
-- \`c.status(code)\`: Sets HTTP status code.
-- \`c.header(key, value)\`: Sets response header.
-    `,
-    codeSnippet: {
-      filename: 'src/routes.ts',
-      language: 'typescript',
-      code: `app.get('/api/users/:id', async (c) => {
-  const userId = c.params.id;
-  const includeProfile = c.query.profile === true;
-
-  // Custom response headers
-  c.header('X-Volt-Processed', 'true');
-
-  return c.json({
-    id: userId,
-    name: 'Sarah Connor',
-    profileIncluded: includeProfile,
-  });
-});`,
-    },
-  },
-
-  middleware: {
-    slug: 'middleware',
-    title: 'Middleware Pipeline',
-    description: 'Compose composable middleware functions using the classic onion-ring execution model.',
-    category: 'Core Concepts',
-    toc: [
-      { id: 'middleware-architecture', text: 'Middleware Architecture' },
-      { id: 'creating-middleware', text: 'Writing Custom Middleware' },
-      { id: 'global-vs-route', text: 'Global vs Route Scoped' },
-    ],
-    content: `
-# Middleware Pipeline
-
-Volt middlewares follow the standard onion-ring execution model with \`await next()\`. A middleware can inspect incoming requests, modify context state, stop execution early, or measure execution timing.
-
-## Writing Custom Middleware
-
-A middleware is a function that receives \`(c, next)\`:
-    `,
-    codeSnippet: {
-      filename: 'src/middleware/timing.ts',
-      language: 'typescript',
-      code: `import { MiddlewareHandler } from 'voltts';
-
-export const timingMiddleware: MiddlewareHandler = async (c, next) => {
-  const start = performance.now();
-  
-  await next(); // Proceed to next handler
-  
-  const duration = (performance.now() - start).toFixed(2);
-  c.header('X-Response-Time', \`\${duration}ms\`);
-};`,
-    },
-  },
-
-  'lifecycle-hooks': {
-    slug: 'lifecycle-hooks',
-    title: 'Lifecycle Hooks',
-    description: 'Run setup and cleanup callbacks and handle unhandled request errors.',
-    category: 'Core Concepts',
-    toc: [
-      { id: 'available-hooks', text: 'Available Hooks' },
-      { id: 'execution-order', text: 'Execution Order' },
-    ],
-    content: `
-# Lifecycle Hooks
-
-Volt supports \`app.onStart(fn)\` before the server starts, \`app.onStop(fn)\` during shutdown, and \`app.onError(fn)\` for unhandled request errors. The error callback receives an Error and the native Request, and must return a Response. For work around each request, use middleware instead.
-
-## Execution Order
-
-Register callbacks before calling \`listen()\`. Await \`app.stop()\` when shutting down to run the stop callback.
-`,
-    codeSnippet: {
-      filename: 'index.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-
-const app = new Volt({ port: 3000 });
-app.onStart(() => console.log('Starting Volt'));
-app.onStop(() => console.log('Stopping Volt'));
-app.onError((error) => {
-  console.error(error);
-  return Response.json({ error: 'Internal server error' }, { status: 500 });
-});
-app.get('/health', () => ({ ok: true }));
-app.listen(3000);`,
-    },
-  },
-
-  router: {
-    slug: 'router',
-    title: 'Radix Tree Router',
-    description: 'High-speed $O(1)$ static matching and zero-allocation dynamic parameter extraction.',
-    category: 'Routing & Handlers',
-    toc: [
-      { id: 'router-features', text: 'Radix Tree Architecture' },
-      { id: 'route-definitions', text: 'HTTP Methods' },
-      { id: 'dynamic-parameters', text: 'Dynamic Parameters & Wildcards' },
-      { id: 'automatic-options', text: 'Automatic OPTIONS & HEAD' },
-    ],
-    content: `
-# Radix Tree Router
-
-Volt uses an ultra-fast Radix Tree (compressed prefix tree) router. Routes are classified into:
-1. **Static Table**: Fixed URLs (e.g. \`/api/products\`) are resolved in $O(1)$ constant time via direct lookup.
-2. **Parametric Radix Tree**: Dynamic segments (e.g. \`/api/products/:id/reviews/:reviewId\`) are matched with zero string allocations.
-3. **Wildcard Catch-All**: Catch-all routes (e.g. \`/static/*path\`).
-    `,
-    codeSnippet: {
-      filename: 'src/routes.ts',
-      language: 'typescript',
-      code: `// Static route (O(1))
-app.get('/api/status', (c) => c.json({ ok: true }));
-
-// Dynamic parameter
-app.get('/api/users/:id', (c) => c.json({ id: c.params.id }));
-
-// Nested parameters
-app.get('/api/posts/:postId/comments/:commentId', (c) => {
-  return c.json({
-    postId: c.params.postId,
-    commentId: c.params.commentId,
-  });
-});
-
-// Wildcard catch-all
-app.get('/files/*filepath', (c) => {
-  return c.text(\`Requested file: \${c.params.filepath}\`);
-});`,
-    },
-  },
-
-  'route-groups': {
-    slug: 'route-groups',
-    title: 'Route Groups & Scoping',
-    description: 'Organize related endpoints with prefix scoping and group-level middlewares.',
-    category: 'Routing & Handlers',
-    toc: [
-      { id: 'group-syntax', text: 'Group Syntax' },
-      { id: 'group-middleware', text: 'Group-Level Middleware' },
-      { id: 'nested-groups', text: 'Nested Prefix Groups' },
-    ],
-    content: `
-# Route Groups & Scoping
-
-Route groups let you cleanly structure large applications into logical modules with shared URL prefixes and middleware chains.
-    `,
-    codeSnippet: {
-      filename: 'src/api.ts',
-      language: 'typescript',
-      code: `// Public API group
-app.group('/api/v1', (v1) => {
-  v1.get('/products', listProductsHandler);
-
-  // Authenticated Admin sub-group
-  v1.group('/admin', (admin) => {
-    admin.use(requireAdminAuth);
-    admin.post('/products', createProductHandler);
-    admin.delete('/products/:id', deleteProductHandler);
-  });
-});`,
-    },
-  },
-
-  'schema-validation': {
-    slug: 'schema-validation',
-    title: 'Schema Validation',
-    description: 'Validate request bodies, queries, and headers with compile-time type safety.',
-    category: 'Validation & Typing',
-    toc: [
-      { id: 'validation-overview', text: 'Overview' },
-      { id: 'zod-integration', text: 'Zod Integration' },
-      { id: 'validation-responses', text: 'Error Translation' },
-    ],
-    content: `
-# Schema Validation
-
-Volt's built-in \`t\` schema builder validates bodies and queries before the handler runs. Invalid input receives a 400 response. Define schemas in the third argument to a route, as shown below.
-    `,
-    codeSnippet: {
-      filename: 'src/schemas.ts',
-      language: 'typescript',
-      code: `import { Volt, t } from 'voltts';
-
-const app = new Volt({ port: 3000 });
-
-app.post('/api/products', (c) => {
-  return c.json({ success: true, product: c.body }, 201);
-}, {
-  body: t.Object({
-    title: t.String({ minLength: 3 }),
-    price: t.Number({ minimum: 0 }),
-  }),
-});
-
-app.listen(3000);`,
-    },
-  },
-
-  'type-coercion': {
-    slug: 'type-coercion',
-    title: 'Automatic Type Coercion',
-    description: 'Effortlessly coerce URL query strings to numbers, booleans, and arrays without manual parsing.',
-    category: 'Validation & Typing',
-    badge: 'New',
-    toc: [
-      { id: 'coercion-problem', text: 'The HTTP Query String Problem' },
-      { id: 'volt-solution', text: 'How Volt Coerces Types' },
-      { id: 'coercion-examples', text: 'Supported Types' },
-    ],
-    content: `
-# Automatic Type Coercion
-
-In standard Web APIs, all query parameters arrive as strings (e.g. \`?limit=20&active=true\` becomes \`{ limit: "20", active: "true" }\`).
-
-Volt automatically coerces values based on your validation schema:
-- \`"20"\` $\rightarrow$ \`20\` (number)
-- \`"true"\` / \`"false"\` $\rightarrow$ \`true\` / \`false\` (boolean)
-- \`"tag1,tag2"\` $\rightarrow$ \`["tag1", "tag2"]\` (arrays)
-    `,
-    codeSnippet: {
-      filename: 'src/routes.ts',
-      language: 'typescript',
-      code: `import { z } from 'zod';
-
-const QuerySchema = z.object({
-  limit: z.coerce.number().default(20),
-  page: z.coerce.number().default(1),
-  inStock: z.coerce.boolean().default(true),
-});
-
-app.get('/api/items', {
-  schema: { query: QuerySchema }
-}, (c) => {
-  // typeof c.query.limit === 'number'
-  // typeof c.query.inStock === 'boolean'
-  return c.json({ query: c.query });
-});`,
-    },
-  },
-
-  openapi: {
-    slug: 'openapi',
-    title: 'OpenAPI 3.1 & Swagger UI',
-    description: 'Auto-generate comprehensive OpenAPI 3.1 specifications and host interactive documentation.',
-    category: 'OpenAPI & Swagger',
-    toc: [
-      { id: 'openapi-overview', text: 'Overview' },
-      { id: 'mounting-docs', text: 'Mounting Swagger UI' },
-      { id: 'documenting-endpoints', text: 'Endpoint Metadata' },
-    ],
-    content: `
-# OpenAPI 3.1 & Swagger UI
-
-Volt includes native OpenAPI 3.1 generation. By attaching schemas and route metadata, Volt automatically builds the OpenAPI JSON specification and serves interactive Swagger UI or Scalar UI.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt, openapi } from 'voltts';
-
-const app = new Volt();
-
-app.use(openapi({
-  info: {
-    title: 'Volt Store API',
-    version: '1.0.0',
-    description: 'High-performance eCommerce API',
-  },
-  path: '/docs',
-  swaggerPath: '/swagger',
-  specPath: '/openapi.json',
-  ui: 'both', // Serves both Swagger and Scalar
-}));`,
-    },
-  },
-
-  'dependency-injection': {
-    slug: 'dependency-injection',
-    title: 'Dependency Injection',
-    description: 'Enterprise-grade Inversion of Control (IoC) with Singleton and Transient scopes.',
-    category: 'Architecture & DI',
-    toc: [
-      { id: 'di-container', text: 'Built-in DI Container' },
-      { id: 'service-registration', text: 'Injectable Services' },
-      { id: 'circular-dependency', text: 'Circular Dependency Protection' },
-    ],
-    content: `
-# Dependency Injection
-
-Volt features a lightweight, zero-dependency IoC container. You can declare injectable services with \`@Injectable()\` and inject them into controllers, middlewares, or other services.
-    `,
-    codeSnippet: {
-      filename: 'src/services/user.service.ts',
-      language: 'typescript',
-      code: `import { Injectable, Container } from 'voltts';
-
-@Injectable()
-export class DatabaseService {
-  query(sql: string) { return [{ id: 1, name: 'Alice' }]; }
-}
-
-@Injectable()
-export class UserService {
-  constructor(private db: DatabaseService) {}
-
-  getAllUsers() {
-    return this.db.query('SELECT * FROM users');
-  }
-}
-
-// Resolve instance automatically with dependencies
-const container = new Container();
-const userService = container.resolve(UserService);`,
-    },
-  },
-
-  modules: {
-    slug: 'modules',
-    title: 'Modular Architecture',
-    description: 'Encapsulate domain functionality into cohesive modules with controllers and providers.',
-    category: 'Architecture & DI',
-    toc: [
-      { id: 'volt-modules', text: 'VoltModule Class' },
-      { id: 'feature-modules', text: 'Feature Scoping' },
-    ],
-    content: `
-# Modular Architecture
-
-For large codebases, Volt provides a modular architecture pattern similar to NestJS, but without the heavyweight runtime overhead or slow reflection.
-    `,
-    codeSnippet: {
-      filename: 'src/modules/products/products.module.ts',
-      language: 'typescript',
-      code: `import { RouteGroup } from 'voltts';
-import { productsService } from './products.service';
-
-export class ProductsModule {
-  static register(router: RouteGroup): void {
-    router.get('/', async (c) => {
-      const items = await productsService.getAll();
-      return c.json({ data: items });
-    });
-
-    router.get('/:id', async (c) => {
-      const item = await productsService.getById(c.params.id);
-      if (!item) return c.json({ error: 'Not found' }, 404);
-      return c.json({ data: item });
-    });
-  }
-}`,
-    },
-  },
-
-  'plugin-prisma': {
-    slug: 'plugin-prisma',
-    title: 'Prisma ORM Plugin',
-    description: 'Seamless integration with Prisma Client, automatic error code mapping, and lifecycle management.',
-    category: 'Plugins Ecosystem',
-    badge: 'Official',
-    toc: [
-      { id: 'prisma-overview', text: 'Overview' },
-      { id: 'installation', text: 'Installation' },
-      { id: 'plugin-registration', text: 'Plugin Registration' },
-      { id: 'context-access', text: 'Accessing Prisma in Handlers' },
-      { id: 'error-translation', text: 'Prisma Error Translation' },
-    ],
-    content: `
-# Prisma ORM Plugin (\`@voltts/plugin-prisma\`)
-
-The official Volt Prisma plugin connects your database with Prisma ORM and Volt's HTTP engine.
-
-## Features
-
-- **Store Injection**: Automatically exposes Prisma Client on \`c.store.prisma\` and \`app.prisma\`.
-- **Error Code Translation**: Automatically converts Prisma error codes:
-  - \`P2002\` (Unique constraint violation) $\rightarrow$ \`409 Conflict\`
-  - \`P2025\` (Record not found) $\rightarrow$ \`404 Not Found\`
-- **Clean Shutdown**: Calls \`$disconnect()\` during server teardown.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt, prismaPlugin } from 'voltts';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-const app = new Volt();
-
-// Register Plugin
-app.plugin(prismaPlugin({
-  client: prisma,
-  handleErrors: true,
-  injectContext: true,
+export const docsDatabase: Record<string, DocItem> = Object.fromEntries(
+  pages.map((page) => [page.slug, {
+    ...page,
+    toc: parseDocBlocks(page.content)
+      .filter((block) => block.kind === 'heading')
+      .map((block) => ({ id: block.id, text: block.text, depth: block.depth })),
+  }]),
+);
+
+export const docCategories: DocCategory[] = Object.entries({"Getting Started": "i-lucide-rocket", "Core Concepts": "i-lucide-cpu", "Routing & Handlers": "i-lucide-split", "Validation & Typing": "i-lucide-shield-check", "Architecture & DI": "i-lucide-layers", "Guides": "i-lucide-book-open", "Plugins Ecosystem": "i-lucide-blocks", "API Reference": "i-lucide-list"}).map(([title, icon]) => ({
+  title,
+  icon,
+  items: pages.filter((page) => page.category === title).map(({ slug, title }) => ({ slug, title })),
 }));
 
-// Use in route handlers
-app.get('/api/users', async (c) => {
-  const users = await c.store.prisma.user.findMany({
-    take: 10,
-    orderBy: { createdAt: 'desc' },
-  });
-  return c.json({ users });
-});`,
-    },
-  },
-
-  'plugin-postgres': {
-    slug: 'plugin-postgres',
-    title: 'PostgreSQL Native Driver',
-    description: 'High-throughput PostgreSQL integration utilizing Bun\'s native SQL client.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'postgres-overview', text: 'Overview' },
-      { id: 'transactions', text: 'Transactions' },
-    ],
-    content: `
-# PostgreSQL Native Plugin (\`@voltts/plugin-postgres\`)
-
-For maximum performance, Volt integrates directly with Bun's native SQL driver (\`Bun.SQL\`), providing tagged template queries and connection pooling.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { postgresPlugin } from '@voltts/plugin-postgres';
-
-const app = new Volt();
-
-app.plugin(postgresPlugin({
-  url: process.env.DATABASE_URL,
-}));
-
-app.get('/api/categories', async (c) => {
-  const rows = await c.store.db\`SELECT * FROM categories ORDER BY name ASC\`;
-  return c.json({ categories: rows });
-});`,
-    },
-  },
-
-  'plugin-redis': {
-    slug: 'plugin-redis',
-    title: 'Redis Cache Plugin',
-    description: 'Lightning-fast Redis client plugin for response caching, sessions, and distributed rate limiting.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'redis-overview', text: 'Overview' },
-      { id: 'cache-helpers', text: 'Cache Helpers' },
-    ],
-    content: `
-# Redis Cache Plugin (\`@voltts/plugin-redis\`)
-
-Integrates Redis into Volt with connection pooling, automated retry logic, and decorator caching helpers.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { redisPlugin } from '@voltts/plugin-redis';
-
-const app = new Volt();
-
-app.plugin(redisPlugin({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-}));
-
-app.get('/api/stats', async (c) => {
-  const cached = await c.store.redis.get('dashboard:stats');
-  if (cached) return c.json(JSON.parse(cached));
-
-  const stats = { activeUsers: 4200, ordersToday: 310 };
-  await c.store.redis.setex('dashboard:stats', 60, JSON.stringify(stats));
-  return c.json(stats);
-});`,
-    },
-  },
-
-  'plugin-jwt': {
-    slug: 'plugin-jwt',
-    title: 'JWT Authentication',
-    description: 'Sign, verify, and enforce JSON Web Tokens with automatic Bearer header extraction.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'jwt-overview', text: 'Overview' },
-      { id: 'route-guard', text: 'Route Protection' },
-    ],
-    content: `
-# JWT Authentication Plugin (\`@voltts/plugin-jwt\`)
-
-Provides fast HMAC-SHA256 and RSA token signing and verification directly on context.
-    `,
-    codeSnippet: {
-      filename: 'src/auth.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { jwtPlugin } from '@voltts/plugin-jwt';
-
-const app = new Volt();
-
-app.plugin(jwtPlugin({
-  secret: process.env.JWT_SECRET || 'super-secret-key-volt',
-}));
-
-app.post('/api/auth/login', async (c) => {
-  const token = await c.jwt.sign({ sub: 'user-123', role: 'admin' });
-  return c.json({ token });
-});
-
-app.get('/api/protected', (c) => {
-  // c.jwt.verify() is automatically checked when protectRoute is enabled
-  return c.json({ user: c.store.jwtUser });
-});`,
-    },
-  },
-
-  'plugin-cors': {
-    slug: 'plugin-cors',
-    title: 'CORS & Security',
-    description: 'Configure Cross-Origin Resource Sharing with preflight handling, credentials, and allowed headers.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'cors-options', text: 'Options' },
-      { id: 'configuration', text: 'Usage' },
-    ],
-    content: `
-# CORS Plugin (\`@voltts/plugin-cors\`)
-
-Handles preflight \`OPTIONS\` requests and attaches configurable CORS headers to all routes.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt, cors } from 'voltts';
-
-const app = new Volt();
-
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://myapp.com'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-Id'],
-  maxAge: 86400,
-}));`,
-    },
-  },
-
-  'plugin-rate-limit': {
-    slug: 'plugin-rate-limit',
-    title: 'Rate Limiter',
-    description: 'Token bucket rate limiting to protect your endpoints against brute-force and DDoS attacks.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'rate-limit-overview', text: 'Overview' },
-      { id: 'rate-limit-options', text: 'Options & Custom Key Generator' },
-    ],
-    content: `
-# Rate Limiting (\`@voltts/plugin-rate-limit\`)
-
-Safeguard endpoints with in-memory or Redis-backed token bucket rate limits. Automatically injects \`RateLimit-Limit\`, \`RateLimit-Remaining\`, and \`RateLimit-Reset\` headers.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { rateLimit } from '@voltts/plugin-rate-limit';
-
-const app = new Volt();
-
-// Limit to 100 requests per 60 seconds per IP
-app.use(rateLimit({
-  windowMs: 60 * 1000,
-  max: 100,
-  message: 'Too many requests, please try again in 1 minute.',
-}));`,
-    },
-  },
-
-  'plugin-cookies': {
-    slug: 'plugin-cookies',
-    title: 'Signed Cookies',
-    description: 'Parse, serialize, and cryptographically sign HTTP cookies with tamper protection.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'cookies-overview', text: 'Overview' },
-      { id: 'signed-cookies', text: 'Tamper-Proof Signing' },
-    ],
-    content: `
-# Cookies Plugin (\`@voltts/plugin-cookies\`)
-
-Provides cookie reading and setting with HMAC signature validation to prevent client-side cookie tampering.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { cookiesPlugin } from '@voltts/plugin-cookies';
-
-const app = new Volt();
-
-app.plugin(cookiesPlugin({ secret: 'cookie-encryption-secret' }));
-
-app.post('/api/login', (c) => {
-  c.setCookie('sessionId', 'sess_987654', {
-    signed: true,
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-    maxAge: 3600 * 24 * 7,
-  });
-  return c.json({ loggedIn: true });
-});`,
-    },
-  },
-
-  'plugin-logger': {
-    slug: 'plugin-logger',
-    title: 'Structured Logger',
-    description: 'High-throughput structured JSON logging with colorized terminal development formatting.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'logger-overview', text: 'Overview' },
-      { id: 'formatting-options', text: 'Formatting Options' },
-    ],
-    content: `
-# Structured Logger (\`@voltts/plugin-logger\`)
-
-Minimal overhead request and error logger. Outputs colorized summaries in \`dev\` mode and single-line structured JSON in production for ELK/Datadog ingesters.
-    `,
-    codeSnippet: {
-      filename: 'src/app.ts',
-      language: 'typescript',
-      code: `import { Volt, logger } from 'voltts';
-
-const app = new Volt();
-
-app.use(logger({
-  format: process.env.NODE_ENV === 'production' ? 'json' : 'dev',
-}));`,
-    },
-  },
-
-  'plugin-graphql': {
-    slug: 'plugin-graphql',
-    title: 'GraphQL Server',
-    description: 'Execute GraphQL queries and mutations with embedded GraphiQL web interface.',
-    category: 'Plugins Ecosystem',
-    toc: [
-      { id: 'graphql-overview', text: 'Overview' },
-      { id: 'mounting-graphiql', text: 'GraphiQL Playground' },
-    ],
-    content: `
-# GraphQL Plugin (\`@voltts/plugin-graphql\`)
-
-Provides full GraphQL schema execution with automatic request context injection and GraphiQL web IDE.
-    `,
-    codeSnippet: {
-      filename: 'src/graphql.ts',
-      language: 'typescript',
-      code: `import { Volt } from 'voltts';
-import { graphqlPlugin } from '@voltts/plugin-graphql';
-import { buildSchema } from 'graphql';
-
-const schema = buildSchema(\`
-  type Query {
-    greeting(name: String): String
-  }
-\`);
-
-const rootValue = {
-  greeting: ({ name }: { name: string }) => \`Hello \${name || 'World'} from Volt!\`,
-};
-
-const app = new Volt();
-
-app.plugin(graphqlPlugin({
-  schema,
-  rootValue,
-  graphiql: true,
-  path: '/graphql',
-}));`,
-    },
-  },
-
-  benchmarks: {
-    slug: 'benchmarks',
-    title: 'Performance & Benchmarks',
-    description: 'Comprehensive, reproducible throughput and latency benchmarks against Elysia, Hono, Fastify, and Express.',
-    category: 'Benchmarks & Ops',
-    toc: [
-      { id: 'benchmark-results', text: 'Benchmark Results' },
-      { id: 'methodology', text: 'Methodology' },
-      { id: 'reproducing-results', text: 'Reproducing Benchmarks' },
-    ],
-    content: `
-# Performance & Benchmarks
-
-Volt is engineered for extreme throughput and sub-millisecond tail latency on Bun.
-
-## Measured Throughput (req/sec)
-
-| Framework | Runtime | Requests / sec | Avg Latency | p99 Latency |
-| :--- | :--- | :--- | :--- | :--- |
-| **Volt** | **Bun** | **184,210** | **0.54 ms** | **1.12 ms** |
-| Elysia | Bun | 168,450 | 0.59 ms | 1.34 ms |
-| Hono | Bun | 152,100 | 0.65 ms | 1.58 ms |
-| Fastify | Node.js | 78,300 | 1.28 ms | 3.42 ms |
-| Express | Node.js | 24,150 | 4.14 ms | 12.80 ms |
-| NestJS | Node.js | 18,900 | 5.29 ms | 16.50 ms |
-
-## Why is Volt so Fast?
-
-1. **Direct Bun.serve Integration**: Eliminates intermediate buffer copies and abstraction layers.
-2. **Zero-Allocation Radix Router**: Matches static endpoints in a single lookup and extracts params with in-place slices.
-3. **No Garbage Collection Pressure**: Pre-allocates context pools and response headers.
-    `,
-    codeSnippet: {
-      filename: 'terminal',
-      language: 'bash',
-      code: `# Run the benchmark suite locally
-bun run bench:compare
-
-# Run all frameworks side-by-side
-bun run bench:all`,
-    },
-  },
-
-};
+export { docExamples };

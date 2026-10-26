@@ -6,6 +6,16 @@ const searchQuery = ref('');
 const router = useRouter();
 
 const results = computed(() => search(searchQuery.value));
+const activeResult = ref(0);
+const searchInput = ref<HTMLInputElement | null>(null);
+
+watch(searchQuery, () => { activeResult.value = 0; });
+watch(isSearchOpen, async (open) => {
+  if (open) {
+    await nextTick();
+    searchInput.value?.focus();
+  }
+});
 
 function navigateToDoc(slug: string) {
   closeSearch();
@@ -22,6 +32,18 @@ onMounted(() => {
     if (e.key === 'Escape' && isSearchOpen.value) {
       closeSearch();
     }
+    if (isSearchOpen.value && results.value.length) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const direction = e.key === 'ArrowDown' ? 1 : -1;
+        activeResult.value = (activeResult.value + direction + results.value.length) % results.value.length;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const result = results.value[activeResult.value];
+        if (result) navigateToDoc(result.slug);
+      }
+    }
   };
   window.addEventListener('keydown', handleKeydown);
   onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
@@ -32,6 +54,9 @@ onMounted(() => {
   <Teleport to="body">
     <div
       v-if="isSearchOpen"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search Volt documentation"
       class="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/70 backdrop-blur-md transition-all font-mono"
       @click.self="closeSearch"
     >
@@ -40,7 +65,9 @@ onMounted(() => {
         <div class="flex items-center px-4 border-b border-neutral-200 dark:border-neutral-800">
           <UIcon name="i-lucide-search" class="w-4 h-4 text-neutral-400 mr-3" />
           <input
+            ref="searchInput"
             v-model="searchQuery"
+            aria-label="Search documentation"
             type="text"
             placeholder="Search documentation, APIs, plugins, guides..."
             class="w-full py-3.5 bg-transparent text-xs text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:outline-none font-mono"
@@ -67,8 +94,9 @@ onMounted(() => {
 
           <div v-else class="space-y-1">
             <button
-              v-for="item in results"
+              v-for="(item, index) in results"
               :key="item.slug"
+              :class="index === activeResult ? 'bg-neutral-100 dark:bg-neutral-800' : ''"
               @click="navigateToDoc(item.slug)"
               class="w-full text-left p-2.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-colors flex flex-col gap-1 group"
             >

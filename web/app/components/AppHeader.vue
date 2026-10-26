@@ -12,44 +12,8 @@ watch(() => route.path, () => {
 
 <template>
   <div>
-    <!-- Top Telemetry Marquee Ticker -->
-    <div class="w-full bg-neutral-900 text-neutral-300 dark:bg-black dark:text-neutral-400 text-[11px] font-mono border-b border-neutral-800 py-1.5 overflow-hidden select-none">
-      <div class="animate-ticker whitespace-nowrap flex items-center gap-8">
-        <span class="inline-flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span class="text-white font-semibold">VOLT HYPERTHROUGHPUT ENGINE</span>
-          <span class="text-neutral-500">//</span>
-          <span class="text-primary-400">184,210 REQ/SEC</span>
-        </span>
-        <span class="text-neutral-600">■</span>
-        <span>0.18MS P99 TAIL LATENCY</span>
-        <span class="text-neutral-600">■</span>
-        <span>BUN 1.1 C++ NATIVE HTTP CORE</span>
-        <span class="text-neutral-600">■</span>
-        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@voltts/plugin-prisma)</span>
-        <span class="text-neutral-600">■</span>
-        <span>ZERO-ALLOCATION RADIX TREE ROUTER</span>
-        <span class="text-neutral-600">■</span>
-        <span>ENTERPRISE INVERSION OF CONTROL (DI) CONTAINER</span>
-        <span class="text-neutral-600">■</span>
-        <!-- Duplicate for seamless infinite loop -->
-        <span class="inline-flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span class="text-white font-semibold">VOLT HYPERTHROUGHPUT ENGINE</span>
-          <span class="text-neutral-500">//</span>
-          <span class="text-primary-400">184,210 REQ/SEC</span>
-        </span>
-        <span class="text-neutral-600">■</span>
-        <span>0.18MS P99 TAIL LATENCY</span>
-        <span class="text-neutral-600">■</span>
-        <span>BUN 1.1 C++ NATIVE HTTP CORE</span>
-        <span class="text-neutral-600">■</span>
-        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@voltts/plugin-prisma)</span>
-        <span class="text-neutral-600">■</span>
-        <span>ZERO-ALLOCATION RADIX TREE ROUTER</span>
-        <span class="text-neutral-600">■</span>
-        <span>ENTERPRISE INVERSION OF CONTROL (DI) CONTAINER</span>
-      </div>
+    <div class="border-b border-neutral-200 bg-neutral-100 px-4 py-2 text-center text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+      Volt v0.1 · TypeScript APIs on Bun · <NuxtLink to="/docs/quick-start" class="text-primary-600 underline dark:text-primary-400">Get started</NuxtLink>
     </div>
 
     <!-- Primary Floating Navigation Bar -->

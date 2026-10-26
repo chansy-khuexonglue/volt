@@ -3,7 +3,7 @@ useSeoMeta({
   title: 'Volt - High-Performance TypeScript-first API Framework built for Bun',
   description: 'The ultra-fast, modern API framework for Bun. Radix Tree routing, Dependency Injection, automatic type coercion, and first-class Prisma ORM integration.',
   ogTitle: 'Volt - High-Performance TypeScript API Framework',
-  ogDescription: 'Experience 180,000+ requests per second with sub-millisecond p99 latency on Bun.',
+  ogDescription: 'Build TypeScript APIs with routing, validation, middleware, and practical tutorials on Bun.',
 });
 
 const installPkgOptions = ['bun', 'pnpm', 'npm'] as const;
@@ -22,29 +22,14 @@ async function copyCommand() {
   setTimeout(() => (copied.value = false), 2000);
 }
 
-const quickstartCode = `import { Volt, cors, logger, prismaPlugin } from 'voltts';
-import { PrismaClient } from '@prisma/client';
+const quickstartCode = `import { Volt, t } from 'voltts';
 
-const prisma = new PrismaClient();
 const app = new Volt({ port: 3000 });
-
-// Global middlewares & official plugins
-app.use(logger({ format: 'dev' }));
-app.use(cors());
-app.plugin(prismaPlugin({ client: prisma }));
-
-// O(1) Radix tree route with type-safe context
-app.get('/api/users/:id', async (c) => {
-  const user = await c.store.prisma.user.findUnique({
-    where: { id: c.params.id },
-  });
-  if (!user) return c.json({ error: 'User not found' }, 404);
-  return c.json({ success: true, user });
+app.get('/hello', () => ({ message: 'Hello Volt' }));
+app.post('/tasks', (c) => c.json(c.body, 201), {
+  body: t.Object({ title: t.String({ minLength: 2 }) }),
 });
-
-app.listen(() => {
-  console.log('⚡ Volt server running on http://localhost:3000');
-});`;
+app.listen(3000);`;
 </script>
 
 <template>
@@ -62,9 +47,9 @@ app.listen(() => {
           <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span class="font-bold text-primary-400">VOLT ARCHITECTURE</span>
           <span class="text-neutral-600">■</span>
-          <span>BUN 1.1 C++ ENGINE</span>
+          <span>BUN HTTP SERVER</span>
           <span class="text-neutral-600">■</span>
-          <span class="text-neutral-400">184,210 REQ/S</span>
+          <span class="text-neutral-400">TYPESCRIPT API FRAMEWORK</span>
         </div>
 
         <!-- Headline -->
@@ -77,7 +62,7 @@ app.listen(() => {
 
         <!-- Subheading -->
         <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
-          Sub-millisecond p99 tail latency, zero-allocation Radix routing, enterprise Dependency Injection, and first-class Prisma ORM integration.
+          Build APIs with routing, request validation, middleware, OpenAPI, and explicit service composition. Start with a complete example and add integrations as you need them.
         </p>
 
         <!-- CTA & Quick Install Box -->
@@ -99,17 +84,8 @@ app.listen(() => {
           </NuxtLink>
         </div>
 
-        <div class="max-w-xl mx-auto text-left rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-950 p-4 font-mono text-xs text-neutral-100 space-y-2">
-          <p class="text-neutral-400"># Install, create index.ts, then run</p>
-          <p>bun add voltts</p>
-          <p>import { Volt } from 'voltts';</p>
-          <p>const app = new Volt({ port: 3000 });</p>
-          <p>app.get('/hello', () => ({ message: 'Hello Volt' }));</p>
-          <p>app.listen(3000);</p>
-          <p class="text-neutral-400"># bun run index.ts</p>
-          <p class="text-primary-400">curl http://localhost:3000/hello</p>
-          <NuxtLink to="/docs/tutorial-crud" class="inline-block text-primary-400 underline pt-2">Continue with the Tasks API tutorial →</NuxtLink>
-        </div>
+        <p class="text-sm text-neutral-500">Install with Bun, save the example below as index.ts, then run <code>bun run index.ts</code>.</p>
+        <NuxtLink to="/docs/tutorial-crud" class="inline-block text-primary-600 underline underline-offset-4 dark:text-primary-400">Follow the complete Tasks API tutorial →</NuxtLink>
         <!-- Terminal Install Selector -->
         <div class="pt-4 max-w-md mx-auto">
           <div class="flex items-center justify-center gap-2 mb-2 font-mono">
@@ -183,10 +159,10 @@ app.listen(() => {
               01
             </div>
             <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
-              184,000+ Requests / sec
+              Native Bun HTTP
             </h3>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              Direct integration with Bun's C++ native HTTP engine bypasses Node.js legacy event loops, producing sub-millisecond p99 tail latencies.
+              Volt registers routes on Bun's native HTTP server. Measure your own workload with the repository's checked-in benchmark scripts.
             </p>
           </div>
 
@@ -225,7 +201,7 @@ app.listen(() => {
               Built-in Dependency Injection
             </h3>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              NestJS-style modular architecture with <code class="code-inline">@Injectable()</code>, Singleton & Transient scopes, and circular dependency protection without the reflection penalty.
+              Compose services with explicit providers and <code class="code-inline">Container</code>, singleton and transient lifetimes, and circular dependency detection.
             </p>
           </div>
 
@@ -235,7 +211,7 @@ app.listen(() => {
               05
             </div>
             <h3 class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-500 transition-colors uppercase font-mono">
-              OpenAPI 3.1 & Swagger
+              OpenAPI & Swagger
             </h3>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
               Generates OpenAPI specifications automatically from validation schemas and serves interactive Swagger UI and Scalar UI documentation out of the box.
@@ -251,7 +227,7 @@ app.listen(() => {
               Automatic Type Coercion
             </h3>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              Eliminate manual parsing. Query strings like <code class="code-inline">?limit=20&active=true</code> are automatically coerced into strictly-typed numbers and booleans.
+              With a GET query schema, strings like <code class="code-inline">?limit=20&active=true</code> can be validated and coerced into numbers and booleans. See the coercion guide for current method restrictions.
             </p>
           </div>
         </div>
@@ -266,10 +242,10 @@ app.listen(() => {
             INTERACTIVE SYSTEM TEST
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-950 dark:text-white tracking-tight mt-1">
-            Experience Volt's Speed in Your Browser
+            Explore API Request and Response Shapes
           </h2>
           <p class="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-sans">
-            Test live routes, inspect type-safe responses, and measure execution latency.
+            Explore preset responses in the browser, then run the documented examples locally to test real HTTP behavior.
           </p>
         </div>
 
@@ -289,17 +265,17 @@ app.listen(() => {
     <section class="border-t border-neutral-200 dark:border-neutral-800 bg-black text-white py-16 relative overflow-hidden">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6">
         <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-          Ready to Deploy Extreme Throughput?
+          Ready to build your first API?
         </h2>
         <p class="text-neutral-400 text-xs sm:text-sm max-w-xl mx-auto font-sans leading-relaxed">
-          Start building production services in seconds with Volt, Bun, and TypeScript.
+          Follow a runnable tutorial, verify its responses, and add tests as you build.
         </p>
         <div class="flex flex-wrap items-center justify-center gap-4 pt-2 font-mono">
           <NuxtLink
             to="/docs/quick-start"
             class="px-6 py-3 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
           >
-            Get Started in 60s
+            Start the tutorial
           </NuxtLink>
           <a
             href="https://github.com/chansy-khuexonglue/volt"

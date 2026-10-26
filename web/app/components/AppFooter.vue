@@ -1,29 +1,5 @@
 <template>
   <footer class="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100/50 dark:bg-black text-neutral-600 dark:text-neutral-400 text-xs font-mono transition-colors">
-    <!-- Telemetry System Status Ribbon -->
-    <div class="border-b border-neutral-200 dark:border-neutral-800 py-3 bg-white dark:bg-neutral-950">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-6">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span class="font-bold text-neutral-900 dark:text-white uppercase tracking-wider text-[11px]">ALL RUNTIMES OPERATIONAL</span>
-          </div>
-          <div class="hidden sm:flex items-center gap-2 text-neutral-500">
-            <span>BUN V1.4.4</span>
-            <span>•</span>
-            <span>PRISMA 6.19.3</span>
-            <span>•</span>
-            <span>184,210 REQ/S</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-4 text-[11px] text-neutral-500">
-          <span>LATENCY: 0.18MS (P99)</span>
-          <span class="text-neutral-700 dark:text-neutral-300">|</span>
-          <span class="text-primary-500 font-bold uppercase">ZERO GC OVERHEAD</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Main Footer Columns -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-10">
@@ -31,7 +7,7 @@
         <div class="md:col-span-2 space-y-4">
           <VoltLogo />
           <p class="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm leading-relaxed font-sans">
-            High-performance, TypeScript-first API framework built specifically for Bun. Designed for maximum throughput, zero runtime overhead, and pleasant developer ergonomics.
+            High-performance, TypeScript-first API framework built specifically for Bun. Explore practical guides, complete examples, and current API limitations.
           </p>
           <div class="flex items-center gap-3 pt-1">
             <a
@@ -61,7 +37,7 @@
             <li><NuxtLink to="/docs/quick-start" class="hover:text-primary-500 transition-colors">Quick Start</NuxtLink></li>
             <li><NuxtLink to="/docs/router" class="hover:text-primary-500 transition-colors">Radix Router</NuxtLink></li>
             <li><NuxtLink to="/docs/schema-validation" class="hover:text-primary-500 transition-colors">Validation</NuxtLink></li>
-            <li><NuxtLink to="/docs/openapi" class="hover:text-primary-500 transition-colors">OpenAPI 3.1</NuxtLink></li>
+            <li><NuxtLink to="/docs/openapi" class="hover:text-primary-500 transition-colors">OpenAPI</NuxtLink></li>
           </ul>
         </div>
 
@@ -72,7 +48,7 @@
           </h4>
           <ul class="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
             <li><NuxtLink to="/docs/plugin-prisma" class="hover:text-primary-500 transition-colors">Prisma ORM</NuxtLink></li>
-            <li><NuxtLink to="/docs/plugin-postgres" class="hover:text-primary-500 transition-colors">PostgreSQL Native</NuxtLink></li>
+            <li><NuxtLink to="/docs/plugin-postgres" class="hover:text-primary-500 transition-colors">PostgreSQL Integration</NuxtLink></li>
             <li><NuxtLink to="/docs/plugin-redis" class="hover:text-primary-500 transition-colors">Redis Cache</NuxtLink></li>
             <li><NuxtLink to="/docs/plugin-jwt" class="hover:text-primary-500 transition-colors">JWT Security</NuxtLink></li>
             <li><NuxtLink to="/docs/plugin-graphql" class="hover:text-primary-500 transition-colors">GraphQL Server</NuxtLink></li>
@@ -86,7 +62,7 @@
           </h4>
           <ul class="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
             <li><NuxtLink to="/benchmarks" class="hover:text-primary-500 transition-colors">Benchmarks</NuxtLink></li>
-            <li><NuxtLink to="/playground" class="hover:text-primary-500 transition-colors">Live Sandbox</NuxtLink></li>
+            <li><NuxtLink to="/playground" class="hover:text-primary-500 transition-colors">Response Examples</NuxtLink></li>
             <li><NuxtLink to="/ecosystem" class="hover:text-primary-500 transition-colors">All Packages</NuxtLink></li>
             <li><a href="https://github.com/chansy-khuexonglue/volt/releases" target="_blank" class="hover:text-primary-500 transition-colors">Releases</a></li>
             <li><a href="https://github.com/chansy-khuexonglue/volt/blob/main/LICENSE" target="_blank" class="hover:text-primary-500 transition-colors">MIT License</a></li>
