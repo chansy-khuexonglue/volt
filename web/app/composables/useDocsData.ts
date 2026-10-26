@@ -1061,36 +1061,62 @@ bun run bench:all`,
     description: 'Deploy Volt to Docker, Fly.io, Railway, Kubernetes, and Linux edge VMs.',
     category: 'Benchmarks & Ops',
     toc: [
-      { id: 'docker-deployment', text: 'Docker Deployment' },
-      { id: 'systemd', text: 'Systemd Service' },
+      { id: 'docker-deployment', text: 'Docker & Compose' },
+      { id: 'web-docs', text: 'Deploying Documentation' },
       { id: 'environment-variables', text: 'Environment Configuration' },
     ],
     content: `
 # Production Deployment
 
-Volt compiles to a single lean executable or runs directly under \`bun run\`.
+Volt compiles to a single lean executable or runs directly under \`bun run\`. Production Docker images start in under 10ms with RSS footprint below 35MB.
 
-## Multi-Stage Dockerfile
+## Multi-Container Docker Compose
 
-Here is an optimized production Dockerfile with minimal image size (~90MB):
+Deploy the Volt API Engine, Documentation Portal, and PostgreSQL database with a single command:
+
+\`\`\`bash
+docker compose up -d --build
+\`\`\`
+
+## Service Ports
+
+| Service | Port | Description |
+| :--- | :--- | :--- |
+| **volt-api** | \`3000\` | High-throughput Volt REST API engine |
+| **volt-docs** | \`3002\` | Nuxt 4 Documentation & Telemetry Portal |
+| **postgres** | \`5432\` | PostgreSQL 17 Relational Database |
     `,
     codeSnippet: {
-      filename: 'Dockerfile',
-      language: 'dockerfile',
-      code: `FROM oven/bun:1.1-alpine AS base
-WORKDIR /app
+      filename: 'docker-compose.yml',
+      language: 'yaml',
+      code: `services:
+  volt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/volt_ecommerce?schema=public
 
-# Install production dependencies
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+  volt-docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
 
-# Copy source code
-COPY . .
-
-# Run as non-root user
-USER bun
-EXPOSE 3000
-CMD ["bun", "run", "src/index.ts"]`,
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=volt_ecommerce`,
     },
   },
 };

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.npm/
+.bun/
+
+# Build and runtime outputs
+.output/
+.nuxt/
+dist/
+coverage/
+*.log
+
+# Git & IDE
+.git/
+.gitignore
+.agents/
+.gemini/
+.idea/
+.vscode/
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key

@@ -1,0 +1,61 @@
+services:
+  # ==========================================
+  # Volt Framework API Engine (Port 3000)
+  # ==========================================
+  volt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: volt-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/volt_ecommerce?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ==========================================
+  # Volt Web Documentation Platform (Port 3002)
+  # ==========================================
+  volt-docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: volt-docs
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - HOST=0.0.0.0
+
+  # ==========================================
+  # PostgreSQL 17 Database Engine
+  # ==========================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: volt-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=volt_ecommerce
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local

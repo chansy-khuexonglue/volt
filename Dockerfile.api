@@ -1,0 +1,51 @@
+# syntax=docker/dockerfile:1
+
+# ==========================================
+# Stage 1: Build workspace and generate Prisma
+# ==========================================
+FROM oven/bun:1-alpine AS builder
+
+WORKDIR /app
+
+# Install native dependencies required by Prisma engine on Alpine
+RUN apk add --no-cache openssl libc6-compat
+
+# Copy workspace package manifests
+COPY package.json bunfig.toml tsconfig.base.json tsconfig.json ./
+COPY packages/ packages/
+COPY examples/ecommerce/ examples/ecommerce/
+
+# Install workspace dependencies
+RUN bun install
+
+# Generate Prisma Client for PostgreSQL
+WORKDIR /app/examples/ecommerce/api
+RUN bun x prisma generate
+
+WORKDIR /app
+
+# ==========================================
+# Stage 2: Production API Runtime
+# ==========================================
+FROM oven/bun:1-alpine AS runner
+
+WORKDIR /app
+
+RUN apk add --no-cache openssl libc6-compat
+
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+# Run as non-root user for security
+USER bun
+
+# Copy built workspace from builder
+COPY --from=builder --chown=bun:bun /app ./
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/health || exit 1
+
+CMD ["bun", "run", "examples/ecommerce/api/src/index.ts"]

@@ -1,0 +1,45 @@
+# syntax=docker/dockerfile:1
+
+# ==========================================
+# Stage 1: Build documentation platform
+# ==========================================
+FROM oven/bun:1-alpine AS builder
+
+WORKDIR /app
+
+# Copy package metadata
+COPY web/package.json ./
+
+# Install dependencies with Bun
+RUN bun install
+
+# Copy web application source code
+COPY web/ ./
+
+# Build Nuxt 4 production bundle (Nitro server + static assets)
+ENV NODE_ENV=production
+RUN bun run build
+
+# ==========================================
+# Stage 2: Minimal Production Runtime
+# ==========================================
+FROM oven/bun:1-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3002
+
+# Run as non-root user for security
+USER bun
+
+# Copy built server output and static assets from builder
+COPY --from=builder --chown=bun:bun /app/.output ./.output
+
+EXPOSE 3002
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3002/ || exit 1
+
+CMD ["bun", ".output/server/index.mjs"]
