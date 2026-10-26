@@ -2,30 +2,78 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@voltts/core": ["./packages/core/src/index.ts"],
-      "@voltts/router": ["./packages/router/src/index.ts"],
-      "@voltts/validator": ["./packages/validator/src/index.ts"],
-      "@voltts/serializer": ["./packages/serializer/src/index.ts"],
-      "@voltts/middleware": ["./packages/middleware/src/index.ts"],
-      "@voltts/di": ["./packages/di/src/index.ts"],
-      "@voltts/websocket": ["./packages/websocket/src/index.ts"],
-      "@voltts/openapi": ["./packages/openapi/src/index.ts"],
-      "@voltts/testing": ["./packages/testing/src/index.ts"],
-      "@voltts/cli": ["./packages/cli/src/index.ts"],
-      "@voltts/jwt": ["./packages/jwt/src/index.ts"],
-      "@voltts/cache": ["./packages/cache/src/index.ts"],
-      "@voltts/jobs": ["./packages/jobs/src/index.ts"],
-      "@voltts/node": ["./packages/node/src/index.ts"],
-      "@voltts/plugin-cors": ["./packages/plugins/cors/src/index.ts"],
-      "@voltts/plugin-jwt": ["./packages/plugins/jwt/src/index.ts"],
-      "@voltts/plugin-redis": ["./packages/plugins/redis/src/index.ts"],
-      "@voltts/plugin-postgres": ["./packages/plugins/postgres/src/index.ts"],
-      "@voltts/plugin-logger": ["./packages/plugins/logger/src/index.ts"],
-      "@voltts/plugin-graphql": ["./packages/plugins/graphql/src/index.ts"],
-      "@voltts/plugin-prisma": ["./packages/plugins/prisma/src/index.ts"],
-      "@voltts/plugin-cookies": ["./packages/plugins/cookies/src/index.ts"],
-      "@voltts/plugin-rate-limit": ["./packages/plugins/rate-limit/src/index.ts"],
-      "voltts": ["./packages/volt/src/index.ts"]
+      "@voltts/core": [
+        "./packages/core/src/index.ts"
+      ],
+      "@voltts/router": [
+        "./packages/router/src/index.ts"
+      ],
+      "@voltts/validator": [
+        "./packages/validator/src/index.ts"
+      ],
+      "@voltts/serializer": [
+        "./packages/serializer/src/index.ts"
+      ],
+      "@voltts/middleware": [
+        "./packages/middleware/src/index.ts"
+      ],
+      "@voltts/di": [
+        "./packages/di/src/index.ts"
+      ],
+      "@voltts/websocket": [
+        "./packages/websocket/src/index.ts"
+      ],
+      "@voltts/openapi": [
+        "./packages/openapi/src/index.ts"
+      ],
+      "@voltts/testing": [
+        "./packages/testing/src/index.ts"
+      ],
+      "@voltts/cli": [
+        "./packages/cli/src/index.ts"
+      ],
+      "@voltts/jwt": [
+        "./packages/jwt/src/index.ts"
+      ],
+      "@voltts/cache": [
+        "./packages/cache/src/index.ts"
+      ],
+      "@voltts/jobs": [
+        "./packages/jobs/src/index.ts"
+      ],
+      "@voltts/node": [
+        "./packages/node/src/index.ts"
+      ],
+      "@voltts/plugin-cors": [
+        "./packages/plugins/cors/src/index.ts"
+      ],
+      "@voltts/plugin-jwt": [
+        "./packages/plugins/jwt/src/index.ts"
+      ],
+      "@voltts/plugin-redis": [
+        "./packages/plugins/redis/src/index.ts"
+      ],
+      "@voltts/plugin-postgres": [
+        "./packages/plugins/postgres/src/index.ts"
+      ],
+      "@voltts/plugin-logger": [
+        "./packages/plugins/logger/src/index.ts"
+      ],
+      "@voltts/plugin-graphql": [
+        "./packages/plugins/graphql/src/index.ts"
+      ],
+      "@voltts/plugin-prisma": [
+        "./packages/plugins/prisma/src/index.ts"
+      ],
+      "@voltts/plugin-cookies": [
+        "./packages/plugins/cookies/src/index.ts"
+      ],
+      "@voltts/plugin-rate-limit": [
+        "./packages/plugins/rate-limit/src/index.ts"
+      ],
+      "voltts": [
+        "./packages/volt/src/index.ts"
+      ]
     }
   },
   "include": [
@@ -33,11 +81,10 @@
     "packages/*/test/**/*",
     "packages/plugins/*/src/**/*",
     "packages/plugins/*/test/**/*",
-    "benchmarks/**/*",
-    "examples/**/*"
+    "benchmarks/**/*"
   ],
   "exclude": [
-    "examples/ecommerce/web/**/*",
+    "examples/**/*",
     "**/node_modules",
     "**/.nuxt",
     "**/.output"
