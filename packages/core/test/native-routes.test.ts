@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { Volt, t } from '../src/index';
 
 test('native static GET runs per request and preserves method routing and async results', async () => {
-  const app = new Volt({ port: 0, hostname: '127.0.0.1' });
+  const app = new Volt({ port: 0, hostname: '127.0.0.1', nativeRoutes: true });
   let count = 0;
   app.get('/counter', () => ({ count: ++count }));
   app.get('/async', async () => ({ ok: true }));
@@ -27,7 +27,7 @@ test('native static GET runs per request and preserves method routing and async 
 });
 
 test('native handlers preserve errors, request access and middleware', async () => {
-  const app = new Volt({port:0,hostname:'127.0.0.1'});
+  const app = new Volt({port:0,hostname:'127.0.0.1',nativeRoutes:true});
   app.onError((_error, request) => Response.json({path:new URL(request.url).pathname},{status:503}));
   app.get('/throw', () => { throw Error('sync'); });
   app.get('/reject', async () => { throw Error('async'); });

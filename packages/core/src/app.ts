@@ -581,7 +581,9 @@ export class Volt {
     // Delegate plain static GET paths to Bun. Keep every other
     // method on the ordinary dispatcher so HEAD, OPTIONS and fallback semantics
     // remain Volt's responsibility. Never evaluate handlers during registration.
-    if (this.serverOptions.nativeRoutes !== false) {
+    const useNativeRoutes = this.serverOptions.nativeRoutes ??
+      (typeof process !== "undefined" && process.arch === "arm64");
+    if (useNativeRoutes) {
       const nativeRoutes: Record<string, Record<string, (req: Request) => Response | Promise<Response>>> = Object.create(null);
       for (const [path, match] of this.router.getStaticGetMap()) {
         if (!/^\/[a-zA-Z0-9/_-]*$/.test(path)) continue;
