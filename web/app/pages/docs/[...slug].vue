@@ -110,6 +110,9 @@ const nextDoc = computed(() => {
           {{ para.replace('# ', '') }}
         </h3>
 
+        <!-- Fenced code examples -->
+        <pre v-else-if="para.startsWith('```')" class="overflow-x-auto rounded-xl bg-neutral-950 p-4 text-xs text-neutral-100"><code>{{ para.replace(/^```[^\n]*\n?/, '').replace(/\n?```$/, '') }}</code></pre>
+
         <!-- Table -->
         <div v-else-if="para.includes('| :--- |')" class="my-6 overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm">
           <table class="w-full text-left text-xs font-mono">
