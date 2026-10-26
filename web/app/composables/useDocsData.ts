@@ -30,6 +30,7 @@ export const docCategories: DocCategory[] = [
     items: [
       { slug: 'introduction', title: 'Introduction' },
       { slug: 'quick-start', title: 'Quick Start', badge: 'Fast' },
+      { slug: 'tutorial-crud', title: 'Tutorial: Build a Tasks API', badge: 'New' },
       { slug: 'cli', title: 'Volt CLI' },
     ],
   },
@@ -161,7 +162,7 @@ You can build a blazing-fast REST API with Volt in less than a minute.
 
 ## Prerequisites
 
-Volt requires [Bun](https://bun.sh) runtime version 1.1 or later.
+Volt runs on Bun. Install a recent Bun release and check its version before starting.
 \`\`\`bash
 # Verify Bun is installed
 bun --version
@@ -169,7 +170,7 @@ bun --version
 
 ## Manual Installation
 
-To install Volt inside an existing project:
+In a new directory run \`bun init -y\`, then install Volt:
 
 \`\`\`bash
 bun add voltts
@@ -177,7 +178,7 @@ bun add voltts
 
 ## Your First API Route
 
-Create an \`index.ts\` file and declare your routes:
+Create an \`index.ts\` file and declare your routes. Run it with \`bun run index.ts\`, then open \`http://localhost:3000/api/health\`. For a complete API with POST requests and validation, follow [Build a Tasks API](/docs/tutorial-crud).
     `,
     codeSnippet: {
       filename: 'index.ts',
@@ -209,6 +210,91 @@ app.get('/api/users/:id', (c) => {
 });
 
 app.listen();`,
+    },
+  },
+
+
+  'tutorial-crud': {
+    slug: 'tutorial-crud',
+    title: 'Tutorial: Build a Tasks API',
+    description: 'Build and test a small REST API with routes, path parameters, JSON bodies, and validation.',
+    category: 'Getting Started',
+    badge: 'New',
+    toc: [
+      { id: 'create-the-project', text: 'Create the project' },
+      { id: 'add-the-routes', text: 'Add the routes' },
+      { id: 'try-the-api', text: 'Try the API' },
+      { id: 'next-steps', text: 'Next steps' },
+    ],
+    content: `
+## Create the project
+
+Install Bun, then run these commands in a new directory:
+
+\`\`\`bash
+mkdir tasks-api && cd tasks-api
+bun init -y
+bun add voltts
+\`\`\`
+
+Create \`index.ts\` using the complete example above. This tutorial keeps tasks in memory, so restarting the server clears them.
+
+## Add the routes
+
+\`GET /tasks\` returns all tasks. \`GET /tasks/:id\` reads a path parameter and returns 404 when it cannot find the task. \`POST /tasks\` validates the JSON body before the handler runs and returns 201 for a new task. The \`t.Object\` schema requires a title of at least two characters.
+
+## Try the API
+
+Start the server:
+
+\`\`\`bash
+bun run index.ts
+\`\`\`
+
+In another terminal, create and fetch a task:
+
+\`\`\`bash
+curl -i http://localhost:3000/tasks
+curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"Learn Volt"}'
+curl -i http://localhost:3000/tasks/1
+\`\`\`
+
+Try an invalid body to see validation in action:
+
+\`\`\`bash
+curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"x"}'
+\`\`\`
+
+## Next steps
+
+Read [Schema Validation](/docs/schema-validation) for more field types, [Middleware](/docs/middleware) for request processing, and [OpenAPI](/docs/openapi) for interactive API documentation. Replace the in-memory array with a database before using this example for persistent data.
+`,
+    codeSnippet: {
+      filename: 'index.ts',
+      language: 'typescript',
+      code: `import { Volt, t } from 'voltts';
+
+const app = new Volt({ port: 3000 });
+const tasks: { id: number; title: string }[] = [];
+
+app.get('/tasks', () => ({ tasks }));
+
+app.get('/tasks/:id', (c) => {
+  const task = tasks.find((item) => item.id === Number(c.params.id));
+  return task ? c.json(task) : c.json({ error: 'Task not found' }, 404);
+});
+
+app.post('/tasks', (c) => {
+  const task = { id: tasks.length + 1, title: c.body.title };
+  tasks.push(task);
+  return c.json(task, 201);
+}, {
+  body: t.Object({ title: t.String({ minLength: 2 }) }),
+});
+
+app.listen(3000, (server) => {
+  console.log(\`Tasks API: http://localhost:\${server.port}\`);
+});`,
     },
   },
 
