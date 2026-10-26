@@ -1,10 +1,15 @@
-import { compose, MiddlewareHandler } from '@voltts/middleware';
-import { Router } from '@voltts/router';
-import { serializeResponse } from '@voltts/serializer';
-import { compile, ValidationError } from '@voltts/validator';
-import { VoltContext, extractPathname } from './context';
-import { BadRequestError, handleServerException, HttpError, NotFoundError } from './error';
-import { RouteGroup } from './group';
+import { compose, MiddlewareHandler } from "@voltts/middleware";
+import { Router } from "@voltts/router";
+import { serializeResponse } from "@voltts/serializer";
+import { compile, ValidationError } from "@voltts/validator";
+import { VoltContext, extractPathname } from "./context";
+import {
+  BadRequestError,
+  handleServerException,
+  HttpError,
+  NotFoundError,
+} from "./error";
+import { RouteGroup } from "./group";
 import {
   ExtractParams,
   Handler,
@@ -13,7 +18,7 @@ import {
   RouteSchemaConfig,
   ServerOptions,
   VoltPlugin,
-} from './types';
+} from "./types";
 
 export interface RouteDefinition {
   method: string;
@@ -53,7 +58,10 @@ export class Volt {
   }
 
   use(middlewareOrPlugin: MiddlewareHandler | VoltPlugin): this {
-    if ('setup' in middlewareOrPlugin && typeof middlewareOrPlugin.setup === 'function') {
+    if (
+      "setup" in middlewareOrPlugin &&
+      typeof middlewareOrPlugin.setup === "function"
+    ) {
       return this.plugin(middlewareOrPlugin);
     }
     this.globalMiddlewares.push(middlewareOrPlugin as MiddlewareHandler);
@@ -91,7 +99,9 @@ export class Volt {
     return this;
   }
 
-  onError(fn: (error: Error, req: Request) => Response | Promise<Response>): this {
+  onError(
+    fn: (error: Error, req: Request) => Response | Promise<Response>
+  ): this {
     this.hooks.onError = fn;
     return this;
   }
@@ -122,7 +132,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('GET', path, handler, schema, routeMiddlewares);
+    return this.add("GET", path, handler, schema, routeMiddlewares);
   }
 
   post<TPath extends string = string>(
@@ -131,7 +141,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('POST', path, handler, schema, routeMiddlewares);
+    return this.add("POST", path, handler, schema, routeMiddlewares);
   }
 
   put<TPath extends string = string>(
@@ -140,7 +150,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('PUT', path, handler, schema, routeMiddlewares);
+    return this.add("PUT", path, handler, schema, routeMiddlewares);
   }
 
   delete<TPath extends string = string>(
@@ -149,7 +159,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('DELETE', path, handler, schema, routeMiddlewares);
+    return this.add("DELETE", path, handler, schema, routeMiddlewares);
   }
 
   patch<TPath extends string = string>(
@@ -158,7 +168,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('PATCH', path, handler, schema, routeMiddlewares);
+    return this.add("PATCH", path, handler, schema, routeMiddlewares);
   }
 
   head<TPath extends string = string>(
@@ -167,7 +177,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('HEAD', path, handler, schema, routeMiddlewares);
+    return this.add("HEAD", path, handler, schema, routeMiddlewares);
   }
 
   options<TPath extends string = string>(
@@ -176,7 +186,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('OPTIONS', path, handler, schema, routeMiddlewares);
+    return this.add("OPTIONS", path, handler, schema, routeMiddlewares);
   }
 
   all<TPath extends string = string>(
@@ -185,7 +195,7 @@ export class Volt {
     schema?: RouteSchemaConfig,
     routeMiddlewares: MiddlewareHandler[] = []
   ): this {
-    return this.add('ALL', path, handler, schema, routeMiddlewares);
+    return this.add("ALL", path, handler, schema, routeMiddlewares);
   }
 
   group(prefix: string, fn: (group: RouteGroup) => void): this {
@@ -209,13 +219,13 @@ export class Volt {
     // Register upgrade route
     this.get(path, (ctx) => {
       const server = this.serverInstance;
-      if (server && typeof server.upgrade === 'function') {
+      if (server && typeof server.upgrade === "function") {
         const upgraded = server.upgrade(ctx.req, {
           data: { path, store: ctx.store },
         });
         if (upgraded) return new Response(null);
       }
-      return new Response('WebSocket upgrade failed', { status: 400 });
+      return new Response("WebSocket upgrade failed", { status: 400 });
     });
 
     return this;
@@ -226,12 +236,20 @@ export class Volt {
    */
   private compileRoute(def: RouteDefinition): void {
     const bodyValidator = def.schema?.body ? compile(def.schema.body) : null;
-    const queryValidator = def.schema?.query ? compile(def.schema.query, { coerce: true }) : null;
-    const paramsValidator = def.schema?.params ? compile(def.schema.params, { coerce: true }) : null;
-    const headersValidator = def.schema?.headers ? compile(def.schema.headers) : null;
-    const hasBody = ['POST', 'PUT', 'PATCH'].includes(def.method);
+    const queryValidator = def.schema?.query
+      ? compile(def.schema.query, { coerce: true })
+      : null;
+    const paramsValidator = def.schema?.params
+      ? compile(def.schema.params, { coerce: true })
+      : null;
+    const headersValidator = def.schema?.headers
+      ? compile(def.schema.headers)
+      : null;
+    const hasBody = ["POST", "PUT", "PATCH"].includes(def.method);
 
-    const hasValidation = Boolean(paramsValidator || queryValidator || headersValidator);
+    const hasValidation = Boolean(
+      paramsValidator || queryValidator || headersValidator
+    );
 
     const baseHandler = (ctx: VoltContext): Response | Promise<Response> => {
       // 1. Validate body if schema provided or method has body
@@ -241,7 +259,7 @@ export class Volt {
           if (bodyValidator) {
             const res = bodyValidator(ctx.body);
             if (!res.success) {
-              throw new BadRequestError('Invalid request body', res.errors);
+              throw new BadRequestError("Invalid request body", res.errors);
             }
           }
           if (headersValidator) {
@@ -251,12 +269,13 @@ export class Volt {
             });
             const res = headersValidator(headerObj);
             if (!res.success) {
-              throw new BadRequestError('Invalid request headers', res.errors);
+              throw new BadRequestError("Invalid request headers", res.errors);
             }
           }
 
           const result = await def.handler(ctx);
-          const response = result instanceof Response ? result : serializeResponse(result);
+          const response =
+            result instanceof Response ? result : serializeResponse(result);
           const ctxHeaders = ctx.getResponseHeaders();
           if (ctxHeaders) {
             ctxHeaders.forEach((val, key) => {
@@ -272,7 +291,7 @@ export class Volt {
         if (paramsValidator) {
           const res = paramsValidator(ctx.params);
           if (!res.success) {
-            throw new BadRequestError('Invalid route parameters', res.errors);
+            throw new BadRequestError("Invalid route parameters", res.errors);
           }
           if (res.data) {
             Object.assign(ctx.params, res.data);
@@ -281,7 +300,7 @@ export class Volt {
         if (queryValidator) {
           const res = queryValidator(ctx.query);
           if (!res.success) {
-            throw new BadRequestError('Invalid query parameters', res.errors);
+            throw new BadRequestError("Invalid query parameters", res.errors);
           }
           if (res.data) {
             Object.assign(ctx.query, res.data);
@@ -294,7 +313,7 @@ export class Volt {
           });
           const res = headersValidator(headerObj);
           if (!res.success) {
-            throw new BadRequestError('Invalid request headers', res.errors);
+            throw new BadRequestError("Invalid request headers", res.errors);
           }
         }
       }
@@ -303,7 +322,8 @@ export class Volt {
       const result = def.handler(ctx);
       if (result instanceof Promise) {
         return result.then((res) => {
-          const response = res instanceof Response ? res : serializeResponse(res);
+          const response =
+            res instanceof Response ? res : serializeResponse(res);
           const ctxHeaders = ctx.getResponseHeaders();
           if (ctxHeaders) {
             ctxHeaders.forEach((val, key) => {
@@ -314,7 +334,8 @@ export class Volt {
         });
       }
 
-      const response = result instanceof Response ? result : serializeResponse(result);
+      const response =
+        result instanceof Response ? result : serializeResponse(result);
       const ctxHeaders = ctx.getResponseHeaders();
       if (ctxHeaders) {
         ctxHeaders.forEach((val, key) => {
@@ -354,22 +375,34 @@ export class Volt {
   /**
    * Internal request dispatcher bypassing redundant path extraction.
    */
-  private dispatch(req: Request, pathname: string): Response | Promise<Response> {
+  private dispatch(
+    req: Request,
+    pathname: string
+  ): Response | Promise<Response> {
     try {
       const match = this.router.match(req.method, pathname);
 
       if (!match || !match.handler) {
         // Check for OPTIONS discovery / preflight
-        if (req.method === 'OPTIONS') {
+        if (req.method === "OPTIONS") {
           const allowed = this.router.getAllowedMethods(pathname);
           if (allowed.length > 0 || this.globalMiddlewares.length > 0) {
-            const ctx = new VoltContext(req, match?.params || {}, this.globalStore);
+            const ctx = new VoltContext(
+              req,
+              match?.params || {},
+              this.globalStore
+            );
             if (this.globalMiddlewares.length > 0) {
               const composed = compose(this.globalMiddlewares);
               return composed(ctx, () => {
                 return new Response(null, {
                   status: 204,
-                  headers: { Allow: allowed.length > 0 ? allowed.join(', ') : 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS' },
+                  headers: {
+                    Allow:
+                      allowed.length > 0
+                        ? allowed.join(", ")
+                        : "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS",
+                  },
                 });
               });
             }
@@ -377,7 +410,7 @@ export class Volt {
             if (allowed.length > 0) {
               return new Response(null, {
                 status: 204,
-                headers: { Allow: allowed.join(', ') },
+                headers: { Allow: allowed.join(", ") },
               });
             }
           }
@@ -391,7 +424,7 @@ export class Volt {
       if (response instanceof Promise) {
         return response
           .then((res) => {
-            if (req.method === 'HEAD') {
+            if (req.method === "HEAD") {
               return new Response(null, {
                 status: res.status,
                 statusText: res.statusText,
@@ -404,7 +437,7 @@ export class Volt {
       }
 
       // Strip body for HEAD requests
-      if (req.method === 'HEAD') {
+      if (req.method === "HEAD") {
         return new Response(null, {
           status: response.status,
           statusText: response.statusText,
@@ -426,7 +459,10 @@ export class Volt {
     return this.dispatch(req, extractPathname(req.url));
   }
 
-  private handleException(err: any, req: Request): Response | Promise<Response> {
+  private handleException(
+    err: any,
+    req: Request
+  ): Response | Promise<Response> {
     if (this.hooks.onError) {
       try {
         return this.hooks.onError(err, req);
@@ -454,13 +490,17 @@ export class Volt {
     return (req: Request): Response | Promise<Response> => {
       const pathname = extractPathname(req.url);
 
-      if (req.method === 'GET') {
+      if (req.method === "GET") {
         const match = staticGets.get(pathname);
         if (match) {
           if ((match.handler as any).isZeroArg) {
             return (match.handler as any).pipeline(undefined);
           }
-          const ctx = new VoltContext(req, (match.params as any) || {}, globalStore);
+          const ctx = new VoltContext(
+            req,
+            (match.params as any) || {},
+            globalStore
+          );
           return match.handler.pipeline(ctx);
         }
 
@@ -470,16 +510,24 @@ export class Volt {
             pathname.length > r.prefixLen &&
             pathname.charCodeAt(1) === r.prefix.charCodeAt(1) &&
             pathname.startsWith(r.prefix) &&
-            pathname.indexOf('/', r.prefixLen) === -1
+            pathname.indexOf("/", r.prefixLen) === -1
           ) {
-            const ctx = new VoltContext(req, r.createParams(pathname.slice(r.prefixLen)), globalStore);
+            const ctx = new VoltContext(
+              req,
+              r.createParams(pathname.slice(r.prefixLen)),
+              globalStore
+            );
             return (r.handler as any).pipeline(ctx);
           }
         }
-      } else if (req.method === 'POST') {
+      } else if (req.method === "POST") {
         const match = staticPosts.get(pathname);
         if (match) {
-          const ctx = new VoltContext(req, (match.params as any) || {}, globalStore);
+          const ctx = new VoltContext(
+            req,
+            (match.params as any) || {},
+            globalStore
+          );
           return match.handler.pipeline(ctx);
         }
       }
@@ -495,9 +543,16 @@ export class Volt {
   /**
    * Starts native Bun HTTP server.
    */
-  listen(port?: number, callback?: (server: any) => void): any {
+  listen(
+    portOrCallback?: number | ((server: any) => void),
+    callback?: (server: any) => void
+  ): any {
+    const port =
+      typeof portOrCallback === "number" ? portOrCallback : undefined;
+    const onListen =
+      typeof portOrCallback === "function" ? portOrCallback : callback;
     const listenPort = port ?? this.serverOptions.port ?? 3000;
-    const hostname = this.serverOptions.hostname ?? '0.0.0.0';
+    const hostname = this.serverOptions.hostname ?? "0.0.0.0";
 
     if (this.hooks.onStart) {
       this.hooks.onStart();
@@ -516,7 +571,8 @@ export class Volt {
     }
 
     if (this.serverOptions.maxRequestBodySize) {
-      bunServeOptions.maxRequestBodySize = this.serverOptions.maxRequestBodySize;
+      bunServeOptions.maxRequestBodySize =
+        this.serverOptions.maxRequestBodySize;
     }
 
     if (this.wsManager) {
@@ -524,9 +580,9 @@ export class Volt {
     }
 
     // Call Bun.serve if in Bun environment
-    if (typeof Bun !== 'undefined' && typeof Bun.serve === 'function') {
+    if (typeof Bun !== "undefined" && typeof Bun.serve === "function") {
       this.serverInstance = Bun.serve(bunServeOptions);
-      if (callback) callback(this.serverInstance);
+      if (onListen) onListen(this.serverInstance);
       return this.serverInstance;
     }
 
@@ -539,7 +595,7 @@ export class Volt {
   }
 
   async stop(): Promise<void> {
-    if (this.serverInstance && typeof this.serverInstance.stop === 'function') {
+    if (this.serverInstance && typeof this.serverInstance.stop === "function") {
       this.serverInstance.stop(true);
     }
     for (const plugin of this.plugins) {
