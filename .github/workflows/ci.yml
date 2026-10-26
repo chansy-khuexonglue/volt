@@ -23,8 +23,27 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Generate ecommerce Prisma client
+        working-directory: examples/ecommerce/api
+        env:
+          # Generation reads the schema but does not connect to a database.
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/volt_ecommerce
+        run: bunx prisma generate --schema=prisma/schema.prisma
+
       - name: Typecheck
         run: bun run typecheck
 
       - name: Run Framework Test Suite
         run: bun test packages/*/test packages/plugins/*/test benchmarks/test
+
+  docs:
+    name: Build Documentation Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build documentation image
+        run: docker build --progress=plain --file Dockerfile.web --tag volt-docs:ci .

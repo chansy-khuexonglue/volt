@@ -245,7 +245,7 @@ Create \`index.ts\` using the complete example above. This tutorial keeps tasks 
 
 ## Update and delete
 
-`PUT /tasks/:id` replaces a title after validating the body. `DELETE /tasks/:id` removes a task and returns 204. Both return 404 when the ID does not exist.
+\`PUT /tasks/:id\` replaces a title after validating the body. \`DELETE /tasks/:id\` removes a task and returns 204. Both return 404 when the ID does not exist.
 
 ## Try the API
 
