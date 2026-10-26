@@ -28,7 +28,7 @@ jobs:
         env:
           # Generation reads the schema but does not connect to a database.
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/volt_ecommerce
-        run: bunx --no-install prisma generate --schema=prisma/schema.prisma
+        run: bunx prisma generate --schema=prisma/schema.prisma
 
       - name: Typecheck
         run: bun run typecheck
