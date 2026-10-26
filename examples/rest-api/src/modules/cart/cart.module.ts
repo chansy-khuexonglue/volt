@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate } from '../../common/guards/auth.guard';
 import { cartController } from './cart.controller';
 import { addToCartSchema, cartParamSchema, updateCartItemSchema } from './cart.schema';

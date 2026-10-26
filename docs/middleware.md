@@ -9,7 +9,7 @@ At server boot, Volt flattens and precompiles all middleware functions into a si
 ## Official Middleware
 
 ```typescript
-import { cors, logger, rateLimit, secureHeaders, timeout, cache, jwt } from 'volt';
+import { cors, logger, rateLimit, secureHeaders, timeout, cache, jwt } from 'voltts';
 
 // Global Structured Request Logging
 app.use(logger());

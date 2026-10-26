@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { loggerPlugin } from '../src/index';
 
-describe('@volt/plugin-logger', () => {
+describe('@voltts/plugin-logger', () => {
   it('decorates Volt application with logger instance', () => {
     const app = new Volt();
     app.use(loggerPlugin());

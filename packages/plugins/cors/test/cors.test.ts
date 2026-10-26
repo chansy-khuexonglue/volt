@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { corsPlugin } from '../src/index';
 
-describe('@volt/plugin-cors', () => {
+describe('@voltts/plugin-cors', () => {
   it('registers cors plugin and sets headers on requests', async () => {
     const app = new Volt();
     app.use(corsPlugin({ origin: 'https://volt.sh' }));

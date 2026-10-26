@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { reviewsService } from './reviews.service';
 import { CreateReviewDto } from './reviews.types';
 

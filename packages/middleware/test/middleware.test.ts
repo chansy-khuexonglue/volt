@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { compose, cors, rateLimit, secureHeaders, timeout } from '../src/index';
 
-describe('@volt/middleware', () => {
+describe('@voltts/middleware', () => {
   it('executes middleware in deterministic order', async () => {
     const order: number[] = [];
 

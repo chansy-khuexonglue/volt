@@ -1,7 +1,7 @@
-import { Volt, VoltPlugin } from '@volt/core';
-import { decode, jwt as jwtMiddleware, JwtMiddlewareOptions, sign, verify } from '@volt/jwt';
+import { Volt, VoltPlugin } from '@voltts/core';
+import { decode, jwt as jwtMiddleware, JwtMiddlewareOptions, sign, verify } from '@voltts/jwt';
 
-export * from '@volt/jwt';
+export * from '@voltts/jwt';
 
 export interface JwtPluginOptions extends Partial<JwtMiddlewareOptions> {
   secret: string;
@@ -10,7 +10,7 @@ export interface JwtPluginOptions extends Partial<JwtMiddlewareOptions> {
 
 export function jwtPlugin(options: JwtPluginOptions): VoltPlugin {
   return {
-    name: '@volt/plugin-jwt',
+    name: '@voltts/plugin-jwt',
     version: '0.1.0',
     setup(app: Volt) {
       // Decorate application with JWT helpers

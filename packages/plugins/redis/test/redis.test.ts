@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { redisPlugin } from '../src/index';
 
-describe('@volt/plugin-redis', () => {
+describe('@voltts/plugin-redis', () => {
   it('decorates Volt application with redis client', async () => {
     const app = new Volt();
     app.use(redisPlugin());

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { cache, MemoryCacheStore, RedisCacheStore } from '../src/index';
 
-describe('@volt/cache', () => {
+describe('@voltts/cache', () => {
   it('stores and retrieves data with MemoryCacheStore', () => {
     const store = new MemoryCacheStore();
     store.set('key1', 'value1');

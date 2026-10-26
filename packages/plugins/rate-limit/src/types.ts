@@ -1,4 +1,4 @@
-import { VoltContext } from '@volt/core';
+import { VoltContext } from '@voltts/core';
 
 export interface RateLimitClientRecord {
   count: number;

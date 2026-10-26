@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin } from '@volt/core';
+import { Volt, VoltPlugin } from '@voltts/core';
 
 export interface PostgresOptions {
   connectionString?: string;
@@ -56,7 +56,7 @@ export function postgresPlugin(options: PostgresOptions = {}): VoltPlugin {
   }
 
   return {
-    name: '@volt/plugin-postgres',
+    name: '@voltts/plugin-postgres',
     version: '0.1.0',
     setup(app: Volt) {
       app.decorate('db', client);

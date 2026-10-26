@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { RouteConflictError, Router, TrieRouter } from '../src/index';
 
-describe('@volt/router', () => {
+describe('@voltts/router', () => {
   it('matches static routes with high speed O(1) table', () => {
     const router = new Router<() => string>();
     router.get('/health', () => 'ok');

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { createTestClient } from '../../testing/src/index';
 import { BadRequestError, NotFoundError, t, Volt } from '../src/index';
 
-describe('@volt/core', () => {
+describe('@voltts/core', () => {
   it('handles basic GET and returns JSON', async () => {
     const app = new Volt();
 

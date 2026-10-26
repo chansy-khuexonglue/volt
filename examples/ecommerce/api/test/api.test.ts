@@ -16,7 +16,7 @@ describe('🛒 Volt eCommerce REST API', () => {
     const body = await res.json();
     expect(body.status).toBe('ok');
     expect(body.database).toBe('connected');
-    expect(body.orm).toBe('Prisma Plugin (@volt/plugin-prisma)');
+    expect(body.orm).toBe('Prisma Plugin (@voltts/plugin-prisma)');
     expect(body.framework).toBe('Volt');
   }, 15000);
 

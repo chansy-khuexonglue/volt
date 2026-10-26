@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const registerSchema = t.Object({
   name: t.String({ minLength: 2, maxLength: 50, description: 'User full name' }),

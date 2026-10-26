@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const reviewParamSchema = t.Object({
   id: t.String({ description: 'Product identifier' }),

@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import * as http from 'node:http';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 
 export interface NodeServerOptions {
   port?: number;

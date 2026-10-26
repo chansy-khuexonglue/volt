@@ -1,5 +1,5 @@
 {
-  "name": "@volt/plugin-graphql",
+  "name": "@voltts/plugin-graphql",
   "version": "0.1.0",
   "description": "Official GraphQL integration plugin for Volt API framework",
   "type": "module",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*",
+    "@voltts/core": "workspace:*",
     "graphql": "^16.8.0 || ^17.0.0"
   },
   "scripts": {

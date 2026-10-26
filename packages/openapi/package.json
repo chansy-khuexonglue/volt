@@ -1,5 +1,5 @@
 {
-  "name": "@volt/openapi",
+  "name": "@voltts/openapi",
   "version": "0.1.0",
   "description": "OpenAPI 3.1.0 schema generator and interactive documentation UI for Volt",
   "type": "module",
@@ -12,8 +12,8 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*",
-    "@volt/validator": "workspace:*"
+    "@voltts/core": "workspace:*",
+    "@voltts/validator": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

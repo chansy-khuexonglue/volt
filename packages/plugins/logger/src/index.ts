@@ -1,5 +1,5 @@
-import { Volt, VoltPlugin } from '@volt/core';
-import { logger as loggerMiddleware, LoggerOptions } from '@volt/middleware';
+import { Volt, VoltPlugin } from '@voltts/core';
+import { logger as loggerMiddleware, LoggerOptions } from '@voltts/middleware';
 
 export type PluginLoggerOptions = LoggerOptions;
 
@@ -33,7 +33,7 @@ export function loggerPlugin(options: PluginLoggerOptions = {}): VoltPlugin {
   };
 
   return {
-    name: '@volt/plugin-logger',
+    name: '@voltts/plugin-logger',
     version: '0.1.0',
     setup(app: Volt) {
       app.decorate('logger', loggerInstance);

@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { paymentsService } from './payments.service';
 import { ProcessPaymentDto } from './payments.types';
 

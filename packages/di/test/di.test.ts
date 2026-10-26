@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { CircularDependencyError, Container, ServiceNotFoundError } from '../src/index';
 
-describe('@volt/di', () => {
+describe('@voltts/di', () => {
   it('resolves singleton dependencies caching the same instance', () => {
     const container = new Container();
 

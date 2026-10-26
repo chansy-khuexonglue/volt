@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { graphqlPlugin } from '../src/index';
 
-describe('@volt/plugin-graphql', () => {
+describe('@voltts/plugin-graphql', () => {
   const typeDefs = `
     type User {
       id: ID!

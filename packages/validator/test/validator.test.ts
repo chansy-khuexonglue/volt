@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { compile, t, validateOrThrow, ValidationError } from '../src/index';
 
-describe('@volt/validator', () => {
+describe('@voltts/validator', () => {
   it('validates strings with formats and lengths', () => {
     const schema = t.Object({
       email: t.String({ format: 'email' }),

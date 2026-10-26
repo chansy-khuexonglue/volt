@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin, VoltContext } from '@volt/core';
+import { Volt, VoltPlugin, VoltContext } from '@voltts/core';
 import { buildSchema, graphql, GraphQLSchema, ExecutionResult } from 'graphql';
 import { GraphQLOptions, GraphQLRequestBody, GraphiQLOptions } from './types';
 import { renderGraphiQL } from './ui';
@@ -19,7 +19,7 @@ export function graphqlPlugin(options: GraphQLOptions): VoltPlugin {
   } else if (options.typeDefs) {
     schema = buildSchema(options.typeDefs);
   } else {
-    throw new Error('[@volt/plugin-graphql] Either "schema" or "typeDefs" must be provided.');
+    throw new Error('[@voltts/plugin-graphql] Either "schema" or "typeDefs" must be provided.');
   }
 
   // Combine resolvers into rootValue
@@ -59,7 +59,7 @@ export function graphqlPlugin(options: GraphQLOptions): VoltPlugin {
   }
 
   return {
-    name: '@volt/plugin-graphql',
+    name: '@voltts/plugin-graphql',
     version: '0.1.0',
     setup(app: Volt) {
       // Decorate application with GraphQL service

@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate, requireRole } from '../../common/guards/auth.guard';
 import { productsController } from './products.controller';
 import {

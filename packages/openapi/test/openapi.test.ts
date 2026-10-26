@@ -4,7 +4,7 @@ import { createTestClient } from '../../testing/src/index';
 import { t } from '../../validator/src/index';
 import { openapi, swagger } from '../src/index';
 
-describe('@volt/openapi', () => {
+describe('@voltts/openapi', () => {
   it('generates OpenAPI specification and Scalar UI endpoints', async () => {
     const app = new Volt();
 

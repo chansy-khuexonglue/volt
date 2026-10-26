@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { jwtPlugin } from '../src/index';
 
-describe('@volt/plugin-jwt', () => {
+describe('@voltts/plugin-jwt', () => {
   const secret = 'super-secret-volt-plugin-key-1234567890';
 
   it('decorates Volt application with sign and verify helpers', async () => {

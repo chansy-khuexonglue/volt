@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin, VoltContext, CookieOptions } from '@volt/core';
+import { Volt, VoltPlugin, VoltContext, CookieOptions } from '@voltts/core';
 import { signCookie, unsignCookie } from './signer';
 import { CookiesPluginOptions, CookieContextHelper } from './types';
 
@@ -20,7 +20,7 @@ export function cookiesPlugin(options: CookiesPluginOptions = {}): VoltPlugin {
   };
 
   return {
-    name: '@volt/plugin-cookies',
+    name: '@voltts/plugin-cookies',
     version: '0.1.0',
     setup(app: Volt) {
       app.decorate('cookies', {
@@ -38,7 +38,7 @@ export function cookiesPlugin(options: CookiesPluginOptions = {}): VoltPlugin {
             const raw = c.getCookie(name);
             if (!raw) return undefined;
             if (!secret) {
-              throw new Error('[@volt/plugin-cookies] Cookie secret not configured for verification.');
+              throw new Error('[@voltts/plugin-cookies] Cookie secret not configured for verification.');
             }
             return unsignCookie(raw, secret);
           },
@@ -47,7 +47,7 @@ export function cookiesPlugin(options: CookiesPluginOptions = {}): VoltPlugin {
           },
           setSigned(name: string, value: string, opts?: CookieOptions): void {
             if (!secret) {
-              throw new Error('[@volt/plugin-cookies] Cookie secret not configured for signing.');
+              throw new Error('[@voltts/plugin-cookies] Cookie secret not configured for signing.');
             }
             const signed = signCookie(value, secret);
             c.setCookie(name, signed, { ...defaultCookieOpts, ...opts });

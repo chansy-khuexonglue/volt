@@ -8,6 +8,6 @@
     "start": "bun run index.ts"
   },
   "dependencies": {
-    "volt": "workspace:*"
+    "voltts": "workspace:*"
   }
 }

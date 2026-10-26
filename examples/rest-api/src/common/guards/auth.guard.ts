@@ -1,4 +1,4 @@
-import { jwt, MiddlewareHandler } from 'volt';
+import { jwt, MiddlewareHandler } from 'voltts';
 import { config } from '../../config/env';
 import { UserPayload, UserRole } from '../../modules/auth/auth.types';
 

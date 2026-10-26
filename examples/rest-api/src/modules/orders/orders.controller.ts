@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { ordersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './orders.types';
 

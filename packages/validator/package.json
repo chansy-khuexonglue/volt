@@ -1,5 +1,5 @@
 {
-  "name": "@volt/validator",
+  "name": "@voltts/validator",
   "version": "0.1.0",
   "description": "High-performance schema builder, validator, and type inference for Volt",
   "type": "module",

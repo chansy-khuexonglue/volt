@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { postgresPlugin, PostgresClient } from '../src/index';
 
-describe('@volt/plugin-postgres', () => {
+describe('@voltts/plugin-postgres', () => {
   it('decorates Volt application with db client', async () => {
     const app = new Volt();
     app.use(postgresPlugin());

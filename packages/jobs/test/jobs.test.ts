@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { JobQueue } from '../src/index';
 
-describe('@volt/jobs', () => {
+describe('@voltts/jobs', () => {
   it('defines, enqueues, and completes a background job', async () => {
     const queue = new JobQueue({ concurrency: 2 });
 

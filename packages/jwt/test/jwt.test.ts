@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { decode, jwt, sign, verify } from '../src/index';
 
-describe('@volt/jwt', () => {
+describe('@voltts/jwt', () => {
   const secret = 'super-secret-volt-key-1234567890123456';
 
   it('signs and verifies a valid JWT payload using HS256', async () => {

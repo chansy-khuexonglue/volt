@@ -1,4 +1,4 @@
-import { Context, RouteGroup } from 'volt';
+import { Context, RouteGroup } from 'voltts';
 import { authService } from './auth.service';
 
 export class AuthModule {

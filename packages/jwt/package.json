@@ -1,5 +1,5 @@
 {
-  "name": "@volt/jwt",
+  "name": "@voltts/jwt",
   "version": "0.1.0",
   "description": "High-performance JWT authentication plugin for Volt built on native Web Crypto",
   "type": "module",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@volt/middleware": "workspace:*"
+    "@voltts/middleware": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

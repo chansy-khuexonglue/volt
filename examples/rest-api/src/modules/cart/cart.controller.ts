@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { cartService } from './cart.service';
 import { AddToCartDto, UpdateCartItemDto } from './cart.types';
 

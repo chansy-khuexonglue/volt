@@ -1,4 +1,4 @@
-import { json, text, html } from '@volt/serializer';
+import { json, text, html } from '@voltts/serializer';
 
 export interface CookieOptions {
   domain?: string;

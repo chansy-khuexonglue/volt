@@ -1,4 +1,4 @@
-import { MiddlewareHandler, VoltContext } from '@volt/core';
+import { MiddlewareHandler, VoltContext } from '@voltts/core';
 
 export function isPrismaError(error: any): boolean {
   return error && (typeof error.code === 'string' && error.code.startsWith('P'));

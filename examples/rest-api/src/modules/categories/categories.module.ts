@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate, requireRole } from '../../common/guards/auth.guard';
 import { categoriesController } from './categories.controller';
 import { categoryParamSchema, createCategorySchema } from './categories.schema';

@@ -76,13 +76,13 @@ Volt is structured as a modular TypeScript monorepo with 14 core packages and 5 
 ### 1. Installation
 
 ```bash
-bun add volt
+bun add voltts
 ```
 
 ### 2. Create your API (`src/index.ts`)
 
 ```typescript
-import { Volt, t, cors, logger, openapi } from 'volt';
+import { Volt, t, cors, logger, openapi } from 'voltts';
 
 const app = new Volt({ port: 3000 });
 

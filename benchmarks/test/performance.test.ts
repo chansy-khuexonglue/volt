@@ -8,7 +8,7 @@ import { createExpressServer } from '../servers/express';
 import { createNestFastifyServer } from '../servers/nest-fastify';
 import { createNestExpressServer } from '../servers/nest-express';
 
-describe('@volt/benchmarks - Framework Equivalence & Functional Tests', () => {
+describe('@voltts/benchmarks - Framework Equivalence & Functional Tests', () => {
   it('verifies Volt baseline endpoints respond correctly', async () => {
     const app = createVoltServer();
 
@@ -161,7 +161,7 @@ describe('@volt/benchmarks - Framework Equivalence & Functional Tests', () => {
   });
 });
 
-describe('@volt/benchmarks - Performance SLA & Budget Validation', () => {
+describe('@voltts/benchmarks - Performance SLA & Budget Validation', () => {
   it('validates Volt satisfies throughput performance SLA (>50,000 req/sec static)', async () => {
     const app = createVoltServer();
     const iterations = 5000;

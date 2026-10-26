@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { prismaPlugin, MemoryPrismaClient } from '../src/index';
 
-describe('@volt/plugin-prisma', () => {
+describe('@voltts/plugin-prisma', () => {
   it('decorates Volt application with prisma instance', () => {
     const app = new Volt();
     const client = new MemoryPrismaClient();

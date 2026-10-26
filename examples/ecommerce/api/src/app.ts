@@ -1,4 +1,4 @@
-import { Volt, cors, logger, openapi, prismaPlugin } from 'volt';
+import { Volt, cors, logger, openapi, prismaPlugin } from 'voltts';
 import { config } from './config';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -52,7 +52,7 @@ export function createApplication(): Volt {
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
         database: 'connected',
-        orm: 'Prisma Plugin (@volt/plugin-prisma)',
+        orm: 'Prisma Plugin (@voltts/plugin-prisma)',
         framework: 'Volt',
         runtime: `Bun v${Bun.version}`,
       });

@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin, VoltContext } from '@volt/core';
+import { Volt, VoltPlugin, VoltContext } from '@voltts/core';
 import { MemoryRateLimitStore } from './store';
 import { RateLimitPluginOptions } from './types';
 
@@ -24,7 +24,7 @@ export function rateLimitPlugin(options: RateLimitPluginOptions = {}): VoltPlugi
   const keyGen = options.keyGenerator || defaultKeyGen;
 
   return {
-    name: '@volt/plugin-rate-limit',
+    name: '@voltts/plugin-rate-limit',
     version: '0.1.0',
     setup(app: Volt) {
       app.use(async (ctx: VoltContext, next) => {

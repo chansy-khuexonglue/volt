@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate } from '../../common/guards/auth.guard';
 import { paymentsController } from './payments.controller';
 import { paymentParamSchema, processPaymentSchema } from './payments.schema';

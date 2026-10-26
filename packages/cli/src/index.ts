@@ -95,7 +95,7 @@ export function scaffoldProject(name: string): void {
       test: 'bun test',
     },
     dependencies: {
-      volt: 'latest',
+      voltts: 'latest',
     },
   };
   writeFileSync(resolve(targetDir, 'package.json'), JSON.stringify(pkg, null, 2));
@@ -114,7 +114,7 @@ export function scaffoldProject(name: string): void {
   writeFileSync(resolve(targetDir, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
 
   // src/index.ts
-  const indexTs = `import { Volt, t, cors, logger } from 'volt';
+  const indexTs = `import { Volt, t, cors, logger } from 'voltts';
 
 const app = new Volt({ port: 3000 });
 

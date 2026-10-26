@@ -1,4 +1,4 @@
-import { MiddlewareHandler } from '@volt/middleware';
+import { MiddlewareHandler } from '@voltts/middleware';
 import { MemoryCacheStore } from './memory-store';
 import { CachedResponse, CacheOptions, CacheStore } from './types';
 

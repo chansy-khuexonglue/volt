@@ -1,7 +1,7 @@
-import { compose, MiddlewareHandler } from '@volt/middleware';
-import { Router } from '@volt/router';
-import { serializeResponse } from '@volt/serializer';
-import { compile, ValidationError } from '@volt/validator';
+import { compose, MiddlewareHandler } from '@voltts/middleware';
+import { Router } from '@voltts/router';
+import { serializeResponse } from '@voltts/serializer';
+import { compile, ValidationError } from '@voltts/validator';
 import { VoltContext, extractPathname } from './context';
 import { BadRequestError, handleServerException, HttpError, NotFoundError } from './error';
 import { RouteGroup } from './group';

@@ -1,5 +1,5 @@
 {
-  "name": "@volt/plugin-postgres",
+  "name": "@voltts/plugin-postgres",
   "version": "0.1.0",
   "description": "Official PostgreSQL integration plugin for Volt API framework",
   "type": "module",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*"
+    "@voltts/core": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

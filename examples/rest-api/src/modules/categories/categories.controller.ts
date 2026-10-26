@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { categoriesService } from './categories.service';
 import { CreateCategoryDto } from './categories.types';
 

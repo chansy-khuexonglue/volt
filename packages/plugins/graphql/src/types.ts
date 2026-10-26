@@ -1,5 +1,5 @@
 import { GraphQLSchema } from 'graphql';
-import { VoltContext } from '@volt/core';
+import { VoltContext } from '@voltts/core';
 
 export interface GraphQLResolverMap {
   Query?: Record<string, (args: any, context: any, info: any) => any>;

@@ -6,7 +6,7 @@ import {
   secureHeaders,
   timeout,
   Volt,
-} from 'volt';
+} from 'voltts';
 import { config } from './config/env';
 import { AuthModule } from './modules/auth/auth.module';
 import { CartModule } from './modules/cart/cart.module';

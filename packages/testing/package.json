@@ -1,5 +1,5 @@
 {
-  "name": "@volt/testing",
+  "name": "@voltts/testing",
   "version": "0.1.0",
   "description": "High-speed in-memory testing client and assertion utilities for Volt",
   "type": "module",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*"
+    "@voltts/core": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

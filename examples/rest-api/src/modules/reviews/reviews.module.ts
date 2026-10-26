@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate } from '../../common/guards/auth.guard';
 import { reviewsController } from './reviews.controller';
 import { createReviewSchema, reviewParamSchema } from './reviews.schema';

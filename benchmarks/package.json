@@ -1,5 +1,5 @@
 {
-  "name": "@volt/benchmarks",
+  "name": "@voltts/benchmarks",
   "version": "0.1.0",
   "private": true,
   "description": "High-throughput performance benchmark suite comparing Volt with Elysia, Hono, Bun.serve, Fastify, Express, and NestJS",
@@ -11,10 +11,10 @@
     "bench:all": "bun run all-frameworks.ts"
   },
   "dependencies": {
-    "volt": "workspace:*",
-    "@volt/core": "workspace:*",
-    "@volt/testing": "workspace:*",
-    "@volt/validator": "workspace:*",
+    "voltts": "workspace:*",
+    "@voltts/core": "workspace:*",
+    "@voltts/testing": "workspace:*",
+    "@voltts/validator": "workspace:*",
     "elysia": "^1.4.30",
     "hono": "^4.13.14",
     "fastify": "^5.12.7",

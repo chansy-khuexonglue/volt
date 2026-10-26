@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { cookiesPlugin, signCookie, unsignCookie } from '../src/index';
 
-describe('@volt/plugin-cookies', () => {
+describe('@voltts/plugin-cookies', () => {
   const secret = 'super-secret-cookie-signing-key-32-chars';
 
   it('signs and verifies signed cookies correctly', () => {

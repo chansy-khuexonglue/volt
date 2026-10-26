@@ -16,7 +16,7 @@ interface PluginInfo {
 const plugins: PluginInfo[] = [
   {
     name: 'Prisma ORM Plugin',
-    package: '@volt/plugin-prisma',
+    package: '@voltts/plugin-prisma',
     description: 'Official Prisma Client integration with context store injection, automatic P2002/P2025 error code translation, and graceful connection teardown.',
     docSlug: 'plugin-prisma',
     icon: 'i-simple-icons-prisma',
@@ -24,7 +24,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'PostgreSQL Native',
-    package: '@volt/plugin-postgres',
+    package: '@voltts/plugin-postgres',
     description: 'Harnesses Bun\'s native SQL client for high-throughput tagged template queries and transaction support.',
     docSlug: 'plugin-postgres',
     icon: 'i-simple-icons-postgresql',
@@ -32,7 +32,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'Redis Cache',
-    package: '@volt/plugin-redis',
+    package: '@voltts/plugin-redis',
     description: 'Redis client with pooled connections, response caching, key expiration, and session store helpers.',
     docSlug: 'plugin-redis',
     icon: 'i-simple-icons-redis',
@@ -40,7 +40,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'JWT Authentication',
-    package: '@volt/plugin-jwt',
+    package: '@voltts/plugin-jwt',
     description: 'Sign and verify JSON Web Tokens using HMAC-SHA256 with automatic Bearer token extraction and route guards.',
     docSlug: 'plugin-jwt',
     icon: 'i-lucide-shield-check',
@@ -48,7 +48,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'CORS & Security',
-    package: '@volt/plugin-cors',
+    package: '@voltts/plugin-cors',
     description: 'Configurable Cross-Origin Resource Sharing middleware supporting credentials, dynamic origins, and preflights.',
     docSlug: 'plugin-cors',
     icon: 'i-lucide-lock',
@@ -56,7 +56,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'Rate Limiter',
-    package: '@volt/plugin-rate-limit',
+    package: '@voltts/plugin-rate-limit',
     description: 'Token bucket rate limiting to prevent DDoS, abuse, and brute force with standard RFC headers.',
     docSlug: 'plugin-rate-limit',
     icon: 'i-lucide-gauge',
@@ -64,7 +64,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'Signed Cookies',
-    package: '@volt/plugin-cookies',
+    package: '@voltts/plugin-cookies',
     description: 'Parse, serialize, and cryptographically sign HTTP cookies with HMAC integrity checks.',
     docSlug: 'plugin-cookies',
     icon: 'i-lucide-cookie',
@@ -72,7 +72,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'Structured Logger',
-    package: '@volt/plugin-logger',
+    package: '@voltts/plugin-logger',
     description: 'Ultra-low overhead request logger with colorful dev formatting and single-line JSON for production.',
     docSlug: 'plugin-logger',
     icon: 'i-lucide-file-text',
@@ -80,7 +80,7 @@ const plugins: PluginInfo[] = [
   },
   {
     name: 'GraphQL Server',
-    package: '@volt/plugin-graphql',
+    package: '@voltts/plugin-graphql',
     description: 'Run GraphQL schemas natively in Volt with request context injection and embedded GraphiQL web IDE.',
     docSlug: 'plugin-graphql',
     icon: 'i-simple-icons-graphql',

@@ -1,4 +1,4 @@
-import { JobQueue } from 'volt';
+import { JobQueue } from 'voltts';
 
 export interface OrderEmailPayload {
   orderId: string;

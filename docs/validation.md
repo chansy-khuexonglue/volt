@@ -5,7 +5,7 @@ Volt provides a built-in schema validator (`t`) that precompiles validation rule
 ## Schema Types
 
 ```typescript
-import { t, Static } from 'volt';
+import { t, Static } from 'voltts';
 
 const UserSchema = t.Object({
   name: t.String({ minLength: 2, maxLength: 50 }),

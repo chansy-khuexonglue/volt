@@ -15,7 +15,7 @@ export function swagger(options: SwaggerOptions = {}) {
   const specPath = options.specPath || '/openapi.json';
 
   return {
-    name: '@volt/swagger',
+    name: '@voltts/swagger',
     setup(app: any) {
       // 1. Endpoint returning the OpenAPI specification
       app.get(specPath, () => {
@@ -73,7 +73,7 @@ export function openapi(options: OpenApiOptions = {}) {
   const uiType = options.ui || 'both'; // Defaults to both /docs (Scalar) and /swagger (Swagger UI)
 
   return {
-    name: '@volt/openapi',
+    name: '@voltts/openapi',
     setup(app: any) {
       // 1. Endpoint returning the OpenAPI JSON specification
       app.get(specPath, () => {

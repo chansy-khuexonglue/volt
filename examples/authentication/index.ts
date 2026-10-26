@@ -1,4 +1,4 @@
-import { cors, jwt, logger, openapi, sign, t, verify, Volt } from 'volt';
+import { cors, jwt, logger, openapi, sign, t, verify, Volt } from 'voltts';
 
 const PORT = Number(process.env.PORT) || 3004;
 const JWT_SECRET = process.env.JWT_SECRET || 'volt-auth-demo-secret-key-32-chars-long!';

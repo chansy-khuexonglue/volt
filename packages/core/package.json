@@ -1,5 +1,5 @@
 {
-  "name": "@volt/core",
+  "name": "@voltts/core",
   "version": "0.1.0",
   "description": "Core HTTP engine, application lifecycle, context, and Bun.serve integration for Volt",
   "type": "module",
@@ -12,10 +12,10 @@
     }
   },
   "dependencies": {
-    "@volt/router": "workspace:*",
-    "@volt/validator": "workspace:*",
-    "@volt/serializer": "workspace:*",
-    "@volt/middleware": "workspace:*"
+    "@voltts/router": "workspace:*",
+    "@voltts/validator": "workspace:*",
+    "@voltts/serializer": "workspace:*",
+    "@voltts/middleware": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

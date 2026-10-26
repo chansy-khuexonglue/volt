@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin } from '@volt/core';
+import { Volt, VoltPlugin } from '@voltts/core';
 
 export interface RedisOptions {
   url?: string;
@@ -57,7 +57,7 @@ export function redisPlugin(options: RedisOptions = {}): VoltPlugin {
   }
 
   return {
-    name: '@volt/plugin-redis',
+    name: '@voltts/plugin-redis',
     version: '0.1.0',
     setup(app: Volt) {
       app.decorate('redis', redisClient);

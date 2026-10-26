@@ -23,23 +23,23 @@
       },
     },
     "benchmarks": {
-      "name": "@volt/benchmarks",
+      "name": "@voltts/benchmarks",
       "version": "0.1.0",
       "dependencies": {
         "@nestjs/common": "^12.2.0",
         "@nestjs/core": "^12.2.0",
         "@nestjs/platform-express": "^12.2.0",
         "@nestjs/platform-fastify": "^12.2.0",
-        "@volt/core": "workspace:*",
-        "@volt/testing": "workspace:*",
-        "@volt/validator": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/testing": "workspace:*",
+        "@voltts/validator": "workspace:*",
         "elysia": "^1.4.30",
         "express": "^5.3.0",
         "fastify": "^5.12.7",
         "hono": "^4.13.14",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.2",
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "^1.4.4",
@@ -51,21 +51,21 @@
       "name": "example-authentication",
       "version": "0.1.0",
       "dependencies": {
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
     },
     "examples/basic-api": {
       "name": "basic-api-example",
       "version": "0.1.0",
       "dependencies": {
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
     },
     "examples/ecommerce/api": {
       "name": "@ecommerce/api",
       "version": "1.0.0",
       "dependencies": {
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
       "devDependencies": {
         "@prisma/client": "6",
@@ -93,191 +93,191 @@
       "name": "example-hello-world",
       "version": "0.1.0",
       "dependencies": {
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
     },
     "examples/rest-api": {
       "name": "example-rest-api",
       "version": "0.1.0",
       "dependencies": {
-        "volt": "workspace:*",
+        "voltts": "workspace:*",
       },
     },
     "packages/cache": {
-      "name": "@volt/cache",
+      "name": "@voltts/cache",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/middleware": "workspace:*",
+        "@voltts/middleware": "workspace:*",
       },
     },
     "packages/cli": {
-      "name": "@volt/cli",
+      "name": "@voltts/cli",
       "version": "0.1.0",
       "bin": {
         "volt": "./bin/volt.ts",
       },
     },
     "packages/core": {
-      "name": "@volt/core",
+      "name": "@voltts/core",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/middleware": "workspace:*",
-        "@volt/router": "workspace:*",
-        "@volt/serializer": "workspace:*",
-        "@volt/validator": "workspace:*",
+        "@voltts/middleware": "workspace:*",
+        "@voltts/router": "workspace:*",
+        "@voltts/serializer": "workspace:*",
+        "@voltts/validator": "workspace:*",
       },
     },
     "packages/di": {
-      "name": "@volt/di",
+      "name": "@voltts/di",
       "version": "0.1.0",
     },
     "packages/jobs": {
-      "name": "@volt/jobs",
+      "name": "@voltts/jobs",
       "version": "0.1.0",
     },
     "packages/jwt": {
-      "name": "@volt/jwt",
+      "name": "@voltts/jwt",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/middleware": "workspace:*",
+        "@voltts/middleware": "workspace:*",
       },
     },
     "packages/middleware": {
-      "name": "@volt/middleware",
+      "name": "@voltts/middleware",
       "version": "0.1.0",
     },
     "packages/node": {
-      "name": "@volt/node",
+      "name": "@voltts/node",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/openapi": {
-      "name": "@volt/openapi",
+      "name": "@voltts/openapi",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
-        "@volt/validator": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/validator": "workspace:*",
       },
     },
     "packages/plugins/cookies": {
-      "name": "@volt/plugin-cookies",
+      "name": "@voltts/plugin-cookies",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/cors": {
-      "name": "@volt/plugin-cors",
+      "name": "@voltts/plugin-cors",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
-        "@volt/middleware": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/middleware": "workspace:*",
       },
     },
     "packages/plugins/graphql": {
-      "name": "@volt/plugin-graphql",
+      "name": "@voltts/plugin-graphql",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
         "graphql": "^16.8.0 || ^17.0.0",
       },
     },
     "packages/plugins/jwt": {
-      "name": "@volt/plugin-jwt",
+      "name": "@voltts/plugin-jwt",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
-        "@volt/jwt": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/jwt": "workspace:*",
       },
     },
     "packages/plugins/logger": {
-      "name": "@volt/plugin-logger",
+      "name": "@voltts/plugin-logger",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
-        "@volt/middleware": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/middleware": "workspace:*",
       },
     },
     "packages/plugins/postgres": {
-      "name": "@volt/plugin-postgres",
+      "name": "@voltts/plugin-postgres",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/prisma": {
-      "name": "@volt/plugin-prisma",
+      "name": "@voltts/plugin-prisma",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/rate-limit": {
-      "name": "@volt/plugin-rate-limit",
+      "name": "@voltts/plugin-rate-limit",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/redis": {
-      "name": "@volt/plugin-redis",
+      "name": "@voltts/plugin-redis",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/router": {
-      "name": "@volt/router",
+      "name": "@voltts/router",
       "version": "0.1.0",
     },
     "packages/serializer": {
-      "name": "@volt/serializer",
+      "name": "@voltts/serializer",
       "version": "0.1.0",
     },
     "packages/testing": {
-      "name": "@volt/testing",
+      "name": "@voltts/testing",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/core": "workspace:*",
+        "@voltts/core": "workspace:*",
       },
     },
     "packages/validator": {
-      "name": "@volt/validator",
+      "name": "@voltts/validator",
       "version": "0.1.0",
     },
     "packages/volt": {
-      "name": "volt",
+      "name": "voltts",
       "version": "0.1.0",
       "dependencies": {
-        "@volt/cache": "workspace:*",
-        "@volt/cli": "workspace:*",
-        "@volt/core": "workspace:*",
-        "@volt/di": "workspace:*",
-        "@volt/jobs": "workspace:*",
-        "@volt/jwt": "workspace:*",
-        "@volt/middleware": "workspace:*",
-        "@volt/node": "workspace:*",
-        "@volt/openapi": "workspace:*",
-        "@volt/plugin-cookies": "workspace:*",
-        "@volt/plugin-cors": "workspace:*",
-        "@volt/plugin-graphql": "workspace:*",
-        "@volt/plugin-jwt": "workspace:*",
-        "@volt/plugin-logger": "workspace:*",
-        "@volt/plugin-postgres": "workspace:*",
-        "@volt/plugin-prisma": "workspace:*",
-        "@volt/plugin-rate-limit": "workspace:*",
-        "@volt/plugin-redis": "workspace:*",
-        "@volt/router": "workspace:*",
-        "@volt/serializer": "workspace:*",
-        "@volt/testing": "workspace:*",
-        "@volt/validator": "workspace:*",
-        "@volt/websocket": "workspace:*",
+        "@voltts/cache": "workspace:*",
+        "@voltts/cli": "workspace:*",
+        "@voltts/core": "workspace:*",
+        "@voltts/di": "workspace:*",
+        "@voltts/jobs": "workspace:*",
+        "@voltts/jwt": "workspace:*",
+        "@voltts/middleware": "workspace:*",
+        "@voltts/node": "workspace:*",
+        "@voltts/openapi": "workspace:*",
+        "@voltts/plugin-cookies": "workspace:*",
+        "@voltts/plugin-cors": "workspace:*",
+        "@voltts/plugin-graphql": "workspace:*",
+        "@voltts/plugin-jwt": "workspace:*",
+        "@voltts/plugin-logger": "workspace:*",
+        "@voltts/plugin-postgres": "workspace:*",
+        "@voltts/plugin-prisma": "workspace:*",
+        "@voltts/plugin-rate-limit": "workspace:*",
+        "@voltts/plugin-redis": "workspace:*",
+        "@voltts/router": "workspace:*",
+        "@voltts/serializer": "workspace:*",
+        "@voltts/testing": "workspace:*",
+        "@voltts/validator": "workspace:*",
+        "@voltts/websocket": "workspace:*",
       },
     },
     "packages/websocket": {
-      "name": "@volt/websocket",
+      "name": "@voltts/websocket",
       "version": "0.1.0",
     },
   },
@@ -974,53 +974,53 @@
 
     "@volar/typescript": ["@volar/typescript@2.4.28", "", { "dependencies": { "@volar/language-core": "2.4.28", "path-browserify": "^1.0.1", "vscode-uri": "^3.0.8" } }, "sha512-Ja6yvWrbis2QtN4ClAKreeUZPVYMARDYZl9LMEv1iQ1QdepB6wn0jTRxA9MftYmYa4DQ4k/DaSZpFPUfxl8giw=="],
 
-    "@volt/benchmarks": ["@volt/benchmarks@workspace:benchmarks"],
+    "@voltts/benchmarks": ["@voltts/benchmarks@workspace:benchmarks"],
 
-    "@volt/cache": ["@volt/cache@workspace:packages/cache"],
+    "@voltts/cache": ["@voltts/cache@workspace:packages/cache"],
 
-    "@volt/cli": ["@volt/cli@workspace:packages/cli"],
+    "@voltts/cli": ["@voltts/cli@workspace:packages/cli"],
 
-    "@volt/core": ["@volt/core@workspace:packages/core"],
+    "@voltts/core": ["@voltts/core@workspace:packages/core"],
 
-    "@volt/di": ["@volt/di@workspace:packages/di"],
+    "@voltts/di": ["@voltts/di@workspace:packages/di"],
 
-    "@volt/jobs": ["@volt/jobs@workspace:packages/jobs"],
+    "@voltts/jobs": ["@voltts/jobs@workspace:packages/jobs"],
 
-    "@volt/jwt": ["@volt/jwt@workspace:packages/jwt"],
+    "@voltts/jwt": ["@voltts/jwt@workspace:packages/jwt"],
 
-    "@volt/middleware": ["@volt/middleware@workspace:packages/middleware"],
+    "@voltts/middleware": ["@voltts/middleware@workspace:packages/middleware"],
 
-    "@volt/node": ["@volt/node@workspace:packages/node"],
+    "@voltts/node": ["@voltts/node@workspace:packages/node"],
 
-    "@volt/openapi": ["@volt/openapi@workspace:packages/openapi"],
+    "@voltts/openapi": ["@voltts/openapi@workspace:packages/openapi"],
 
-    "@volt/plugin-cookies": ["@volt/plugin-cookies@workspace:packages/plugins/cookies"],
+    "@voltts/plugin-cookies": ["@voltts/plugin-cookies@workspace:packages/plugins/cookies"],
 
-    "@volt/plugin-cors": ["@volt/plugin-cors@workspace:packages/plugins/cors"],
+    "@voltts/plugin-cors": ["@voltts/plugin-cors@workspace:packages/plugins/cors"],
 
-    "@volt/plugin-graphql": ["@volt/plugin-graphql@workspace:packages/plugins/graphql"],
+    "@voltts/plugin-graphql": ["@voltts/plugin-graphql@workspace:packages/plugins/graphql"],
 
-    "@volt/plugin-jwt": ["@volt/plugin-jwt@workspace:packages/plugins/jwt"],
+    "@voltts/plugin-jwt": ["@voltts/plugin-jwt@workspace:packages/plugins/jwt"],
 
-    "@volt/plugin-logger": ["@volt/plugin-logger@workspace:packages/plugins/logger"],
+    "@voltts/plugin-logger": ["@voltts/plugin-logger@workspace:packages/plugins/logger"],
 
-    "@volt/plugin-postgres": ["@volt/plugin-postgres@workspace:packages/plugins/postgres"],
+    "@voltts/plugin-postgres": ["@voltts/plugin-postgres@workspace:packages/plugins/postgres"],
 
-    "@volt/plugin-prisma": ["@volt/plugin-prisma@workspace:packages/plugins/prisma"],
+    "@voltts/plugin-prisma": ["@voltts/plugin-prisma@workspace:packages/plugins/prisma"],
 
-    "@volt/plugin-rate-limit": ["@volt/plugin-rate-limit@workspace:packages/plugins/rate-limit"],
+    "@voltts/plugin-rate-limit": ["@voltts/plugin-rate-limit@workspace:packages/plugins/rate-limit"],
 
-    "@volt/plugin-redis": ["@volt/plugin-redis@workspace:packages/plugins/redis"],
+    "@voltts/plugin-redis": ["@voltts/plugin-redis@workspace:packages/plugins/redis"],
 
-    "@volt/router": ["@volt/router@workspace:packages/router"],
+    "@voltts/router": ["@voltts/router@workspace:packages/router"],
 
-    "@volt/serializer": ["@volt/serializer@workspace:packages/serializer"],
+    "@voltts/serializer": ["@voltts/serializer@workspace:packages/serializer"],
 
-    "@volt/testing": ["@volt/testing@workspace:packages/testing"],
+    "@voltts/testing": ["@voltts/testing@workspace:packages/testing"],
 
-    "@volt/validator": ["@volt/validator@workspace:packages/validator"],
+    "@voltts/validator": ["@voltts/validator@workspace:packages/validator"],
 
-    "@volt/websocket": ["@volt/websocket@workspace:packages/websocket"],
+    "@voltts/websocket": ["@voltts/websocket@workspace:packages/websocket"],
 
     "@vue-macros/common": ["@vue-macros/common@3.1.4", "", { "dependencies": { "@vue/compiler-sfc": "^3.5.22", "ast-kit": "^2.1.2", "local-pkg": "^1.1.2", "magic-string-ast": "^1.0.2", "unplugin-utils": "^0.3.0" }, "peerDependencies": { "vue": "^2.7.0 || ^3.2.25" }, "optionalPeers": ["vue"] }, "sha512-/5Fv+6DgIcM9ajY05ZmKBv+LMX1M9A0X+IUwDRVdt67ciw8OV9bvG2r34p3RiEadlsQybjhKPRKNXDC8Bp23cw=="],
 
@@ -2332,7 +2332,7 @@
 
     "vite-plugin-vue-tracer": ["vite-plugin-vue-tracer@1.6.0", "", { "dependencies": { "estree-walker": "^3.0.3", "exsolve": "^1.1.1", "magic-string": "^1.2.0", "pathe": "^2.0.3", "source-map-js": "^1.2.1" }, "peerDependencies": { "vite": "^6.0.0 || ^7.0.0 || ^8.0.0-0", "vue": "^3.5.0" } }, "sha512-G07az+X68rtz9ngfBxZH8vVhZ7DOnZvJABnT9nFp/TBV+qfKtGqA00djblqvvbf3VYfwLmJtoqZhFDAx8mLpNw=="],
 
-    "volt": ["volt@workspace:packages/volt"],
+    "voltts": ["voltts@workspace:packages/volt"],
 
     "vscode-uri": ["vscode-uri@3.2.0", "", {}, "sha512-m2gXo3bn0G1kT9InzMf07fTbqMbGtyckj3bH5ktLO+1Ssv+yiATZ4dhwaQv9UZWxJh6E9IFGnQyjgWVDWVBDrg=="],
 

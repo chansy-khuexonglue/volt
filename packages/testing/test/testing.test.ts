@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { Volt } from '../../core/src/index';
 import { createTestClient } from '../src/index';
 
-describe('@volt/testing', () => {
+describe('@voltts/testing', () => {
   it('supports all standard HTTP verbs via createTestClient', async () => {
     const app = new Volt();
 

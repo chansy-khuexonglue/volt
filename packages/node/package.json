@@ -1,5 +1,5 @@
 {
-  "name": "@volt/node",
+  "name": "@voltts/node",
   "version": "0.1.0",
   "description": "Node.js HTTP server adapter for Volt applications",
   "type": "module",
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*"
+    "@voltts/core": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

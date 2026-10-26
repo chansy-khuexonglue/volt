@@ -1,5 +1,5 @@
 {
-  "name": "@volt/di",
+  "name": "@voltts/di",
   "version": "0.1.0",
   "description": "High-performance dependency injection container with circular dependency detection for Volt",
   "type": "module",

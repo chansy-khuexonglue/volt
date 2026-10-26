@@ -1,5 +1,5 @@
 {
-  "name": "@volt/router",
+  "name": "@voltts/router",
   "version": "0.1.0",
   "description": "High-performance radix-tree and static-table HTTP router for Volt",
   "type": "module",

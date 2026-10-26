@@ -37,6 +37,7 @@ jobs:
 
       - name: Publish Packages to NPM
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN || secrets.NPM_AUTH_TOKEN }}
           TOKEN: ${{ secrets.NPM_TOKEN || secrets.NODE_AUTH_TOKEN || secrets.NPM_AUTH_TOKEN }}
         run: |
           if [ -z "$TOKEN" ]; then
@@ -44,19 +45,55 @@ jobs:
             exit 1
           fi
 
-          # Configure npm credentials
+          # Configure npm credentials in both ~/.npmrc and local .npmrc
           echo "//registry.npmjs.org/:_authToken=${TOKEN}" > ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${TOKEN}" > .npmrc
 
-          echo "🚀 Publishing workspace packages to NPM..."
+          echo "🔑 Verifying NPM authenticated user..."
+          npm whoami --registry=https://registry.npmjs.org || echo "Could not determine whoami, proceeding with token..."
+
+          echo "🚀 Publishing workspace packages to NPM under @voltts/* and voltts..."
           
-          # Attempt Bun native recursive publisher first
-          bun publish --recursive --access public || true
+          # List of packages in dependency order
+          PACKAGES=(
+            "packages/serializer"
+            "packages/router"
+            "packages/validator"
+            "packages/middleware"
+            "packages/di"
+            "packages/core"
+            "packages/websocket"
+            "packages/openapi"
+            "packages/testing"
+            "packages/cli"
+            "packages/jwt"
+            "packages/cache"
+            "packages/jobs"
+            "packages/node"
+            packages/plugins/*
+            "packages/volt"
+          )
 
-          # Explicit package publish fallback for npm compatibility
-          for pkg in packages/core packages/router packages/validator packages/di packages/serializer packages/middleware packages/websocket packages/openapi packages/testing packages/cli packages/jwt packages/cache packages/jobs packages/node packages/volt packages/plugins/*; do
+          for pkg in "${PACKAGES[@]}"; do
             if [ -f "$pkg/package.json" ]; then
-              echo "Publishing $pkg..."
-              npm publish "$pkg" --access public || true
+              pkg_name=$(node -p "require('./$pkg/package.json').name")
+              pkg_ver=$(node -p "require('./$pkg/package.json').version")
+              echo "----------------------------------------------------"
+              echo "📦 Publishing $pkg_name@$pkg_ver from $pkg..."
+
+              # Skip versions that already exist on the registry
+              if npm view "$pkg_name@$pkg_ver" version --registry https://registry.npmjs.org 2>/dev/null | grep -q "$pkg_ver"; then
+                echo "ℹ️ $pkg_name@$pkg_ver already published, skipping."
+                continue
+              fi
+
+              # bun publish rewrites "workspace:*" deps to concrete versions (npm publish does not)
+              if (cd "$pkg" && NPM_CONFIG_TOKEN="$TOKEN" bun publish --access public); then
+                echo "✅ Successfully published $pkg_name@$pkg_ver"
+              else
+                echo "::error::❌ Failed to publish $pkg_name@$pkg_ver"
+                exit 1
+              fi
             fi
           done
 

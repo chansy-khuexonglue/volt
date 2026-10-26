@@ -1,4 +1,4 @@
-import { Schema, Static } from '@volt/validator';
+import { Schema, Static } from '@voltts/validator';
 
 export type ExtractParamNames<T extends string> =
   T extends `${infer _Start}:${infer Param}/${infer Rest}`

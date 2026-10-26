@@ -1,5 +1,5 @@
 {
-  "name": "@volt/websocket",
+  "name": "@voltts/websocket",
   "version": "0.1.0",
   "description": "High-throughput native WebSocket handling and pub/sub for Volt",
   "type": "module",

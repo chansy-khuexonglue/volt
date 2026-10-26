@@ -1,4 +1,4 @@
-import { CookieOptions } from '@volt/core';
+import { CookieOptions } from '@voltts/core';
 
 export interface CookiesPluginOptions {
   /**

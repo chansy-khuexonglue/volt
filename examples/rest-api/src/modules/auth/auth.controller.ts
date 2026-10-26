@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { authService } from './auth.service';
 import { LoginDto, RegisterDto } from './auth.types';
 

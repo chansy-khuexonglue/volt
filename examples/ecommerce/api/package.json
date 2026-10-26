@@ -10,7 +10,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "volt": "workspace:*"
+    "voltts": "workspace:*"
   },
   "devDependencies": {
     "@prisma/client": "6",

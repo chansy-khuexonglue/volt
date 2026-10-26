@@ -1,5 +1,5 @@
 {
-  "name": "@volt/serializer",
+  "name": "@voltts/serializer",
   "version": "0.1.0",
   "description": "Ultra-fast response serialization and content-type handling for Volt",
   "type": "module",

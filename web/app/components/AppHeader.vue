@@ -26,7 +26,7 @@ watch(() => route.path, () => {
         <span class="text-neutral-600">■</span>
         <span>BUN 1.1 C++ NATIVE HTTP CORE</span>
         <span class="text-neutral-600">■</span>
-        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@volt/plugin-prisma)</span>
+        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@voltts/plugin-prisma)</span>
         <span class="text-neutral-600">■</span>
         <span>ZERO-ALLOCATION RADIX TREE ROUTER</span>
         <span class="text-neutral-600">■</span>
@@ -44,7 +44,7 @@ watch(() => route.path, () => {
         <span class="text-neutral-600">■</span>
         <span>BUN 1.1 C++ NATIVE HTTP CORE</span>
         <span class="text-neutral-600">■</span>
-        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@volt/plugin-prisma)</span>
+        <span class="text-primary-400">OFFICIAL PRISMA ORM PLUGIN (@voltts/plugin-prisma)</span>
         <span class="text-neutral-600">■</span>
         <span>ZERO-ALLOCATION RADIX TREE ROUTER</span>
         <span class="text-neutral-600">■</span>

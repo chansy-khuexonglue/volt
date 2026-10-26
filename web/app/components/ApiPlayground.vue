@@ -22,7 +22,7 @@ const presets: EndpointPreset[] = [
         status: 'ok',
         uptime: 142.85,
         database: 'connected',
-        orm: 'Prisma Plugin (@volt/plugin-prisma)',
+        orm: 'Prisma Plugin (@voltts/plugin-prisma)',
         framework: 'Volt',
         runtime: 'Bun v1.4.4',
       },

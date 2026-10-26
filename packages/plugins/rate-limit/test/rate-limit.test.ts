@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { rateLimitPlugin } from '../src/index';
 
-describe('@volt/plugin-rate-limit', () => {
+describe('@voltts/plugin-rate-limit', () => {
   it('allows requests within rate limit and attaches headers', async () => {
     const app = new Volt();
     app.plugin(rateLimitPlugin({ max: 3, windowMs: 10_000 }));

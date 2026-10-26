@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const orderParamSchema = t.Object({
   id: t.String({ description: 'Order identifier' }),

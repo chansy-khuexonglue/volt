@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { config } from '../../config/env';
 
 export class HealthController {

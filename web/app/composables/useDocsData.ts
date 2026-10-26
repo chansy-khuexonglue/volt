@@ -129,7 +129,7 @@ Volt bridges this gap:
     codeSnippet: {
       filename: 'index.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
+      code: `import { Volt } from 'voltts';
 
 const app = new Volt({ port: 3000 });
 
@@ -172,7 +172,7 @@ bun --version
 To install Volt inside an existing project:
 
 \`\`\`bash
-bun add volt
+bun add voltts
 \`\`\`
 
 ## Your First API Route
@@ -182,7 +182,7 @@ Create an \`index.ts\` file and declare your routes:
     codeSnippet: {
       filename: 'index.ts',
       language: 'typescript',
-      code: `import { Volt, cors, logger } from 'volt';
+      code: `import { Volt, cors, logger } from 'voltts';
 
 const app = new Volt({
   port: 3000,
@@ -278,7 +278,7 @@ When creating an instance of \`Volt\`, you can supply:
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
+      code: `import { Volt } from 'voltts';
 
 export const app = new Volt({
   port: Number(process.env.PORT) || 3000,
@@ -368,7 +368,7 @@ A middleware is a function that receives \`(c, next)\`:
     codeSnippet: {
       filename: 'src/middleware/timing.ts',
       language: 'typescript',
-      code: `import { MiddlewareHandler } from 'volt';
+      code: `import { MiddlewareHandler } from 'voltts';
 
 export const timingMiddleware: MiddlewareHandler = async (c, next) => {
   const start = performance.now();
@@ -588,7 +588,7 @@ Volt includes native OpenAPI 3.1 generation. By attaching schemas and route meta
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt, openapi } from 'volt';
+      code: `import { Volt, openapi } from 'voltts';
 
 const app = new Volt();
 
@@ -624,7 +624,7 @@ Volt features a lightweight, zero-dependency IoC container. You can declare inje
     codeSnippet: {
       filename: 'src/services/user.service.ts',
       language: 'typescript',
-      code: `import { Injectable, Container } from 'volt';
+      code: `import { Injectable, Container } from 'voltts';
 
 @Injectable()
 export class DatabaseService {
@@ -663,7 +663,7 @@ For large codebases, Volt provides a modular architecture pattern similar to Nes
     codeSnippet: {
       filename: 'src/modules/products/products.module.ts',
       language: 'typescript',
-      code: `import { RouteGroup } from 'volt';
+      code: `import { RouteGroup } from 'voltts';
 import { productsService } from './products.service';
 
 export class ProductsModule {
@@ -697,7 +697,7 @@ export class ProductsModule {
       { id: 'error-translation', text: 'Prisma Error Translation' },
     ],
     content: `
-# Prisma ORM Plugin (\`@volt/plugin-prisma\`)
+# Prisma ORM Plugin (\`@voltts/plugin-prisma\`)
 
 The official Volt Prisma plugin connects your database with Prisma ORM and Volt's HTTP engine.
 
@@ -712,7 +712,7 @@ The official Volt Prisma plugin connects your database with Prisma ORM and Volt'
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt, prismaPlugin } from 'volt';
+      code: `import { Volt, prismaPlugin } from 'voltts';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -746,15 +746,15 @@ app.get('/api/users', async (c) => {
       { id: 'transactions', text: 'Transactions' },
     ],
     content: `
-# PostgreSQL Native Plugin (\`@volt/plugin-postgres\`)
+# PostgreSQL Native Plugin (\`@voltts/plugin-postgres\`)
 
 For maximum performance, Volt integrates directly with Bun's native SQL driver (\`Bun.SQL\`), providing tagged template queries and connection pooling.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { postgresPlugin } from '@volt/plugin-postgres';
+      code: `import { Volt } from 'voltts';
+import { postgresPlugin } from '@voltts/plugin-postgres';
 
 const app = new Volt();
 
@@ -779,15 +779,15 @@ app.get('/api/categories', async (c) => {
       { id: 'cache-helpers', text: 'Cache Helpers' },
     ],
     content: `
-# Redis Cache Plugin (\`@volt/plugin-redis\`)
+# Redis Cache Plugin (\`@voltts/plugin-redis\`)
 
 Integrates Redis into Volt with connection pooling, automated retry logic, and decorator caching helpers.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { redisPlugin } from '@volt/plugin-redis';
+      code: `import { Volt } from 'voltts';
+import { redisPlugin } from '@voltts/plugin-redis';
 
 const app = new Volt();
 
@@ -816,15 +816,15 @@ app.get('/api/stats', async (c) => {
       { id: 'route-guard', text: 'Route Protection' },
     ],
     content: `
-# JWT Authentication Plugin (\`@volt/plugin-jwt\`)
+# JWT Authentication Plugin (\`@voltts/plugin-jwt\`)
 
 Provides fast HMAC-SHA256 and RSA token signing and verification directly on context.
     `,
     codeSnippet: {
       filename: 'src/auth.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { jwtPlugin } from '@volt/plugin-jwt';
+      code: `import { Volt } from 'voltts';
+import { jwtPlugin } from '@voltts/plugin-jwt';
 
 const app = new Volt();
 
@@ -854,14 +854,14 @@ app.get('/api/protected', (c) => {
       { id: 'configuration', text: 'Usage' },
     ],
     content: `
-# CORS Plugin (\`@volt/plugin-cors\`)
+# CORS Plugin (\`@voltts/plugin-cors\`)
 
 Handles preflight \`OPTIONS\` requests and attaches configurable CORS headers to all routes.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt, cors } from 'volt';
+      code: `import { Volt, cors } from 'voltts';
 
 const app = new Volt();
 
@@ -885,15 +885,15 @@ app.use(cors({
       { id: 'rate-limit-options', text: 'Options & Custom Key Generator' },
     ],
     content: `
-# Rate Limiting (\`@volt/plugin-rate-limit\`)
+# Rate Limiting (\`@voltts/plugin-rate-limit\`)
 
 Safeguard endpoints with in-memory or Redis-backed token bucket rate limits. Automatically injects \`RateLimit-Limit\`, \`RateLimit-Remaining\`, and \`RateLimit-Reset\` headers.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { rateLimit } from '@volt/plugin-rate-limit';
+      code: `import { Volt } from 'voltts';
+import { rateLimit } from '@voltts/plugin-rate-limit';
 
 const app = new Volt();
 
@@ -916,15 +916,15 @@ app.use(rateLimit({
       { id: 'signed-cookies', text: 'Tamper-Proof Signing' },
     ],
     content: `
-# Cookies Plugin (\`@volt/plugin-cookies\`)
+# Cookies Plugin (\`@voltts/plugin-cookies\`)
 
 Provides cookie reading and setting with HMAC signature validation to prevent client-side cookie tampering.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { cookiesPlugin } from '@volt/plugin-cookies';
+      code: `import { Volt } from 'voltts';
+import { cookiesPlugin } from '@voltts/plugin-cookies';
 
 const app = new Volt();
 
@@ -953,14 +953,14 @@ app.post('/api/login', (c) => {
       { id: 'formatting-options', text: 'Formatting Options' },
     ],
     content: `
-# Structured Logger (\`@volt/plugin-logger\`)
+# Structured Logger (\`@voltts/plugin-logger\`)
 
 Minimal overhead request and error logger. Outputs colorized summaries in \`dev\` mode and single-line structured JSON in production for ELK/Datadog ingesters.
     `,
     codeSnippet: {
       filename: 'src/app.ts',
       language: 'typescript',
-      code: `import { Volt, logger } from 'volt';
+      code: `import { Volt, logger } from 'voltts';
 
 const app = new Volt();
 
@@ -980,15 +980,15 @@ app.use(logger({
       { id: 'mounting-graphiql', text: 'GraphiQL Playground' },
     ],
     content: `
-# GraphQL Plugin (\`@volt/plugin-graphql\`)
+# GraphQL Plugin (\`@voltts/plugin-graphql\`)
 
 Provides full GraphQL schema execution with automatic request context injection and GraphiQL web IDE.
     `,
     codeSnippet: {
       filename: 'src/graphql.ts',
       language: 'typescript',
-      code: `import { Volt } from 'volt';
-import { graphqlPlugin } from '@volt/plugin-graphql';
+      code: `import { Volt } from 'voltts';
+import { graphqlPlugin } from '@voltts/plugin-graphql';
 import { buildSchema } from 'graphql';
 
 const schema = buildSchema(\`

@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const paymentParamSchema = t.Object({
   id: t.String({ description: 'Payment identifier' }),

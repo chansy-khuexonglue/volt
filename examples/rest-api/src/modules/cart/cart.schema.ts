@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const cartParamSchema = t.Object({
   productId: t.String({ description: 'Product identifier' }),

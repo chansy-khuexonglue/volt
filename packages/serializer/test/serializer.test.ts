@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { html, json, serializeResponse, text } from '../src/index';
 
-describe('@volt/serializer', () => {
+describe('@voltts/serializer', () => {
   it('serializes JSON responses with correct headers', async () => {
     const res = json({ hello: 'volt' }, 201);
     expect(res.status).toBe(201);

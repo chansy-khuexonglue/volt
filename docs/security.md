@@ -2,12 +2,12 @@
 
 Volt prioritizes security and correctness over raw speed.
 
-## JWT Authentication (`@volt/jwt`)
+## JWT Authentication (`@voltts/jwt`)
 
 Volt uses the native Web Crypto API (`crypto.subtle`) for high-speed token signing and verification:
 
 ```typescript
-import { sign, verify, jwt } from 'volt';
+import { sign, verify, jwt } from 'voltts';
 
 // Generate Token
 const token = await sign(

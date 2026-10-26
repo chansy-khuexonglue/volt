@@ -1,5 +1,5 @@
 {
-  "name": "@volt/plugin-cors",
+  "name": "@voltts/plugin-cors",
   "version": "0.1.0",
   "description": "Official CORS plugin for Volt API framework",
   "type": "module",
@@ -12,8 +12,8 @@
     }
   },
   "dependencies": {
-    "@volt/core": "workspace:*",
-    "@volt/middleware": "workspace:*"
+    "@voltts/core": "workspace:*",
+    "@voltts/middleware": "workspace:*"
   },
   "scripts": {
     "test": "bun test"

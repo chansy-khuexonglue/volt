@@ -1,4 +1,4 @@
-import { MiddlewareHandler } from '@volt/middleware';
+import { MiddlewareHandler } from '@voltts/middleware';
 import { ExtractParams, Handler, RouteSchemaConfig } from './types';
 
 export class RouteGroup {

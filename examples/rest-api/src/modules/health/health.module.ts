@@ -1,4 +1,4 @@
-import { Volt } from 'volt';
+import { Volt } from 'voltts';
 import { healthController } from './health.controller';
 
 export class HealthModule {

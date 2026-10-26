@@ -1,4 +1,4 @@
-import { Volt, VoltPlugin, VoltContext } from '@volt/core';
+import { Volt, VoltPlugin, VoltContext } from '@voltts/core';
 import { PrismaClientLike, PrismaPluginOptions } from './types';
 import { prismaErrorMiddleware } from './errors';
 
@@ -35,7 +35,7 @@ export function prismaPlugin(options: PrismaPluginOptions = {}): VoltPlugin {
   }
 
   return {
-    name: '@volt/plugin-prisma',
+    name: '@voltts/plugin-prisma',
     version: '0.1.0',
     setup(app: Volt) {
       app.decorate('prisma', client);

@@ -1,4 +1,4 @@
-import { Context, RouteGroup } from 'volt';
+import { Context, RouteGroup } from 'voltts';
 import { ordersService, CheckoutPayload } from './orders.service';
 
 export class OrdersModule {

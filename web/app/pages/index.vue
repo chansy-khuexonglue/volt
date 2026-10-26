@@ -10,9 +10,9 @@ const installPkgOptions = ['bun', 'pnpm', 'npm'] as const;
 type PkgManager = typeof installPkgOptions[number];
 const activeInstallTab = ref<PkgManager>('bun');
 const installCommands: Record<PkgManager, string> = {
-  bun: 'bun add volt',
-  pnpm: 'pnpm add volt',
-  npm: 'npm install volt',
+  bun: 'bun add voltts',
+  pnpm: 'pnpm add voltts',
+  npm: 'npm install voltts',
 };
 
 const copied = ref(false);
@@ -22,7 +22,7 @@ async function copyCommand() {
   setTimeout(() => (copied.value = false), 2000);
 }
 
-const quickstartCode = `import { Volt, cors, logger, prismaPlugin } from 'volt';
+const quickstartCode = `import { Volt, cors, logger, prismaPlugin } from 'voltts';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -201,7 +201,7 @@ app.listen(() => {
               Prisma ORM Plugin
             </h3>
             <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              Official <code class="code-inline">@volt/plugin-prisma</code> provides context store injection (<code class="code-inline">c.store.prisma</code>), automated P2002 error translation, and graceful connection teardown.
+              Official <code class="code-inline">@voltts/plugin-prisma</code> provides context store injection (<code class="code-inline">c.store.prisma</code>), automated P2002 error translation, and graceful connection teardown.
             </p>
           </div>
 

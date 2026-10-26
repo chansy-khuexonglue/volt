@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
-import { createTestClient } from 'volt';
+import { createTestClient } from 'voltts';
 import { createApplication } from '../src/app';
 
 describe('REST API Integration Tests', () => {

@@ -1,4 +1,4 @@
-import { Schema } from '@volt/validator';
+import { Schema } from '@voltts/validator';
 import { OpenApiInfo, OpenApiSpec, SecurityScheme } from './types';
 
 export function schemaToOpenApi(schema?: Schema): Record<string, any> {

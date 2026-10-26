@@ -1,4 +1,4 @@
-import { Context } from 'volt';
+import { Context } from 'voltts';
 import { productsService } from './products.service';
 import { CreateProductDto, ProductQueryFilters, UpdateProductDto } from './products.types';
 

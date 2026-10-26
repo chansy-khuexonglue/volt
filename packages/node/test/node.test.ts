@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import * as http from 'node:http';
-import { Volt } from '@volt/core';
+import { Volt } from '@voltts/core';
 import { serve } from '../src/index';
 
-describe('@volt/node Adapter', () => {
+describe('@voltts/node Adapter', () => {
   let server: http.Server;
   let port: number;
 

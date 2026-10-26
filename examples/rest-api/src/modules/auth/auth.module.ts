@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate } from '../../common/guards/auth.guard';
 import { authController } from './auth.controller';
 import { loginSchema, registerSchema } from './auth.schema';

@@ -1,5 +1,5 @@
 {
-  "name": "@volt/jobs",
+  "name": "@voltts/jobs",
   "version": "0.1.0",
   "description": "High-performance background job queue and worker system for Volt",
   "type": "module",

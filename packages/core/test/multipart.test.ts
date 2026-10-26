@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Volt } from '../src/index';
 
-describe('@volt/core Multipart & File Uploads', () => {
+describe('@voltts/core Multipart & File Uploads', () => {
   it('parses multipart form data with fields and files', async () => {
     const app = new Volt();
 

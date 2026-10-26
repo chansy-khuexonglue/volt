@@ -1,4 +1,4 @@
-import { Volt } from 'volt';
+import { Volt } from 'voltts';
 import { AppModule } from './app.module';
 import { config } from './config/env';
 

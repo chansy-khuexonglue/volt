@@ -1,4 +1,4 @@
-import { RouteGroup } from 'volt';
+import { RouteGroup } from 'voltts';
 import { authenticate, requireRole } from '../../common/guards/auth.guard';
 import { ordersController } from './orders.controller';
 import { createOrderSchema, orderParamSchema, updateOrderStatusSchema } from './orders.schema';

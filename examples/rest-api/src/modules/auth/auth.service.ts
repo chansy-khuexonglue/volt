@@ -1,4 +1,4 @@
-import { sign, verify } from 'volt';
+import { sign, verify } from 'voltts';
 import { config } from '../../config/env';
 import { AuthResult, RegisterDto, UserAccount, UserPayload } from './auth.types';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@volt/middleware",
+  "name": "@voltts/middleware",
   "version": "0.1.0",
   "description": "Precomposed high-performance middleware pipeline and security suites for Volt",
   "type": "module",

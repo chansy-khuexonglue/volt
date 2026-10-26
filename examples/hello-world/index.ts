@@ -1,4 +1,4 @@
-import { Volt } from 'volt';
+import { Volt } from 'voltts';
 
 const app = new Volt({ port: 3000 });
 

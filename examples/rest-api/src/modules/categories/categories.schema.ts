@@ -1,4 +1,4 @@
-import { t } from 'volt';
+import { t } from 'voltts';
 
 export const categoryParamSchema = t.Object({
   id: t.String({ description: 'Category identifier or slug' }),

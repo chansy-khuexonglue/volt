@@ -1,5 +1,5 @@
 {
-  "name": "@volt/cli",
+  "name": "@voltts/cli",
   "version": "0.1.0",
   "description": "Developer CLI tool for Volt applications",
   "type": "module",

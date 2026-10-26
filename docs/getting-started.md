@@ -7,7 +7,7 @@ Volt is a high-performance, TypeScript-first API framework built natively for **
 Volt requires Bun 1.4 or later:
 
 ```bash
-bun add volt
+bun add voltts
 ```
 
 ## Quick Start (Minimal Server)
@@ -15,7 +15,7 @@ bun add volt
 Create an `index.ts` file:
 
 ```typescript
-import { Volt } from 'volt';
+import { Volt } from 'voltts';
 
 const app = new Volt({ port: 3000 });
 
