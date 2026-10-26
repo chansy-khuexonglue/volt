@@ -95,7 +95,6 @@ export const docCategories: DocCategory[] = [
     icon: 'i-lucide-gauge',
     items: [
       { slug: 'benchmarks', title: 'Performance & Benchmarks' },
-      { slug: 'deployment', title: 'Production Deployment' },
     ],
   },
 ];
@@ -223,6 +222,7 @@ app.listen();`,
     toc: [
       { id: 'create-the-project', text: 'Create the project' },
       { id: 'add-the-routes', text: 'Add the routes' },
+      { id: 'update-and-delete', text: 'Update and delete' },
       { id: 'try-the-api', text: 'Try the API' },
       { id: 'next-steps', text: 'Next steps' },
     ],
@@ -243,6 +243,10 @@ Create \`index.ts\` using the complete example above. This tutorial keeps tasks 
 
 \`GET /tasks\` returns all tasks. \`GET /tasks/:id\` reads a path parameter and returns 404 when it cannot find the task. \`POST /tasks\` validates the JSON body before the handler runs and returns 201 for a new task. The \`t.Object\` schema requires a title of at least two characters.
 
+## Update and delete
+
+`PUT /tasks/:id` replaces a title after validating the body. `DELETE /tasks/:id` removes a task and returns 204. Both return 404 when the ID does not exist.
+
 ## Try the API
 
 Start the server:
@@ -257,6 +261,8 @@ In another terminal, create and fetch a task:
 curl -i http://localhost:3000/tasks
 curl -i -X POST http://localhost:3000/tasks -H 'Content-Type: application/json' -d '{"title":"Learn Volt"}'
 curl -i http://localhost:3000/tasks/1
+curl -i -X PUT http://localhost:3000/tasks/1 -H 'Content-Type: application/json' -d '{"title":"Build a Volt API"}'
+curl -i -X DELETE http://localhost:3000/tasks/1
 \`\`\`
 
 Try an invalid body to see validation in action:
@@ -290,6 +296,22 @@ app.post('/tasks', (c) => {
   return c.json(task, 201);
 }, {
   body: t.Object({ title: t.String({ minLength: 2 }) }),
+});
+
+app.put('/tasks/:id', (c) => {
+  const task = tasks.find((item) => item.id === Number(c.params.id));
+  if (!task) return c.json({ error: 'Task not found' }, 404);
+  task.title = c.body.title;
+  return c.json(task);
+}, {
+  body: t.Object({ title: t.String({ minLength: 2 }) }),
+});
+
+app.delete('/tasks/:id', (c) => {
+  const index = tasks.findIndex((item) => item.id === Number(c.params.id));
+  if (index === -1) return c.json({ error: 'Task not found' }, 404);
+  tasks.splice(index, 1);
+  return new Response(null, { status: 204 });
 });
 
 app.listen(3000, (server) => {
@@ -470,33 +492,35 @@ export const timingMiddleware: MiddlewareHandler = async (c, next) => {
   'lifecycle-hooks': {
     slug: 'lifecycle-hooks',
     title: 'Lifecycle Hooks',
-    description: 'Tap into request execution phases with fine-grained lifecycle hooks.',
+    description: 'Run setup and cleanup callbacks and handle unhandled request errors.',
     category: 'Core Concepts',
     toc: [
       { id: 'available-hooks', text: 'Available Hooks' },
-      { id: 'execution-order', text: 'Hook Execution Order' },
+      { id: 'execution-order', text: 'Execution Order' },
     ],
     content: `
 # Lifecycle Hooks
 
-Volt provides granular hooks for requests:
-1. \`onRequest\`: Triggered immediately when a request arrives.
-2. \`preValidation\`: Before body/query validation executes.
-3. \`preHandler\`: After validation passes, before controller handler.
-4. \`postHandler\`: After controller handler produces a result.
-5. \`onError\`: Invoked if an exception is thrown at any point.
-6. \`onResponse\`: Final step after response headers are sent.
-    `,
-    codeSnippet: {
-      filename: 'src/hooks.ts',
-      language: 'typescript',
-      code: `app.hook('onRequest', async (c) => {
-  console.log(\`[\${c.req.method}] \${c.req.url}\`);
-});
+Volt supports \`app.onStart(fn)\` before the server starts, \`app.onStop(fn)\` during shutdown, and \`app.onError(fn)\` for unhandled request errors. The error callback receives an Error and the native Request, and must return a Response. For work around each request, use middleware instead.
 
-app.hook('onError', async (err, c) => {
-  console.error('Request Error:', err.message);
-});`,
+## Execution Order
+
+Register callbacks before calling \`listen()\`. Await \`app.stop()\` when shutting down to run the stop callback.
+`,
+    codeSnippet: {
+      filename: 'index.ts',
+      language: 'typescript',
+      code: `import { Volt } from 'voltts';
+
+const app = new Volt({ port: 3000 });
+app.onStart(() => console.log('Starting Volt'));
+app.onStop(() => console.log('Stopping Volt'));
+app.onError((error) => {
+  console.error(error);
+  return Response.json({ error: 'Internal server error' }, { status: 500 });
+});
+app.get('/health', () => ({ ok: true }));
+app.listen(3000);`,
     },
   },
 
@@ -588,29 +612,25 @@ app.group('/api/v1', (v1) => {
     content: `
 # Schema Validation
 
-Volt integrates seamlessly with popular schema validation libraries like **Zod** and **TypeBox**. When validation fails, Volt automatically returns a standard \`400 Bad Request\` with detailed field errors.
+Volt's built-in \`t\` schema builder validates bodies and queries before the handler runs. Invalid input receives a 400 response. Define schemas in the third argument to a route, as shown below.
     `,
     codeSnippet: {
       filename: 'src/schemas.ts',
       language: 'typescript',
-      code: `import { z } from 'zod';
+      code: `import { Volt, t } from 'voltts';
 
-const CreateProductSchema = z.object({
-  title: z.string().min(3),
-  price: z.number().positive(),
-  inventory: z.number().int().nonnegative().default(0),
-  tags: z.array(z.string()).optional(),
+const app = new Volt({ port: 3000 });
+
+app.post('/api/products', (c) => {
+  return c.json({ success: true, product: c.body }, 201);
+}, {
+  body: t.Object({
+    title: t.String({ minLength: 3 }),
+    price: t.Number({ minimum: 0 }),
+  }),
 });
 
-app.post('/api/products', {
-  schema: {
-    body: CreateProductSchema,
-  },
-}, async (c) => {
-  // c.body is strictly typed!
-  const product = c.body;
-  return c.json({ success: true, product }, 201);
-});`,
+app.listen(3000);`,
     },
   },
 
@@ -1141,68 +1161,4 @@ bun run bench:all`,
     },
   },
 
-  deployment: {
-    slug: 'deployment',
-    title: 'Production Deployment',
-    description: 'Deploy Volt to Docker, Fly.io, Railway, Kubernetes, and Linux edge VMs.',
-    category: 'Benchmarks & Ops',
-    toc: [
-      { id: 'docker-deployment', text: 'Docker & Compose' },
-      { id: 'web-docs', text: 'Deploying Documentation' },
-      { id: 'environment-variables', text: 'Environment Configuration' },
-    ],
-    content: `
-# Production Deployment
-
-Volt compiles to a single lean executable or runs directly under \`bun run\`. Production Docker images start in under 10ms with RSS footprint below 35MB.
-
-## Multi-Container Docker Compose
-
-Deploy the Volt API Engine, Documentation Portal, and PostgreSQL database with a single command:
-
-\`\`\`bash
-docker compose up -d --build
-\`\`\`
-
-## Service Ports
-
-| Service | Port | Description |
-| :--- | :--- | :--- |
-| **volt-api** | \`3000\` | High-throughput Volt REST API engine |
-| **volt-docs** | \`3002\` | Nuxt 4 Documentation & Telemetry Portal |
-| **postgres** | \`5432\` | PostgreSQL 17 Relational Database |
-    `,
-    codeSnippet: {
-      filename: 'docker-compose.yml',
-      language: 'yaml',
-      code: `services:
-  volt-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/volt_ecommerce?schema=public
-
-  volt-docs:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    ports:
-      - "3002:3002"
-    environment:
-      - NODE_ENV=production
-
-  postgres:
-    image: postgres:17-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=volt_ecommerce`,
-    },
-  },
 };

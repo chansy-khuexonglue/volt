@@ -88,6 +88,22 @@ jobs:
                 continue
               fi
 
+              # Inspect the exact package contents before publishing. Never ship the
+              # repository's examples or documentation website in an npm tarball.
+              package_files=$(cd "$pkg" && npm pack --dry-run --json | node -e '
+                let input = "";
+                process.stdin.on("data", chunk => input += chunk);
+                process.stdin.on("end", () => {
+                  const files = JSON.parse(input)[0].files.map(file => file.path);
+                  if (files.some(path => /(^|\\/)(examples|web)(\\/|$)/.test(path))) {
+                    console.error("Unexpected examples/ or web/ content in npm package");
+                    process.exit(1);
+                  }
+                  console.log(files.length + " package files checked");
+                });
+              ')
+              echo "$package_files"
+
               # bun publish rewrites "workspace:*" deps to concrete versions (npm publish does not)
               # stdin from /dev/null + timeout: never hang waiting for an interactive OTP prompt
               if (cd "$pkg" && NPM_CONFIG_TOKEN="$TOKEN" CI=true timeout 120 bun publish --access public < /dev/null); then
