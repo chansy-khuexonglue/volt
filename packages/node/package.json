@@ -1,6 +1,6 @@
 {
   "name": "@voltts/node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js HTTP server adapter for Volt applications",
   "type": "module",
   "main": "./src/index.ts",

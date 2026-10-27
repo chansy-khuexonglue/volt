@@ -1,6 +1,6 @@
 {
   "name": "@voltts/jobs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-performance background job queue and worker system for Volt",
   "type": "module",
   "main": "./src/index.ts",

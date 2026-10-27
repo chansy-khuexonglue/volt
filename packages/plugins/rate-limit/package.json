@@ -1,6 +1,6 @@
 {
   "name": "@voltts/plugin-rate-limit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official Rate Limiting plugin for Volt API framework",
   "type": "module",
   "main": "./src/index.ts",

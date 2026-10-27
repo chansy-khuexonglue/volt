@@ -1,6 +1,6 @@
 {
   "name": "@voltts/plugin-logger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official structured logging plugin for Volt API framework",
   "type": "module",
   "main": "./src/index.ts",

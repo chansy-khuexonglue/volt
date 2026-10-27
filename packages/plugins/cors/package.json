@@ -1,6 +1,6 @@
 {
   "name": "@voltts/plugin-cors",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official CORS plugin for Volt API framework",
   "type": "module",
   "main": "./src/index.ts",

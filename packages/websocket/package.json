@@ -1,6 +1,6 @@
 {
   "name": "@voltts/websocket",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-throughput native WebSocket handling and pub/sub for Volt",
   "type": "module",
   "main": "./src/index.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@voltts/plugin-redis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official Redis integration plugin for Volt API framework",
   "type": "module",
   "main": "./src/index.ts",
