@@ -356,7 +356,9 @@ export class Volt {
     const pipeline = isZeroArg
       ? () => {
           const res = (def.handler as any)();
-          return res instanceof Response ? res : serializeResponse(res);
+          return res instanceof Promise
+            ? res.then((value) => value instanceof Response ? value : serializeResponse(value))
+            : res instanceof Response ? res : serializeResponse(res);
         }
       : def.middlewares.length === 0
       ? baseHandler
@@ -487,7 +489,7 @@ export class Volt {
     const fastGetCount = fastGetParams.length;
     const globalStore = this.globalStore;
 
-    return (req: Request): Response | Promise<Response> => {
+    const fastFetch = (req: Request): Response | Promise<Response> => {
       const pathname = extractPathname(req.url);
 
       if (req.method === "GET") {
@@ -534,6 +536,16 @@ export class Volt {
 
       return this.dispatch(req, pathname);
     };
+    return (req: Request): Response | Promise<Response> => {
+      try {
+        const response = fastFetch(req);
+        return response instanceof Promise
+          ? response.catch((error) => this.handleException(error, req))
+          : response;
+      } catch (error) {
+        return this.handleException(error, req);
+      }
+    };
   }
 
   get fetch(): (req: Request) => Response | Promise<Response> {
@@ -565,6 +577,36 @@ export class Volt {
       hostname,
       fetch: fetchHandler,
     };
+
+    // Delegate plain static GET paths to Bun. Keep every other
+    // method on the ordinary dispatcher so HEAD, OPTIONS and fallback semantics
+    // remain Volt's responsibility. Never evaluate handlers during registration.
+    const useNativeRoutes = this.serverOptions.nativeRoutes ??
+      (typeof process !== "undefined" && process.arch === "arm64");
+    if (useNativeRoutes) {
+      const nativeRoutes: Record<string, Record<string, (req: Request) => Response | Promise<Response>>> = Object.create(null);
+      for (const [path, match] of this.router.getStaticGetMap()) {
+        if (!/^\/[a-zA-Z0-9/_-]*$/.test(path)) continue;
+        const pipeline = match.handler.pipeline;
+        const get = (req: Request): Response | Promise<Response> => {
+          try {
+            const response = pipeline(match.handler.isZeroArg
+              ? undefined as any
+              : new VoltContext(req, match.params, this.globalStore));
+            return response instanceof Promise
+              ? response.catch((error) => this.handleException(error, req))
+              : response;
+          } catch (error) {
+            return this.handleException(error, req);
+          }
+        };
+        nativeRoutes[path] = {
+          GET: get, HEAD: fetchHandler, POST: fetchHandler, PUT: fetchHandler,
+          PATCH: fetchHandler, DELETE: fetchHandler, OPTIONS: fetchHandler,
+        };
+      }
+      if (Object.keys(nativeRoutes).length) bunServeOptions.routes = nativeRoutes;
+    }
 
     if (this.serverOptions.tls) {
       bunServeOptions.tls = this.serverOptions.tls;

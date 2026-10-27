@@ -1,0 +1,39 @@
+name: Static Route Performance
+on:
+  pull_request:
+    paths:
+      - 'benchmarks/static-native.ts'
+      - '.github/workflows/static-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        scenario: [static, context]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          path: .benchmark-baseline
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+      - run: bun install --frozen-lockfile
+      - run: bun install --frozen-lockfile
+        working-directory: .benchmark-baseline
+      - run: bun benchmarks/static-native.ts
+        env:
+          BENCH_BASELINE: .benchmark-baseline/packages/core/src/index.ts
+          BENCH_SCENARIO: ${{ matrix.scenario }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: static-${{ matrix.os }}-${{ matrix.scenario }}
+          path: static-native-results.json
