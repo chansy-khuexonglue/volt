@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { devServer, inspectRoutes, printHelp, scaffoldProject } from '../src/index';
+import { devServer, inspectRoutes, printHelp, createProject } from '../src/index';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -14,7 +14,12 @@ switch (command) {
     break;
 
   case 'new':
-    scaffoldProject(args[1] || '');
+    try {
+      await createProject(args.slice(1));
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    }
     break;
 
   case 'version':

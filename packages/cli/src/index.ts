@@ -2,6 +2,8 @@ import { spawn } from 'child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 import process from 'process';
+import { createInterface } from 'node:readline/promises';
+import { projectFiles, TEMPLATES, type TemplateName } from './templates';
 
 export function printHelp(): void {
   console.log(`
@@ -13,7 +15,8 @@ Usage:
 Commands:
   dev [file]       Run development server with hot reload (default: src/index.ts)
   routes [file]    List all registered routes and HTTP methods in the app
-  new <name>       Scaffold a new production-ready Volt API project
+  new [name]       Create an app and choose a template
+                   --template api|minimal (for scripts or CI)
   version, -v      Show current Volt version
   help, -h         Show this help message
 
@@ -70,91 +73,54 @@ export async function inspectRoutes(entry = 'src/index.ts'): Promise<void> {
   }
 }
 
-export function scaffoldProject(name: string): void {
-  if (!name) {
-    console.error('Error: Project name required: volt new <name>');
-    process.exit(1);
+export function scaffoldProject(name: string, template: TemplateName = 'api', cwd = process.cwd()): void {
+  if (!/^[a-z0-9][a-z0-9._-]*$/.test(name) || name === '.' || name === '..') {
+    throw new Error('Project name must use lowercase letters, numbers, dots, hyphens or underscores and cannot contain a path.');
   }
-
-  const targetDir = resolve(process.cwd(), name);
-  if (existsSync(targetDir)) {
-    console.error(`Error: Directory '${name}' already exists.`);
-    process.exit(1);
+  if (!Object.hasOwn(TEMPLATES, template)) throw new Error(`Unknown template: ${template}`);
+  const targetDir = resolve(cwd, name);
+  if (existsSync(targetDir)) throw new Error(`Directory '${name}' already exists.`);
+  const files = projectFiles({ name, template });
+  mkdirSync(targetDir, { recursive: false });
+  for (const [path, content] of Object.entries(files)) {
+    const destination = resolve(targetDir, path);
+    mkdirSync(resolve(destination, '..'), { recursive: true });
+    writeFileSync(destination, content, { flag: 'wx' });
   }
+  console.log(`\n⚡ Created ${name} using the ${template} template.\n\n  cd ${name}\n  bun install\n  bun run dev\n  bun test\n`);
+}
 
-  mkdirSync(resolve(targetDir, 'src'), { recursive: true });
-
-  // package.json
-  const pkg = {
-    name,
-    version: '0.1.0',
-    type: 'module',
-    scripts: {
-      dev: 'volt dev',
-      start: 'bun run src/index.ts',
-      test: 'bun test',
-    },
-    dependencies: {
-      voltts: 'latest',
-    },
-  };
-  writeFileSync(resolve(targetDir, 'package.json'), JSON.stringify(pkg, null, 2));
-
-  // tsconfig.json
-  const tsconfig = {
-    compilerOptions: {
-      target: 'ESNext',
-      module: 'ESNext',
-      moduleResolution: 'bundler',
-      strict: true,
-      skipLibCheck: true,
-      types: ['bun-types'],
-    },
-  };
-  writeFileSync(resolve(targetDir, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
-
-  // src/index.ts
-  const indexTs = `import { Volt, t, cors, logger } from 'voltts';
-
-const app = new Volt({ port: 3000 });
-
-app.use(cors());
-app.use(logger());
-
-app.get('/', () => {
-  return { message: '⚡ Welcome to Volt API on Bun!' };
-});
-
-app.get('/users/:id', (c) => {
-  return { id: c.params.id, name: 'Alice' };
-}, {
-  params: t.Object({ id: t.String() }),
-});
-
-app.post('/users', async (c) => {
-  const body = await c.parseBody();
-  return c.json({ user: body, created: true }, 201);
-}, {
-  body: t.Object({
-    name: t.String({ minLength: 2 }),
-    email: t.String({ format: 'email' }),
-  }),
-});
-
-app.listen(3000, (server) => {
-  console.log(\`⚡ Server running on http://localhost:\${server.port}\`);
-});
-
-export default app;
-`;
-  writeFileSync(resolve(targetDir, 'src/index.ts'), indexTs);
-
-  console.log(`
-⚡ Successfully created project "${name}"!
-
-Get started:
-  cd ${name}
-  bun install
-  bun run dev
-`);
+export async function createProject(args: string[]): Promise<void> {
+  const positionals: string[] = [];
+  let template: string | undefined;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]!;
+    if (arg === '--template' || arg === '-t') {
+      template = args[++i];
+      if (!template || template.startsWith('-')) throw new Error('Provide a template after --template.');
+    } else if (arg.startsWith('--template=')) template = arg.slice('--template='.length);
+    else if (arg.startsWith('-')) throw new Error(`Unknown option: ${arg}`);
+    else positionals.push(arg);
+  }
+  if (positionals.length > 1) throw new Error('Provide one project name.');
+  if (template !== undefined && !Object.hasOwn(TEMPLATES, template)) throw new Error(`Unknown template: ${template}. Choose api or minimal.`);
+  let name = positionals[0];
+  if (!process.stdin.isTTY) {
+    if (!name) throw new Error('Provide a project name: volt new my-api --template api');
+    template ??= 'api';
+  }
+  if (!name || !template) {
+    const prompt = createInterface({ input: process.stdin, output: process.stdout });
+    try {
+      if (!name) name = (await prompt.question('Project name: ')).trim();
+      if (!template) {
+        console.log('\nSelect a template:\n  1. api     - Modular REST API with config, validation, OpenAPI and tests\n  2. minimal - Small app with one route and a test');
+        const choice = (await prompt.question('Template [1]: ')).trim();
+        if (choice === '' || choice === '1' || choice === 'api') template = 'api';
+        else if (choice === '2' || choice === 'minimal') template = 'minimal';
+        else throw new Error('Choose 1 (api) or 2 (minimal).');
+      }
+    } finally { prompt.close(); }
+  }
+  scaffoldProject(name || '', template as TemplateName);
 }
