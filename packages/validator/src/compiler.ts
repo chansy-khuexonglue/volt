@@ -23,7 +23,7 @@ const URL_REGEX = /^https?:\/\/.+/i;
 
 function tryCompileJIT<T extends Schema>(schema: T, options?: CompileOptions): ValidatorFn<Static<T>> | null {
   if (options?.coerce) return null;
-  if (schema.type !== 'object') return null;
+  if (schema.type !== 'object' || schema.nullable || schema.optional || schema.default !== undefined) return null;
 
   const objSchema = schema as ObjectSchema;
   const properties = objSchema.properties;
