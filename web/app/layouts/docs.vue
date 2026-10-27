@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { docCategories } from '../composables/useDocsData';
 const route = useRoute();
-function navigateToDoc(event: Event) {
-  const target = event.target as HTMLSelectElement;
-  if (target.value) navigateTo(target.value);
+const selectedDoc = computed(() => route.path === '/docs' ? '/docs/introduction' : route.path);
+const navigationItems = docCategories.map(category => [
+  { label: category.title, value: `category-${category.title}`, type: 'label' as const },
+  ...category.items.map(item => ({ label: item.title, value: `/docs/${item.slug}` })),
+]);
+
+function navigateToDoc(value: string | undefined) {
+  if (value && value !== selectedDoc.value) navigateTo(value);
 }
 </script>
 
@@ -13,12 +18,20 @@ function navigateToDoc(event: Event) {
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 w-full pt-8 pb-16">
       <div class="mb-6 lg:hidden">
-        <label for="docs-navigation" class="mb-2 block text-xs font-semibold text-neutral-600 dark:text-neutral-400">Documentation navigation</label>
-        <select id="docs-navigation" aria-label="Documentation navigation" :value="route.path === '/docs' ? '/docs/introduction' : route.path" class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-3 text-sm dark:border-neutral-700 dark:bg-neutral-900" @change="navigateToDoc">
-          <optgroup v-for="category in docCategories" :key="category.title" :label="category.title">
-            <option v-for="item in category.items" :key="item.slug" :value="`/docs/${item.slug}`">{{ item.title }}</option>
-          </optgroup>
-        </select>
+        <label for="docs-navigation" class="mb-2 block text-xs font-semibold tracking-wide text-neutral-600 dark:text-neutral-400">Documentation</label>
+        <USelectMenu
+          id="docs-navigation"
+          :model-value="selectedDoc"
+          :items="navigationItems"
+          value-key="value"
+          icon="i-lucide-book-open"
+          size="lg"
+          placeholder="Choose a page"
+          :search-input="{ placeholder: 'Search documentation...' }"
+          :ui="{ base: 'w-full min-h-12 rounded-xl bg-white dark:bg-neutral-900', content: 'w-(--reka-combobox-trigger-width)', item: 'min-h-11' }"
+          class="w-full"
+          @update:model-value="navigateToDoc"
+        />
       </div>
       <div class="flex items-start gap-8">
         <!-- Left: Documentation Navigation Sidebar -->
