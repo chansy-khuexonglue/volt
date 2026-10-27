@@ -42,3 +42,16 @@ GitHub run 40402554909 compared the unchanged PR base with explicit native dispa
 All 80 measured cases had zero HTTP errors. The x64 result is mixed, so default native dispatch is limited to ARM64. Explicit options allow users to compare and override the default. These measurements use shared hosted runners and short samples; they do not establish significance or guarantee a gain on every ARM64 host. The initial independent native-vs-JS experiment also improved both ARM64 scenarios. Elysia's and Volt's ranges overlap, so the results do not establish a universal framework winner.
 
 A local CPU sampling profile showed response construction plus dispatch wrappers among active functions, but had too few samples for a precise cost breakdown. The HTTP measurements above are the timing evidence.
+
+## Latest independent run
+
+[GitHub Actions run 40403157366](https://github.com/chansy-khuexonglue/volt/actions/runs/40403157366) used the same method on Bun 1.4.4. Median requests/second across five repetitions:
+
+| Runner | GET scenario | Previous main | Native dispatch | Elysia | Change vs. previous |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Ubuntu ARM64 | Static object | 67,599 | 75,718 | 73,514 | +12.0% |
+| Ubuntu ARM64 | Read request header | 59,587 | 64,583 | 64,138 | +8.4% |
+| Ubuntu x64 | Static object | 50,478 | 53,550 | 52,875 | +6.1% |
+| Ubuntu x64 | Read request header | 93,015 | 92,119 | 93,226 | -1.0% |
+
+All 80 measured cases reported zero errors. Shared runners and short samples can vary substantially; compare the ranges and raw artifacts before drawing conclusions.

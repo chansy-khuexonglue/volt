@@ -1,6 +1,6 @@
 # 🚀 Getting Started with Volt
 
-Volt is a high-performance, TypeScript-first API framework built natively for **Bun**. It compiles route trees, validation schemas, and middleware pipelines at startup to deliver sub-millisecond latencies and over 350,000 req/s.
+Volt is a high-performance, TypeScript-first API framework built natively for **Bun**. It prepares routes, validation schemas, and middleware pipelines for request handling. Performance depends on the workload and environment; see [performance measurements](performance.md).
 
 ## Installation
 
