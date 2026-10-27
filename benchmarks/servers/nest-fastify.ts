@@ -33,6 +33,6 @@ export async function createNestFastifyServer(port = 4007): Promise<NestFastifyA
     { logger: false }
   );
 
-  await app.listen(port, '0.0.0.0');
+  await app.listen(port, '127.0.0.1');
   return app;
 }
