@@ -1,6 +1,6 @@
 {
   "name": "@voltts/middleware",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Precomposed high-performance middleware pipeline and security suites for Volt",
   "type": "module",
   "main": "./src/index.ts",

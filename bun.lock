@@ -105,21 +105,21 @@
     },
     "packages/cache": {
       "name": "@voltts/cache",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/middleware": "workspace:*",
       },
     },
     "packages/cli": {
       "name": "@voltts/cli",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "bin": {
         "volt": "./bin/volt.ts",
       },
     },
     "packages/core": {
       "name": "@voltts/core",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/middleware": "workspace:*",
         "@voltts/router": "workspace:*",
@@ -129,33 +129,33 @@
     },
     "packages/di": {
       "name": "@voltts/di",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/jobs": {
       "name": "@voltts/jobs",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/jwt": {
       "name": "@voltts/jwt",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/middleware": "workspace:*",
       },
     },
     "packages/middleware": {
       "name": "@voltts/middleware",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/node": {
       "name": "@voltts/node",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/openapi": {
       "name": "@voltts/openapi",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
         "@voltts/validator": "workspace:*",
@@ -163,14 +163,14 @@
     },
     "packages/plugins/cookies": {
       "name": "@voltts/plugin-cookies",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/cors": {
       "name": "@voltts/plugin-cors",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
         "@voltts/middleware": "workspace:*",
@@ -178,7 +178,7 @@
     },
     "packages/plugins/graphql": {
       "name": "@voltts/plugin-graphql",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
         "graphql": "^16.8.0 || ^17.0.0",
@@ -186,7 +186,7 @@
     },
     "packages/plugins/jwt": {
       "name": "@voltts/plugin-jwt",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
         "@voltts/jwt": "workspace:*",
@@ -194,7 +194,7 @@
     },
     "packages/plugins/logger": {
       "name": "@voltts/plugin-logger",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
         "@voltts/middleware": "workspace:*",
@@ -202,54 +202,54 @@
     },
     "packages/plugins/postgres": {
       "name": "@voltts/plugin-postgres",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/prisma": {
       "name": "@voltts/plugin-prisma",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/rate-limit": {
       "name": "@voltts/plugin-rate-limit",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/plugins/redis": {
       "name": "@voltts/plugin-redis",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/router": {
       "name": "@voltts/router",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/serializer": {
       "name": "@voltts/serializer",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/testing": {
       "name": "@voltts/testing",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/core": "workspace:*",
       },
     },
     "packages/validator": {
       "name": "@voltts/validator",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/volt": {
       "name": "voltts",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@voltts/cache": "workspace:*",
         "@voltts/cli": "workspace:*",
@@ -278,7 +278,7 @@
     },
     "packages/websocket": {
       "name": "@voltts/websocket",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
   },
   "packages": {

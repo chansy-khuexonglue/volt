@@ -1,6 +1,6 @@
 {
   "name": "voltts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-performance, TypeScript-first API framework built for Bun",
   "type": "module",
   "main": "./src/index.ts",

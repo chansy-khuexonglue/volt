@@ -1,6 +1,6 @@
 {
   "name": "@voltts/cache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-performance caching and Redis plugin for Volt applications",
   "type": "module",
   "main": "./src/index.ts",

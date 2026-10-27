@@ -1,6 +1,6 @@
 {
   "name": "@voltts/validator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-performance schema builder, validator, and type inference for Volt",
   "type": "module",
   "main": "./src/index.ts",

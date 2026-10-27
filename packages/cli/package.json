@@ -1,6 +1,6 @@
 {
   "name": "@voltts/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Developer CLI tool for Volt applications",
   "type": "module",
   "main": "./src/index.ts",
